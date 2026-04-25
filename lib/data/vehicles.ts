@@ -43,18 +43,7 @@ export const VEHICLES: Vehicle[] = [
     pricePerDay: 210,
     bestFor: "Small groups",
     features: ["10 Seats", "A/C", "Luggage space"],
-    image: IMG.vanFleet,
-    region: "All regions",
-  },
-  {
-    id: "v4",
-    name: "16-seater Van",
-    type: "16-seater Van",
-    capacity: 16,
-    pricePerDay: 280,
-    bestFor: "Medium groups",
-    features: ["16 Seats", "A/C", "High roof"],
-    image: IMG.vanFleet,
+    image: IMG.tenSeaterVan,
     region: "All regions",
   },
   {
@@ -76,7 +65,7 @@ export const VEHICLES: Vehicle[] = [
     pricePerDay: 140,
     bestFor: "Family transfers",
     features: ["7 Seats", "A/C", "Economical"],
-    image: IMG.vanFleet,
+    image: IMG.noah,
     region: "City",
   },
   {
@@ -87,7 +76,7 @@ export const VEHICLES: Vehicle[] = [
     pricePerDay: 420,
     bestFor: "Overland expeditions",
     features: ["22 Seats", "Overland kit", "High clearance"],
-    image: IMG.safariJeep,
+    image: IMG.expeditionTruck,
     region: "Cross-border",
   },
 ];
