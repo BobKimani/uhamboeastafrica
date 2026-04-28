@@ -20,9 +20,9 @@ const TT = (p: React.SVGProps<SVGSVGElement>) => (
 );
 
 const SOCIAL = [
-  { href: "https://instagram.com", icon: IG, label: "Instagram" },
+  { href: "https://www.instagram.com/eastafricasafari/", icon: IG, label: "Instagram" },
   { href: "https://facebook.com", icon: FB, label: "Facebook" },
-  { href: "https://tiktok.com", icon: TT, label: "TikTok" },
+  { href: "https://www.tiktok.com/@uhamboeastafrica", icon: TT, label: "TikTok" },
 ];
 
 const LINKS = [
@@ -85,11 +85,11 @@ export function Footer() {
           <ul className="space-y-3 text-sm text-secondary">
             <li className="flex items-center gap-2">
               <Phone className="h-4 w-4 text-primary" />
-              +254 712 345 678
+              +254 795 337 981
             </li>
             <li className="flex items-center gap-2">
               <Mail className="h-4 w-4 text-primary" />
-              hello@uhambo.africa
+              tours@uhamboeastafrica.com
             </li>
           </ul>
         </div>

@@ -17,7 +17,7 @@ export function PricingSummary({ estimate }: { estimate: TripEstimate }) {
             All-in pricing
           </h2>
           <p className="text-white/80 text-sm mt-2 max-w-md">
-            Review your trip and we'll take it from here.
+            Review your trip and we&apos;ll take it from here.
           </p>
         </div>
       </div>

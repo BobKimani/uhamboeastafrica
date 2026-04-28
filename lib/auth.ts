@@ -1,62 +1,145 @@
-import {
-    getAuth,
-    signInWithEmailAndPassword,
-    signOut,
-    sendPasswordResetEmail,
-    onAuthStateChanged,
-    type User,
-    type Auth,
-} from "firebase/auth";
-import { FirebaseError } from "firebase/app";
-import { app } from "@/lib/firebase";
+"use client";
 
-export const auth: Auth = getAuth(app);
+import { useEffect, useMemo, useState } from "react";
+import { AuthError, type AuthResponse, type Session, type User } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase/client";
 
-export function signIn(email: string, password: string) {
-    return signInWithEmailAndPassword(auth, email, password);
+type AuthChangeCallback = (user: User | null, session: Session | null) => void;
+
+export type AdminAuth = {
+    user: User | null;
+    session: Session | null;
+    loading: boolean;
+    signUp: (email: string, password: string) => Promise<AuthResponse>;
+    signIn: (email: string, password: string) => Promise<AuthResponse>;
+    signOut: () => Promise<void>;
+    resetPassword: (email: string) => Promise<void>;
+};
+
+export async function signUp(email: string, password: string) {
+    const response = await supabase.auth.signUp({ email, password });
+    if (response.error) throw response.error;
+    return response;
 }
 
-export function signOutUser() {
-    return signOut(auth);
+export async function signIn(email: string, password: string) {
+    const response = await supabase.auth.signInWithPassword({ email, password });
+    if (response.error) throw response.error;
+    return response;
 }
 
-export function sendResetEmail(email: string) {
-    return sendPasswordResetEmail(auth, email);
+export async function signOutUser() {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
 }
 
-export function onAuthChange(callback: (user: User | null) => void) {
-    return onAuthStateChanged(auth, callback);
+export async function sendResetEmail(email: string) {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth`,
+    });
+    if (error) throw error;
+}
+
+export async function getCurrentSession() {
+    const { data, error } = await supabase.auth.getSession();
+    if (error) throw error;
+    return data.session;
+}
+
+export function onAuthChange(callback: AuthChangeCallback) {
+    let active = true;
+
+    supabase.auth.getSession().then(({ data, error }) => {
+        if (!active) return;
+
+        if (error) {
+            callback(null, null);
+            return;
+        }
+
+        callback(data.session?.user ?? null, data.session);
+    });
+
+    const {
+        data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+        callback(session?.user ?? null, session);
+    });
+
+    return () => {
+        active = false;
+        subscription.unsubscribe();
+    };
+}
+
+export function useAuth(): AdminAuth {
+    const [user, setUser] = useState<User | null>(null);
+    const [session, setSession] = useState<Session | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const unsubscribe = onAuthChange((nextUser, nextSession) => {
+            setUser(nextUser);
+            setSession(nextSession);
+            setLoading(false);
+        });
+
+        return unsubscribe;
+    }, []);
+
+    return useMemo(
+        () => ({
+            user,
+            session,
+            loading,
+            signUp,
+            signIn,
+            signOut: signOutUser,
+            resetPassword: sendResetEmail,
+        }),
+        [user, session, loading]
+    );
 }
 
 export function friendlySignInError(error: unknown): string {
-    if (error instanceof FirebaseError) {
-        switch (error.code) {
-            case "auth/invalid-credential":
-            case "auth/wrong-password":
-            case "auth/user-not-found":
-            case "auth/invalid-email":
-                return "Invalid email or password.";
-            case "auth/too-many-requests":
-                return "Too many attempts. Try again in a moment.";
-            case "auth/network-request-failed":
-                return "Network error. Check your connection.";
+    if (error instanceof AuthError) {
+        if (
+            error.status === 400 ||
+            error.message.toLowerCase().includes("invalid login credentials")
+        ) {
+            return "Invalid email or password.";
+        }
+
+        if (error.status === 429) {
+            return "Too many attempts. Try again in a moment.";
         }
     }
+
+    if (isNetworkError(error)) {
+        return "Network error. Check your connection.";
+    }
+
     return "Something went wrong. Please try again.";
 }
 
 export function friendlyResetError(error: unknown): string | null {
-    if (error instanceof FirebaseError) {
-        switch (error.code) {
-            case "auth/user-not-found":
-                return null;
-            case "auth/invalid-email":
-                return "Please enter a valid email address.";
-            case "auth/too-many-requests":
-                return "Too many attempts. Try again in a moment.";
-            case "auth/network-request-failed":
-                return "Network error. Check your connection.";
+    if (error instanceof AuthError) {
+        if (error.status === 400 || error.message.toLowerCase().includes("email")) {
+            return "Please enter a valid email address.";
+        }
+
+        if (error.status === 429) {
+            return "Too many attempts. Try again in a moment.";
         }
     }
+
+    if (isNetworkError(error)) {
+        return "Network error. Check your connection.";
+    }
+
     return "Something went wrong. Please try again.";
+}
+
+function isNetworkError(error: unknown) {
+    return error instanceof TypeError && error.message.toLowerCase().includes("fetch");
 }

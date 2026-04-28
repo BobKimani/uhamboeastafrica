@@ -34,10 +34,10 @@ export default function ResultsPage() {
           </span>
           <h1 className="text-4xl md:text-5xl font-headline font-extrabold tracking-tight mt-4">
             Start by telling us
-            <br /> where you're going
+            <br /> where you&apos;re going
           </h1>
           <p className="text-on-surface-variant mt-4 max-w-md mx-auto">
-            We'll turn your answers into a tailored trip across East Africa in
+            We&apos;ll turn your answers into a tailored trip across East Africa in
             under two minutes.
           </p>
           <Link href="/plan-trip/destination">
@@ -78,7 +78,7 @@ export default function ResultsPage() {
           <div className="flex items-center gap-3 mb-8">
             <HotelIcon className="h-5 w-5 text-primary" />
             <h2 className="text-2xl md:text-3xl font-headline font-extrabold tracking-tight">
-              Where you'll stay
+              Where you&apos;ll stay
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -98,7 +98,7 @@ export default function ResultsPage() {
           <div className="flex items-center gap-3 mb-8">
             <Car className="h-5 w-5 text-primary" />
             <h2 className="text-2xl md:text-3xl font-headline font-extrabold tracking-tight">
-              How you'll move
+              How you&apos;ll move
             </h2>
           </div>
           {vehicles.length === 0 ? (

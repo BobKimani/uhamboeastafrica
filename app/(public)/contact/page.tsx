@@ -37,7 +37,7 @@ export default function ContactPage() {
           Contact
         </span>
         <h1 className="text-5xl md:text-6xl lg:text-7xl font-headline font-extrabold tracking-tight text-on-background mt-4 leading-[1.05]">
-          Let's build your
+          Let&apos;s build your
           <br /> next journey
         </h1>
         <p className="text-on-surface-variant text-lg md:text-xl mt-5 max-w-2xl mx-auto">

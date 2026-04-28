@@ -53,7 +53,7 @@ export function SummaryPanel({ state }: { state: WizardState }) {
             Your Trip
           </span>
           <h2 className="text-3xl md:text-4xl font-headline font-extrabold tracking-tight text-on-background mt-2">
-            Here's what we're building for you
+            Here&apos;s what we&apos;re building for you
           </h2>
         </div>
         <Link href="/plan-trip/destination">

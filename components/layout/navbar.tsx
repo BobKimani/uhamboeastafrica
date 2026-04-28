@@ -20,8 +20,9 @@ const NAV = [
 
 export function Navbar() {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
+  const [openPathname, setOpenPathname] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  const open = openPathname === pathname;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -29,8 +30,6 @@ export function Navbar() {
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  useEffect(() => setOpen(false), [pathname]);
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -75,7 +74,7 @@ export function Navbar() {
           </Button>
           <button
             aria-label="Toggle menu"
-            onClick={() => setOpen((o) => !o)}
+            onClick={() => setOpenPathname((path) => (path ? null : pathname))}
             className="lg:hidden p-2 text-on-surface"
           >
             {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -90,6 +89,7 @@ export function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={() => setOpenPathname(null)}
                 className={cn(
                   "py-3 px-3 rounded-xl font-headline text-base transition-all",
                   isActive(item.href)

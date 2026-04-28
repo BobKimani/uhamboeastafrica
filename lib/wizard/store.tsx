@@ -26,11 +26,20 @@ export function WizardProvider({ children }: { children: React.ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    try {
-      const raw = sessionStorage.getItem(STORAGE_KEY);
-      if (raw) setState({ ...INITIAL_STATE, ...JSON.parse(raw) });
-    } catch {}
-    setHydrated(true);
+    let cancelled = false;
+    const timeout = window.setTimeout(() => {
+      if (cancelled) return;
+      try {
+        const raw = sessionStorage.getItem(STORAGE_KEY);
+        if (raw) setState({ ...INITIAL_STATE, ...JSON.parse(raw) });
+      } catch {}
+      setHydrated(true);
+    }, 0);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeout);
+    };
   }, []);
 
   useEffect(() => {

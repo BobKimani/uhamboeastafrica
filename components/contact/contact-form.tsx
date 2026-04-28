@@ -24,7 +24,7 @@ export function ContactForm() {
         Send a message
       </span>
       <h2 className="text-3xl md:text-4xl font-headline font-extrabold tracking-tight text-on-background mt-2">
-        Tell us what you're planning
+        Tell us what you&apos;re planning
       </h2>
 
       <form

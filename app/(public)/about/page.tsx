@@ -47,7 +47,7 @@ export default function AboutPage() {
             <br /> on your terms
           </h1>
           <p className="text-white/80 text-lg md:text-xl mt-6 max-w-2xl mx-auto">
-            Uhambo means "journey" in Swahili. We build those journeys for
+            Uhambo means &quot;journey&quot; in Swahili. We build those journeys for
             travelers who want East Africa on their own terms — guided by people
             who grew up on these roads.
           </p>
@@ -112,14 +112,14 @@ export default function AboutPage() {
               <p>
                 The pattern was always the same: travelers wanted East Africa,
                 but not the template version. They wanted someone who knew
-                which lodge the managers actually sleep at, which drivers won't
+                which lodge the managers actually sleep at, which drivers won&apos;t
                 flinch at a river crossing, which week of the season is worth
                 flying halfway around the world for.
               </p>
               <p>
                 So we built Uhambo — a small team with roots across Kenya,
                 Tanzania, Uganda and Rwanda, and a stubborn belief that the
-                best trips are the ones shaped by people who've already lived
+                best trips are the ones shaped by people who&apos;ve already lived
                 them.
               </p>
             </div>
@@ -163,7 +163,7 @@ export default function AboutPage() {
             <br /> East Africa?
           </h2>
           <p className="text-white/85 text-lg mt-5 max-w-xl mx-auto">
-            Tell us where you're dreaming of, and we'll take it from there.
+            Tell us where you&apos;re dreaming of, and we&apos;ll take it from there.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center mt-10">
             <Button

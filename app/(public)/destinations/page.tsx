@@ -1,21 +1,15 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { DESTINATIONS } from "@/lib/data/destinations";
 import { FilterBar } from "@/components/destinations/filter-bar";
 import { DestinationCard } from "@/components/destinations/destination-card";
 import { Card } from "@/components/ui/card";
 
-function DestinationsView() {
-  const params = useSearchParams();
-  const [country, setCountry] = useState<string>("all");
+function DestinationsContent({ initialCountry }: { initialCountry: string }) {
+  const [country, setCountry] = useState<string>(initialCountry);
   const [query, setQuery] = useState("");
-
-  useEffect(() => {
-    const q = params.get("country");
-    if (q) setCountry(q);
-  }, [params]);
 
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase();
@@ -72,6 +66,13 @@ function DestinationsView() {
       </section>
     </>
   );
+}
+
+function DestinationsView() {
+  const params = useSearchParams();
+  const country = params.get("country") ?? "all";
+
+  return <DestinationsContent key={country} initialCountry={country} />;
 }
 
 export default function DestinationsPage() {

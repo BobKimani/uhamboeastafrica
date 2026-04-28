@@ -22,11 +22,11 @@ export default function TravelersStep() {
       stepSlug="travelers"
       title={
         <>
-          Who's sharing the
+          Who&apos;s sharing the
           <br /> horizon with you?
         </>
       }
-      subtitle="Tell us how many and we'll right-size the vehicles, rooms and guides."
+      subtitle="Tell us how many and we&apos;ll right-size the vehicles, rooms and guides."
       canContinue={canContinue}
     >
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
