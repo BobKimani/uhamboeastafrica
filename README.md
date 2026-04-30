@@ -1,36 +1,202 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Uhambo East Africa
+
+> **"The Breath of the Savanna"** — Tailored safaris, transport, and stays across Kenya, Tanzania, Uganda, and Rwanda.
+
+Uhambo is a full-stack travel platform that lets visitors plan multi-leg East Africa trips through a guided multi-step wizard, browse curated destinations and experiences, book transport, and manage all operations through a protected admin dashboard.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | [Next.js 16](https://nextjs.org) (App Router) |
+| Language | TypeScript 5 |
+| Styling | Tailwind CSS v4 |
+| UI Components | Custom component library (Lucide React icons) |
+| Forms | React Hook Form + Zod |
+| Auth & Database | [Supabase](https://supabase.com) (Auth + Postgres) |
+| Fonts | Plus Jakarta Sans · Manrope (Google Fonts via `next/font`) |
+| Theme | `next-themes` (light / dark) |
+| Date utilities | `date-fns` |
+
+---
+
+## Project Structure
+
+```
+/
+├── app/
+│   ├── (public)/          # All public-facing routes (navbar + footer layout)
+│   │   ├── page.tsx       # Homepage
+│   │   ├── plan-trip/     # Multi-step trip wizard (7 steps)
+│   │   │   ├── destination/
+│   │   │   ├── dates/
+│   │   │   ├── travelers/
+│   │   │   ├── service/
+│   │   │   ├── details/
+│   │   │   ├── budget/
+│   │   │   └── review/
+│   │   ├── results/       # Trip recommendations & pricing
+│   │   ├── transport/     # Standalone transport booking
+│   │   ├── destinations/  # Browseable destination grid
+│   │   ├── experiences/   # Categorised experience listings
+│   │   ├── about/
+│   │   └── contact/
+│   ├── admin/             # Protected admin dashboard
+│   │   ├── page.tsx       # Metrics overview
+│   │   ├── bookings/      # Bookings table with filters
+│   │   ├── hotels/        # Hotel CRUD manager
+│   │   ├── transport/     # Vehicle fleet manager
+│   │   └── settings/
+│   └── auth/              # Sign-in / Sign-up / Password reset
+│
+├── components/
+│   ├── home/              # Hero, CountryBentoGrid, ServicesSection,
+│   │                      # FeaturedExperiences, TrendingScroller,
+│   │                      # Testimonials, FAQSection
+│   ├── layout/            # Navbar, Footer, ThemeToggle
+│   ├── wizard/            # WizardShell (progress bar + step transitions)
+│   ├── results/           # HotelCard, VehicleCard, SummaryPanel, PricingSummary
+│   ├── destinations/      # DestinationCard, FilterBar
+│   ├── experiences/       # ExperienceCard, CategoryTabs
+│   ├── transport/         # TransportForm
+│   ├── contact/           # ContactForm
+│   ├── admin/             # Sidebar, Header, MobileNav, MetricCard,
+│   │                      # BookingsTable, HotelsManager, TransportManager,
+│   │                      # DataTable, Modal, StatusBadge
+│   ├── shared/            # SectionHeader
+│   └── ui/                # Button, Input, Card, Badge, Accordion
+│
+├── lib/
+│   ├── supabase/
+│   │   └── client.ts      # Supabase browser client (singleton)
+│   ├── auth.ts            # Auth helpers + useAuth hook
+│   ├── wizard/
+│   │   ├── types.ts       # WizardState type, STEPS constant, enums
+│   │   └── store.tsx      # Wizard context / state store
+│   ├── pricing/
+│   │   └── estimate-trip.ts  # Trip cost estimation logic
+│   ├── data/              # Static seed data (hotels, vehicles, destinations,
+│   │                      # experiences, bookings, countries, FAQs)
+│   ├── images.ts          # Centralised image URL helpers
+│   └── utils.ts           # nightsBetween, formatCurrency, formatDateRange, cn
+│
+├── docs/                  # Internal documentation
+├── stitch/                # UI screenshot references / design tokens
+├── PRD.md                 # Full product requirements document
+├── next.config.ts         # Remote image hosts (Unsplash)
+├── tsconfig.json
+└── package.json
+```
+
+---
+
+## Key Features
+
+### Public Site
+
+| Page | Description |
+|---|---|
+| **Homepage** | Hero section, country bento grid (Kenya, Tanzania, Uganda, Rwanda), service cards, featured experiences, trending scroller, testimonials, and FAQ accordion |
+| **Plan Trip** | 7-step guided wizard: Destination → Dates → Travel Group → Service Type → Details → Budget → Review |
+| **Results** | Personalised hotel + vehicle recommendation cards with a live pricing summary |
+| **Transport** | Standalone form for direct vehicle booking (Van, Alphard, Coaster, Land Cruiser, etc.) |
+| **Destinations** | Filterable grid of East Africa destinations (country filter + search) |
+| **Experiences** | Tabbed experience categories: Safari, Beach, Culture, City |
+| **About / Contact** | Company story and contact form |
+
+### Admin Dashboard (`/admin`)
+
+Protected by Supabase Auth — unauthenticated users are redirected to `/auth`.
+
+| Section | Functionality |
+|---|---|
+| **Overview** | Metric cards: Total Bookings, Revenue, Active Trips, Conversion Rate |
+| **Bookings** | Full bookings table with status/date filters |
+| **Hotels** | Add, edit, delete hotel entries |
+| **Transport** | Add, edit, delete vehicle entries |
+| **Settings** | Admin account settings |
+
+---
+
+## Trip Wizard — Step Reference
+
+| Step | Slug | What it collects |
+|---|---|---|
+| 1 | `destination` | Country / destination selection |
+| 2 | `dates` | Start and end date (validated, no past dates) |
+| 3 | `travelers` | Group type (Solo / Couple / Family / Group) + pax count |
+| 4 | `service` | Service scope: Accommodation, Transport, or Both |
+| 5 | `details` | Hotel region & room type **and/or** transport route & vehicle |
+| 6 | `budget` | Currency (USD / KES / EUR) + budget range |
+| 7 | `review` | Full summary before submission |
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 20+
+- A [Supabase](https://supabase.com) project
+
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Configure environment variables
+
+Create a `.env` file in the project root (never commit this):
+
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=<your-supabase-url>
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<your-publishable-key>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
+SUPABASE_SERVICE_ROLE_KEY=<your-service-role-key>
+```
+
+### 3. Run the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Available scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command | Description |
+|---|---|
+| `npm run dev` | Start dev server |
+| `npm run build` | Production build |
+| `npm run start` | Run the production build |
+| `npm run lint` | Run ESLint |
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Authentication
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Authentication is handled via **Supabase Auth** using email + password. The `useAuth` hook (`lib/auth.ts`) exposes `signIn`, `signUp`, `signOut`, and `resetPassword`, plus reactive `user`, `session`, and `loading` state. The admin layout redirects unauthenticated users to `/auth`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Image Hosting
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Remote images are sourced from **Unsplash** (`images.unsplash.com` and `source.unsplash.com`), permitted in `next.config.ts`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Pricing Engine
+
+`lib/pricing/estimate-trip.ts` computes a trip cost from the wizard state:
+
+- Hotel nightly rate × number of nights (if accommodation selected)
+- Vehicle daily rate × number of days (if transport selected)
+- Fixed safari permits & fees: **$420**
+- 10% service charge on the subtotal
+
+Currency display respects the traveller's selected currency (USD / KES / EUR).

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Image from "next/image";
 import { Compass, Heart, Sparkles } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -33,7 +34,7 @@ export default function AboutPage() {
           src={IMG.heroSavanna}
           alt="East Africa savanna"
           fill
-          priority
+          loading="eager"
           sizes="100vw"
           className="object-cover"
         />
@@ -88,9 +89,10 @@ export default function AboutPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-14 items-center">
           <div className="relative aspect-[4/5] rounded-2xl overflow-hidden">
             <Image
-              src={IMG.aboutStory}
+              src={IMG.aboutUhambo}
               alt="Our story"
               fill
+              loading="eager"
               sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover"
             />
@@ -166,20 +168,26 @@ export default function AboutPage() {
             Tell us where you&apos;re dreaming of, and we&apos;ll take it from there.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center mt-10">
-            <Button
-              size="lg"
-              variant="secondary"
-              className="bg-white text-primary hover:bg-white/90"
-            >
-              Plan my trip
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-white/30 text-white hover:bg-white/10"
-            >
-              Talk to us
-            </Button>
+            <Link href="/plan-trip">
+              <Button
+                size="lg"
+                variant="secondary"
+                className="bg-white text-primary hover:bg-white/90"
+              >
+                Plan my trip
+              </Button>
+            </Link>
+
+            <Link href="/contact">
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-white/30 text-white hover:bg-white/10"
+              >
+                Talk to us
+              </Button>
+            </Link>
+            
           </div>
         </Card>
       </section>

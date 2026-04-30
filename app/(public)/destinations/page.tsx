@@ -5,11 +5,14 @@ import { useSearchParams } from "next/navigation";
 import { DESTINATIONS } from "@/lib/data/destinations";
 import { FilterBar } from "@/components/destinations/filter-bar";
 import { DestinationCard } from "@/components/destinations/destination-card";
+import { CurrencyToggle } from "@/components/shared/currency-toggle";
 import { Card } from "@/components/ui/card";
+import { useCurrencyPreference } from "@/lib/use-currency-preference";
 
 function DestinationsContent({ initialCountry }: { initialCountry: string }) {
   const [country, setCountry] = useState<string>(initialCountry);
   const [query, setQuery] = useState("");
+  const { currency, setCurrency } = useCurrencyPreference();
 
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase();
@@ -47,6 +50,13 @@ function DestinationsContent({ initialCountry }: { initialCountry: string }) {
       />
 
       <section className="max-w-7xl mx-auto px-6 md:px-10 py-14">
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-on-surface-variant">
+            Prices shown in {currency === "KES" ? "Kenyan Shillings" : "US Dollars"}.
+          </p>
+          <CurrencyToggle currency={currency} onChange={setCurrency} />
+        </div>
+
         {filtered.length === 0 ? (
           <Card className="p-12 border border-outline-variant/15 text-center">
             <p className="text-on-surface font-bold">
@@ -59,7 +69,11 @@ function DestinationsContent({ initialCountry }: { initialCountry: string }) {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((d) => (
-              <DestinationCard key={d.slug} destination={d} />
+              <DestinationCard
+                key={d.slug}
+                destination={d}
+                currency={currency}
+              />
             ))}
           </div>
         )}

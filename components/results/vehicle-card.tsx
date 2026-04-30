@@ -3,6 +3,7 @@ import { Users } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { DEFAULT_CURRENCY, formatTravelPrice } from "@/lib/currency";
 import { formatCurrency } from "@/lib/utils";
 import type { Vehicle } from "@/lib/data/vehicles";
 
@@ -10,7 +11,7 @@ export function VehicleCard({
   vehicle,
   price,
   priceLabel = "/ day",
-  currency = "USD",
+  currency = DEFAULT_CURRENCY,
   ctaLabel = "Request",
   highlighted = false,
 }: {
@@ -75,7 +76,9 @@ export function VehicleCard({
               From
             </p>
             <p className="text-on-surface font-headline font-extrabold text-2xl">
-              {formatCurrency(price, currency)}
+              {currency === "KES" || currency === "USD"
+                ? formatTravelPrice(price, currency)
+                : formatCurrency(price, currency)}
               <span className="text-on-surface-variant text-xs font-medium ml-1">
                 {priceLabel}
               </span>

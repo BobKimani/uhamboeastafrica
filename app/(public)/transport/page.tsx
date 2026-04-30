@@ -4,10 +4,12 @@ import { useMemo, useRef, useState } from "react";
 import { VEHICLES } from "@/lib/data/vehicles";
 import { Card } from "@/components/ui/card";
 import { VehicleCard } from "@/components/results/vehicle-card";
+import { CurrencyToggle } from "@/components/shared/currency-toggle";
 import {
   TransportForm,
   type TransportFormValues,
 } from "@/components/transport/transport-form";
+import { useCurrencyPreference } from "@/lib/use-currency-preference";
 
 const INITIAL: TransportFormValues = {
   from: "",
@@ -19,6 +21,7 @@ const INITIAL: TransportFormValues = {
 
 export default function TransportPage() {
   const [values, setValues] = useState<TransportFormValues>(INITIAL);
+  const { currency, setCurrency } = useCurrencyPreference();
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const vehicleTypes = useMemo(
@@ -68,14 +71,17 @@ export default function TransportPage() {
         </div>
 
         <div ref={resultsRef} className="lg:col-span-3">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl md:text-3xl font-headline font-extrabold tracking-tight">
-              {vehicles.length} vehicle{vehicles.length === 1 ? "" : "s"}
-            </h2>
-            <span className="text-on-surface-variant text-sm">
-              {values.days} day{values.days === 1 ? "" : "s"} ·{" "}
-              {values.people} pax
-            </span>
+          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-headline font-extrabold tracking-tight">
+                {vehicles.length} vehicle{vehicles.length === 1 ? "" : "s"}
+              </h2>
+              <span className="text-on-surface-variant text-sm">
+                {values.days} day{values.days === 1 ? "" : "s"} ·{" "}
+                {values.people} pax
+              </span>
+            </div>
+            <CurrencyToggle currency={currency} onChange={setCurrency} />
           </div>
 
           {vehicles.length === 0 ? (
@@ -94,6 +100,7 @@ export default function TransportPage() {
                   key={vehicle.id}
                   vehicle={vehicle}
                   price={vehicle.pricePerDay * values.days}
+                  currency={currency}
                   priceLabel={`for ${values.days} day${values.days === 1 ? "" : "s"}`}
                   highlighted={
                     values.vehicleType !== "Any" &&

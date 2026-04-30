@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./theme-toggle";
-import { Button } from "@/components/ui/button";
 
 const NAV = [
   { href: "/", label: "Home" },
@@ -42,12 +42,15 @@ export function Navbar() {
         scrolled && "shadow-[0_8px_30px_rgba(27,28,26,0.04)]"
       )}
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 md:px-10 py-4">
-        <Link
-          href="/"
-          className="text-2xl font-headline font-extrabold tracking-tighter text-primary"
-        >
-          Uhambo
+      <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-6 md:px-10">
+        <Link href="/" aria-label="Uhambo East Africa — Home">
+          <Image
+            src="/assets/uhambo-logo-v2.png"
+            alt="Uhambo East Africa"
+            width={44}
+            height={44}
+            loading="eager"
+          />
         </Link>
 
         <div className="hidden lg:flex items-center gap-7 font-headline tracking-wide">
@@ -69,9 +72,6 @@ export function Navbar() {
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <Button size="sm" className="hidden md:inline-flex">
-            Login
-          </Button>
           <button
             aria-label="Toggle menu"
             onClick={() => setOpenPathname((path) => (path ? null : pathname))}
@@ -81,29 +81,6 @@ export function Navbar() {
           </button>
         </div>
       </div>
-
-      {open && (
-        <div className="lg:hidden bg-background/95 backdrop-blur-xl border-t border-outline-variant/10">
-          <div className="flex flex-col px-6 py-4 gap-1">
-            {NAV.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setOpenPathname(null)}
-                className={cn(
-                  "py-3 px-3 rounded-xl font-headline text-base transition-all",
-                  isActive(item.href)
-                    ? "bg-surface-container-low text-primary font-bold"
-                    : "text-on-surface hover:bg-surface-container-low"
-                )}
-              >
-                {item.label}
-              </Link>
-            ))}
-            <Button className="mt-3 w-full">Login</Button>
-          </div>
-        </div>
-      )}
     </nav>
   );
 }

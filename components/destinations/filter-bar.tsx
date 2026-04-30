@@ -18,7 +18,7 @@ export function FilterBar({
 }) {
   const pills = [{ slug: "all", name: "All" }, ...COUNTRIES];
   return (
-    <div className="sticky top-20 z-30 bg-background/85 backdrop-blur-xl border-b border-outline-variant/10 py-5">
+    <div className="bg-background/85 backdrop-blur-xl border-b border-outline-variant/10 py-5">
       <div className="max-w-7xl mx-auto px-6 md:px-10 flex flex-col md:flex-row md:items-center gap-4">
         <div className="flex gap-2 overflow-x-auto no-scrollbar">
           {pills.map((p) => {

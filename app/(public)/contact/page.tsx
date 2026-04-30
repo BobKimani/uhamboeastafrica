@@ -1,4 +1,4 @@
-import { Phone, Mail, Clock, Globe, MessageCircle, MapPin } from "lucide-react";
+import { Phone, Mail, Clock, MapPin } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { ContactForm } from "@/components/contact/contact-form";
 
@@ -6,13 +6,13 @@ const CONTACT_ITEMS = [
   {
     icon: Phone,
     label: "Phone",
-    value: "+254 700 000 000",
+    value: "+254 795 337 981",
     hint: "Mon–Sat, 8am – 6pm EAT",
   },
   {
     icon: Mail,
     label: "Email",
-    value: "hello@uhambo.travel",
+    value: "tours@uhamboeastafrica.com",
     hint: "We reply within 24 hours",
   },
   {
@@ -41,7 +41,7 @@ export default function ContactPage() {
           <br /> next journey
         </h1>
         <p className="text-on-surface-variant text-lg md:text-xl mt-5 max-w-2xl mx-auto">
-          Questions, custom trips, big groups — we read every message.
+          Questions, custom trips, big groups. We read every message.
         </p>
       </header>
 
@@ -75,21 +75,6 @@ export default function ContactPage() {
                   </div>
                 </div>
               ))}
-            </div>
-
-            <div className="flex gap-2 mt-8 pt-6 border-t border-outline-variant/15">
-              <button
-                aria-label="Socials"
-                className="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors"
-              >
-                <Globe className="h-4 w-4" />
-              </button>
-              <button
-                aria-label="WhatsApp"
-                className="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors"
-              >
-                <MessageCircle className="h-4 w-4" />
-              </button>
             </div>
           </Card>
 

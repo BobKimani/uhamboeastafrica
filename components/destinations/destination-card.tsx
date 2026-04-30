@@ -2,10 +2,16 @@ import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { formatCurrency } from "@/lib/utils";
+import { DEFAULT_CURRENCY, formatTravelPrice, type DisplayCurrency } from "@/lib/currency";
 import type { Destination } from "@/lib/data/destinations";
 
-export function DestinationCard({ destination }: { destination: Destination }) {
+export function DestinationCard({
+  destination,
+  currency = DEFAULT_CURRENCY,
+}: {
+  destination: Destination;
+  currency?: DisplayCurrency;
+}) {
   return (
     <Card className="border border-outline-variant/15 flex flex-col overflow-hidden group">
       <div className="relative aspect-[4/3] overflow-hidden">
@@ -49,7 +55,7 @@ export function DestinationCard({ destination }: { destination: Destination }) {
               From
             </p>
             <p className="text-on-surface font-headline font-extrabold text-xl">
-              {formatCurrency(destination.pricePerNight)}
+              {formatTravelPrice(destination.pricePerNight, currency)}
               <span className="text-on-surface-variant text-xs font-medium ml-1">
                 / night
               </span>

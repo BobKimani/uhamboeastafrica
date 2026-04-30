@@ -12,7 +12,7 @@ export function Hero() {
           src={IMG.heroSavanna}
           alt="East African savanna at sunset with lone acacia tree"
           fill
-          priority
+          loading="eager"
           sizes="100vw"
           className="object-cover"
         />
@@ -29,7 +29,7 @@ export function Hero() {
         </h1>
         <p className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
           Tailored safaris, seamless transport and curated stays across Kenya,
-          Tanzania, Uganda and Rwanda — handcrafted by local experts.
+          Tanzania, Uganda and Rwanda, handcrafted by local experts.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link href="/plan-trip">

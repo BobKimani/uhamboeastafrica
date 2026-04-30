@@ -3,8 +3,6 @@ import Link from "next/link";
 import { COUNTRIES } from "@/lib/data/countries";
 import { SectionHeader } from "@/components/shared/section-header";
 
-const LAYOUT = ["md:col-span-8", "md:col-span-4", "md:col-span-4", "md:col-span-8"];
-
 export function CountryBentoGrid() {
   return (
     <section className="py-24 md:py-32 px-6 md:px-10 max-w-7xl mx-auto">
@@ -13,19 +11,19 @@ export function CountryBentoGrid() {
         title="The Pearl of the Continent"
         description="Four countries. One shared horizon. Choose your starting point."
       />
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 mt-14 md:h-[600px]">
-        {COUNTRIES.map((c, i) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-14">
+        {COUNTRIES.map((c) => (
           <Link
             key={c.slug}
             href={`/destinations?country=${c.slug}`}
-            className={`${LAYOUT[i]} group relative overflow-hidden rounded-2xl bg-surface-container-low h-72 md:h-auto`}
+            className="group relative aspect-[3/2] overflow-hidden rounded-2xl bg-surface-container-low"
           >
             <Image
               src={c.image}
               alt={c.name}
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover transition-transform duration-700 group-hover:scale-110"
+              className="object-cover transition-transform duration-700 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
             <div className="absolute bottom-6 left-6 right-6">
