@@ -2,13 +2,12 @@ import Image from "next/image";
 import { Clock, MapPin } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import type { Experience } from "@/lib/data/experiences";
 
 export function ExperienceCard({ experience }: { experience: Experience }) {
   return (
     <Card className="border border-outline-variant/15 flex flex-col overflow-hidden group">
-      <div className="relative aspect-[4/3] overflow-hidden">
+      <div className="relative aspect-4/3 overflow-hidden">
         <Image
           src={experience.image}
           alt={experience.title}
@@ -16,7 +15,7 @@ export function ExperienceCard({ experience }: { experience: Experience }) {
           sizes="(max-width: 768px) 100vw, 33vw"
           className="object-cover transition-transform duration-700 group-hover:scale-110"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent" />
         <Badge tone="primary" className="absolute top-4 left-4">
           {experience.category}
         </Badge>
@@ -39,9 +38,6 @@ export function ExperienceCard({ experience }: { experience: Experience }) {
         <p className="text-on-surface-variant text-sm mt-3 leading-relaxed line-clamp-3 flex-1">
           {experience.description}
         </p>
-        <div className="mt-6 pt-6 border-t border-outline-variant/15">
-          <Button size="sm">Learn more</Button>
-        </div>
       </div>
     </Card>
   );

@@ -7,12 +7,27 @@ import { DESTINATIONS } from "@/lib/data/destinations";
 import { formatDateRange } from "@/lib/utils";
 import type { WizardState } from "@/lib/wizard/types";
 
-function prettyDestination(slug?: string) {
-  if (!slug) return "—";
-  const country = COUNTRIES.find((c) => c.slug === slug);
-  if (country) return country.name;
-  const destination = DESTINATIONS.find((d) => d.slug === slug);
-  return destination?.name ?? slug;
+function prettyLocation(state: WizardState): string {
+  const { destination, accommodation } = state;
+  if (!destination) return "—";
+
+  const dest = DESTINATIONS.find((d) => d.slug === destination);
+  if (dest) {
+    const country = COUNTRIES.find((c) => c.slug === dest.country);
+    const countryName = country?.name ?? dest.country;
+    return accommodation?.region
+      ? `${countryName} · ${accommodation.region}`
+      : countryName;
+  }
+
+  const country = COUNTRIES.find((c) => c.slug === destination);
+  if (country) {
+    return accommodation?.region
+      ? `${country.name} · ${accommodation.region}`
+      : country.name;
+  }
+
+  return destination;
 }
 
 const SERVICE_LABEL: Record<string, string> = {
@@ -26,7 +41,7 @@ export function SummaryPanel({ state }: { state: WizardState }) {
     {
       icon: MapPin,
       label: "Destination",
-      value: prettyDestination(state.destination),
+      value: prettyLocation(state),
     },
     {
       icon: Calendar,

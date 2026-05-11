@@ -15,7 +15,7 @@ Uhambo is a full-stack travel platform that lets visitors plan multi-leg East Af
 | Styling | Tailwind CSS v4 |
 | UI Components | Custom component library (Lucide React icons) |
 | Forms | React Hook Form + Zod |
-| Auth & Database | [Supabase](https://supabase.com) (Auth + Postgres) |
+| Authentication | [Firebase Auth](https://firebase.google.com/docs/auth) |
 | Fonts | Plus Jakarta Sans · Manrope (Google Fonts via `next/font`) |
 | Theme | `next-themes` (light / dark) |
 | Date utilities | `date-fns` |
@@ -46,9 +46,7 @@ Uhambo is a full-stack travel platform that lets visitors plan multi-leg East Af
 │   ├── admin/             # Protected admin dashboard
 │   │   ├── page.tsx       # Metrics overview
 │   │   ├── bookings/      # Bookings table with filters
-│   │   ├── hotels/        # Hotel CRUD manager
-│   │   ├── transport/     # Vehicle fleet manager
-│   │   └── settings/
+│   │   └── transport/     # Vehicle fleet manager
 │   └── auth/              # Sign-in / Sign-up / Password reset
 │
 ├── components/
@@ -63,14 +61,13 @@ Uhambo is a full-stack travel platform that lets visitors plan multi-leg East Af
 │   ├── transport/         # TransportForm
 │   ├── contact/           # ContactForm
 │   ├── admin/             # Sidebar, Header, MobileNav, MetricCard,
-│   │                      # BookingsTable, HotelsManager, TransportManager,
+│   │                      # BookingsTable, TransportManager,
 │   │                      # DataTable, Modal, StatusBadge
 │   ├── shared/            # SectionHeader
 │   └── ui/                # Button, Input, Card, Badge, Accordion
 │
 ├── lib/
-│   ├── supabase/
-│   │   └── client.ts      # Supabase browser client (singleton)
+│   ├── firebase.ts        # Firebase app + browser analytics setup
 │   ├── auth.ts            # Auth helpers + useAuth hook
 │   ├── wizard/
 │   │   ├── types.ts       # WizardState type, STEPS constant, enums
@@ -108,15 +105,13 @@ Uhambo is a full-stack travel platform that lets visitors plan multi-leg East Af
 
 ### Admin Dashboard (`/admin`)
 
-Protected by Supabase Auth — unauthenticated users are redirected to `/auth`.
+Protected by Firebase Auth — unauthenticated users are redirected to `/auth`.
 
 | Section | Functionality |
 |---|---|
 | **Overview** | Metric cards: Total Bookings, Revenue, Active Trips, Conversion Rate |
 | **Bookings** | Full bookings table with status/date filters |
-| **Hotels** | Add, edit, delete hotel entries |
-| **Transport** | Add, edit, delete vehicle entries |
-| **Settings** | Admin account settings |
+| **Transport** | Add, edit, delete vehicle entries with USD/KSh display switching |
 
 ---
 
@@ -139,7 +134,7 @@ Protected by Supabase Auth — unauthenticated users are redirected to `/auth`.
 ### Prerequisites
 
 - Node.js 20+
-- A [Supabase](https://supabase.com) project
+- A Firebase project with Email/Password authentication enabled
 
 ### 1. Install dependencies
 
@@ -152,11 +147,14 @@ npm install
 Create a `.env` file in the project root (never commit this):
 
 ```env
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=<your-supabase-url>
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<your-publishable-key>
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
-SUPABASE_SERVICE_ROLE_KEY=<your-service-role-key>
+# Firebase
+NEXT_PUBLIC_FIREBASE_API_KEY=<your-api-key>
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=<your-auth-domain>
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=<your-project-id>
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=<your-storage-bucket>
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=<your-messaging-sender-id>
+NEXT_PUBLIC_FIREBASE_APP_ID=<your-app-id>
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=<your-measurement-id>
 ```
 
 ### 3. Run the development server
@@ -180,7 +178,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Authentication
 
-Authentication is handled via **Supabase Auth** using email + password. The `useAuth` hook (`lib/auth.ts`) exposes `signIn`, `signUp`, `signOut`, and `resetPassword`, plus reactive `user`, `session`, and `loading` state. The admin layout redirects unauthenticated users to `/auth`.
+Authentication is handled via **Firebase Auth** using email + password. The `useAuth` hook (`lib/auth.ts`) exposes `signIn`, `signUp`, `signOut`, and `resetPassword`, plus reactive `user` and `loading` state. The admin layout redirects unauthenticated users to `/auth`.
 
 ---
 

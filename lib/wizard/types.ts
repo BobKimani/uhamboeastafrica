@@ -1,7 +1,7 @@
 export type GroupType = "Solo" | "Couple" | "Family" | "Group";
 export type ServiceType = "accommodation" | "transport" | "both";
 export type RoomType = "Single" | "Twin" | "Double" | "Triple";
-export type Currency = "USD" | "KES" | "EUR";
+export type Currency = "USD" | "KES";
 
 export const STEPS = [
   { slug: "destination", title: "Destination", label: "Exploring Horizons" },

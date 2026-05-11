@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import { VEHICLES } from "@/lib/data/vehicles";
 import { Card } from "@/components/ui/card";
 import { VehicleCard } from "@/components/results/vehicle-card";
 import { CurrencyToggle } from "@/components/shared/currency-toggle";
@@ -10,6 +9,7 @@ import {
   type TransportFormValues,
 } from "@/components/transport/transport-form";
 import { useCurrencyPreference } from "@/lib/use-currency-preference";
+import { useVehicles } from "@/lib/use-vehicles";
 
 const INITIAL: TransportFormValues = {
   from: "",
@@ -22,22 +22,23 @@ const INITIAL: TransportFormValues = {
 export default function TransportPage() {
   const [values, setValues] = useState<TransportFormValues>(INITIAL);
   const { currency, setCurrency } = useCurrencyPreference();
+  const { vehicles: fleet } = useVehicles();
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const vehicleTypes = useMemo(
-    () => Array.from(new Set(VEHICLES.map((v) => v.type))),
-    []
+    () => Array.from(new Set(fleet.map((v) => v.type))),
+    [fleet]
   );
 
   const vehicles = useMemo(() => {
-    const filtered = VEHICLES.filter((v) => v.capacity >= values.people);
+    const filtered = fleet.filter((v) => v.capacity >= values.people);
     if (values.vehicleType === "Any") return filtered;
     return [...filtered].sort((a, b) => {
       if (a.type === values.vehicleType) return -1;
       if (b.type === values.vehicleType) return 1;
       return 0;
     });
-  }, [values.people, values.vehicleType]);
+  }, [fleet, values.people, values.vehicleType]);
 
   const scrollToResults = () => {
     resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });

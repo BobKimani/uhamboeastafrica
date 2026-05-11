@@ -1,20 +1,16 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { DEFAULT_CURRENCY, formatTravelPrice, type DisplayCurrency } from "@/lib/currency";
 import type { Destination } from "@/lib/data/destinations";
+import { cn } from "@/lib/utils";
 
-export function DestinationCard({
-  destination,
-  currency = DEFAULT_CURRENCY,
-}: {
+export function DestinationCard({ destination }: {
   destination: Destination;
-  currency?: DisplayCurrency;
 }) {
   return (
     <Card className="border border-outline-variant/15 flex flex-col overflow-hidden group">
-      <div className="relative aspect-[4/3] overflow-hidden">
+      <div className="relative aspect-4/3 overflow-hidden">
         <Image
           src={destination.image}
           alt={destination.name}
@@ -22,7 +18,7 @@ export function DestinationCard({
           sizes="(max-width: 768px) 100vw, 33vw"
           className="object-cover transition-transform duration-700 group-hover:scale-110"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/10 to-transparent" />
         <Badge tone="primary" className="absolute top-4 left-4 capitalize">
           {destination.country}
         </Badge>
@@ -49,19 +45,16 @@ export function DestinationCard({
           ))}
         </div>
 
-        <div className="flex items-end justify-between mt-6 pt-6 border-t border-outline-variant/15">
-          <div>
-            <p className="text-on-surface-variant text-[10px] font-bold uppercase tracking-widest">
-              From
-            </p>
-            <p className="text-on-surface font-headline font-extrabold text-xl">
-              {formatTravelPrice(destination.pricePerNight, currency)}
-              <span className="text-on-surface-variant text-xs font-medium ml-1">
-                / night
-              </span>
-            </p>
-          </div>
-          <Button size="sm">Explore</Button>
+        <div className="flex justify-end mt-auto pt-6">
+          <Link
+            href="/plan-trip"
+            className={cn(
+              "inline-flex h-9 items-center justify-center gap-2 rounded-xl px-4 text-xs font-bold tracking-wide transition-all duration-300 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+              "sunset-gradient text-white shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:opacity-95"
+            )}
+          >
+            Explore
+          </Link>
         </div>
       </div>
     </Card>

@@ -1,5 +1,17 @@
-import { redirect } from "next/navigation";
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useWizard } from "@/lib/wizard/store";
 
 export default function PlanTripIndex() {
-  redirect("/plan-trip/destination");
+  const { reset } = useWizard();
+  const router = useRouter();
+
+  useEffect(() => {
+    reset();
+    router.replace("/plan-trip/destination");
+  }, [reset, router]);
+
+  return null;
 }

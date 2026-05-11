@@ -2,15 +2,32 @@ import { cn } from "@/lib/utils";
 import type { BookingStatus } from "@/lib/data/bookings";
 
 const STYLES: Record<BookingStatus, string> = {
-  Confirmed:
-    "bg-primary/10 text-primary ring-1 ring-inset ring-primary/20",
-  Pending:
+  new:
     "bg-tertiary-fixed/40 text-on-tertiary-fixed-variant ring-1 ring-inset ring-tertiary-fixed-dim/50",
-  Processing:
+  contacted:
     "bg-secondary-container text-on-secondary-container ring-1 ring-inset ring-outline-variant/60",
-  Cancelled:
+  quoted:
+    "bg-primary/10 text-primary ring-1 ring-inset ring-primary/20",
+  confirmed:
+    "bg-primary/10 text-primary ring-1 ring-inset ring-primary/20",
+  completed:
+    "bg-secondary-container text-on-secondary-container ring-1 ring-inset ring-outline-variant/60",
+  cancelled:
     "bg-error-container text-on-error-container ring-1 ring-inset ring-error/30",
 };
+
+const DOT_STYLES: Record<BookingStatus, string> = {
+  new: "bg-tertiary",
+  contacted: "bg-on-secondary-container/70",
+  quoted: "bg-primary",
+  confirmed: "bg-primary",
+  cancelled: "bg-error",
+  completed: "bg-on-secondary-container/70",
+};
+
+function formatStatus(status: BookingStatus) {
+  return status.charAt(0).toUpperCase() + status.slice(1);
+}
 
 export function StatusBadge({ status }: { status: BookingStatus }) {
   return (
@@ -22,15 +39,9 @@ export function StatusBadge({ status }: { status: BookingStatus }) {
     >
       <span
         aria-hidden
-        className={cn(
-          "h-1.5 w-1.5 rounded-full",
-          status === "Confirmed" && "bg-primary",
-          status === "Pending" && "bg-tertiary",
-          status === "Processing" && "bg-on-secondary-container/70",
-          status === "Cancelled" && "bg-error"
-        )}
+        className={cn("h-1.5 w-1.5 rounded-full", DOT_STYLES[status])}
       />
-      {status}
+      {formatStatus(status)}
     </span>
   );
 }

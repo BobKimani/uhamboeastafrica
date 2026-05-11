@@ -172,7 +172,7 @@ Manual verification only (no test suite exists in the project):
 - Submit reset for a real email → success message appears; check inbox for Firebase reset email
 - Submit reset for a non-existent email → same success message (no enumeration leak)
 - Visit `/auth` while signed in → redirects to `/admin`
-- Reload `/admin/hotels` while signed in → loader briefly shows, then content renders (no redirect)
+- Reload `/admin/transport` while signed in → loader briefly shows, then content renders (no redirect)
 - Open-redirect attempt: `/auth?redirect=https://evil.com` → falls back to `/admin`
 
 ## Risks & open questions

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Plus, Pencil, Trash2, Search, Users } from "lucide-react";
+import { Pencil, Search, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 import { Modal } from "@/components/admin/modal";
@@ -14,10 +14,13 @@ import {
   TableEmpty,
 } from "@/components/admin/data-table";
 import { VEHICLES, type Vehicle } from "@/lib/data/vehicles";
-import { formatCurrency } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
+import { useVehicles } from "@/lib/use-vehicles";
+
+type DisplayCurrency = "USD" | "KES";
 
 type VehicleDraft = {
-  id?: string;
+  id: string;
   name: string;
   type: string;
   capacity: number | "";
@@ -27,6 +30,7 @@ type VehicleDraft = {
 };
 
 const EMPTY: VehicleDraft = {
+  id: "",
   name: "",
   type: "",
   capacity: "",
@@ -35,46 +39,88 @@ const EMPTY: VehicleDraft = {
   bestFor: "",
 };
 
+const KES_PER_USD = 130;
+
+function getDisplayPrice(priceUsd: number, currency: DisplayCurrency) {
+  return currency === "KES" ? priceUsd * KES_PER_USD : priceUsd;
+}
+
+function getUsdPrice(price: number, currency: DisplayCurrency) {
+  return currency === "KES" ? price / KES_PER_USD : price;
+}
+
 export function TransportManager() {
   const [query, setQuery] = useState("");
+  const [currency, setCurrency] = useState<DisplayCurrency>("KES");
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<VehicleDraft>(EMPTY);
-  const [mode, setMode] = useState<"create" | "edit">("create");
+  const { vehicles, saveVehicle } = useVehicles();
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return VEHICLES;
-    return VEHICLES.filter(
+    if (!q) return vehicles;
+    return vehicles.filter(
       (v) =>
         v.name.toLowerCase().includes(q) ||
         v.type.toLowerCase().includes(q) ||
         v.region.toLowerCase().includes(q) ||
         v.bestFor.toLowerCase().includes(q)
     );
-  }, [query]);
-
-  const openCreate = () => {
-    setMode("create");
-    setDraft(EMPTY);
-    setOpen(true);
-  };
+  }, [query, vehicles]);
 
   const openEdit = (v: Vehicle) => {
-    setMode("edit");
     setDraft({
       id: v.id,
       name: v.name,
       type: v.type,
       capacity: v.capacity,
-      pricePerDay: v.pricePerDay,
+      pricePerDay: getDisplayPrice(v.pricePerDay, currency),
       region: v.region,
       bestFor: v.bestFor,
     });
     setOpen(true);
   };
 
+  const handleCurrencyChange = (nextCurrency: DisplayCurrency) => {
+    if (nextCurrency === currency) return;
+
+    setDraft((current) => ({
+      ...current,
+      pricePerDay:
+        current.pricePerDay === ""
+          ? ""
+          : getDisplayPrice(getUsdPrice(current.pricePerDay, currency), nextCurrency),
+    }));
+    setCurrency(nextCurrency);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (
+      !draft.id ||
+      !draft.name ||
+      !draft.type ||
+      draft.capacity === "" ||
+      draft.pricePerDay === ""
+    ) {
+      return;
+    }
+
+    const existingVehicle = vehicles.find((vehicle) => vehicle.id === draft.id);
+    const fallbackVehicle = VEHICLES[0];
+
+    saveVehicle({
+      id: draft.id,
+      name: draft.name,
+      type: draft.type,
+      capacity: draft.capacity,
+      pricePerDay: getUsdPrice(draft.pricePerDay, currency),
+      region: draft.region,
+      bestFor: draft.bestFor,
+      features: existingVehicle?.features ?? fallbackVehicle.features,
+      image: existingVehicle?.image ?? fallbackVehicle.image,
+    });
+
     setOpen(false);
   };
 
@@ -94,10 +140,29 @@ export function TransportManager() {
             />
           </div>
 
-          <Button size="sm" onClick={openCreate} className="gap-2">
-            <Plus className="h-4 w-4" strokeWidth={2.5} />
-            Add vehicle
-          </Button>
+          <div className="flex items-center gap-2">
+            <div
+              className="inline-flex h-10 rounded-xl bg-surface-container-low p-1"
+              aria-label="Display currency"
+            >
+              {(["KES", "USD"] as const).map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => handleCurrencyChange(option)}
+                  aria-pressed={currency === option}
+                  className={cn(
+                    "min-w-14 rounded-lg px-3 text-xs font-bold transition-colors",
+                    currency === option
+                      ? "bg-surface text-on-surface shadow-sm"
+                      : "text-on-surface-variant hover:text-on-surface"
+                  )}
+                >
+                  {option === "KES" ? "KSh" : option}
+                </button>
+              ))}
+            </div>
+          </div>
         </TableToolbar>
 
         {rows.length === 0 ? (
@@ -110,7 +175,9 @@ export function TransportManager() {
                 <Th>Capacity</Th>
                 <Th>Region</Th>
                 <Th>Best for</Th>
-                <Th className="text-right">Price / day</Th>
+                <Th className="text-right">
+                  Price / day ({currency === "KES" ? "KSh" : currency})
+                </Th>
                 <Th className="text-right">Actions</Th>
               </tr>
             </thead>
@@ -137,7 +204,10 @@ export function TransportManager() {
                   <Td className="text-on-surface-variant">{v.region}</Td>
                   <Td className="text-on-surface-variant">{v.bestFor}</Td>
                   <Td className="text-right font-semibold">
-                    {formatCurrency(v.pricePerDay, "USD")}
+                    {formatCurrency(
+                      getDisplayPrice(v.pricePerDay, currency),
+                      currency
+                    )}
                   </Td>
                   <Td className="text-right">
                     <div className="inline-flex items-center gap-1 justify-end">
@@ -148,13 +218,6 @@ export function TransportManager() {
                         className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors"
                       >
                         <Pencil className="h-4 w-4" />
-                      </button>
-                      <button
-                        type="button"
-                        aria-label={`Delete ${v.name}`}
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-on-surface-variant hover:bg-error-container hover:text-on-error-container transition-colors"
-                      >
-                        <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
                   </Td>
@@ -168,12 +231,8 @@ export function TransportManager() {
       <Modal
         open={open}
         onClose={() => setOpen(false)}
-        title={mode === "create" ? "Add vehicle" : "Edit vehicle"}
-        description={
-          mode === "create"
-            ? "Add a vehicle to the transport fleet."
-            : "Update this vehicle's details."
-        }
+        title="Edit vehicle"
+        description="Update this vehicle's details."
       >
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -219,7 +278,9 @@ export function TransportManager() {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="vehicle-price">Price per day (USD)</Label>
+              <Label htmlFor="vehicle-price">
+                Price per day ({currency === "KES" ? "KSh" : currency})
+              </Label>
               <Input
                 id="vehicle-price"
                 type="number"
@@ -270,7 +331,7 @@ export function TransportManager() {
               Cancel
             </Button>
             <Button type="submit" size="sm">
-              {mode === "create" ? "Add vehicle" : "Save changes"}
+              Save changes
             </Button>
           </div>
         </form>
