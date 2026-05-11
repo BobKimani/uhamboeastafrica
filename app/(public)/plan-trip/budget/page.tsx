@@ -70,7 +70,7 @@ export default function BudgetStep() {
                   budget: { ...state.budget, min: Number(e.target.value) },
                 })
               }
-              className="w-full accent-[#9e3d00]"
+              className="w-full accent-primary"
             />
           </div>
           <div>
@@ -93,7 +93,7 @@ export default function BudgetStep() {
                   budget: { ...state.budget, max: Number(e.target.value) },
                 })
               }
-              className="w-full accent-[#9e3d00]"
+              className="w-full accent-primary"
             />
           </div>
         </div>

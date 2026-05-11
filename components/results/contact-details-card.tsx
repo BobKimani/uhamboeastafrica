@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { UserCircle, Send, CheckCircle2, AlertCircle } from "lucide-react";
+import { UserCircle, Send, CheckCircle2, AlertCircle, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input, Label } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -39,13 +39,16 @@ export function ContactDetailsCard() {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const busy = status === "submitting";
+  const done = status === "success";
+
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
   async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (status === "submitting") return;
+    if (busy) return;
 
     if (!state.destination || !state.startDate || !state.endDate) {
       setStatus("error");
@@ -57,7 +60,9 @@ export function ContactDetailsCard() {
 
     const fullName = `${form.firstName} ${form.lastName}`.trim();
     const numberOfRooms =
-      state.serviceType === "transport" ? 0 : Math.max(1, Math.ceil(state.paxCount / 2));
+      state.serviceType === "transport"
+        ? 0
+        : Math.max(1, Math.ceil(state.paxCount / 2));
 
     const payload: CreateBookingInput = {
       fullName,
@@ -91,21 +96,43 @@ export function ContactDetailsCard() {
     }
   }
 
+  function handleCancel() {
+    if (busy || done) return;
+    const confirmed = window.confirm(
+      "Cancel this booking? Your trip details will be cleared."
+    );
+    if (!confirmed) return;
+    reset();
+    router.push("/");
+  }
+
   return (
     <Card className="p-8 md:p-10 border border-outline-variant/15">
-      <div className="flex items-center gap-3 mb-8">
-        <UserCircle className="h-5 w-5 text-primary" />
+      <header className="flex items-start gap-3 mb-8">
+        <span
+          aria-hidden
+          className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0"
+        >
+          <UserCircle className="h-5 w-5" />
+        </span>
         <div>
-          <h2 className="text-2xl md:text-3xl font-headline font-extrabold tracking-tight">
+          <span className="text-primary font-headline font-bold text-xs tracking-widest uppercase">
+            Step 3
+          </span>
+          <h2
+            id="details-heading"
+            className="text-2xl md:text-3xl font-headline font-extrabold tracking-tight text-on-background mt-1"
+          >
             Your details
           </h2>
-          <p className="text-on-surface-variant text-sm mt-1">
-            How we can reach you back.
+          <p className="text-on-surface-variant text-sm mt-1.5 max-w-md">
+            How we can reach you. We&apos;ll confirm your itinerary within 24
+            hours.
           </p>
         </div>
-      </div>
+      </header>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-6" noValidate>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div className="flex flex-col gap-2">
             <Label htmlFor="firstName">First name</Label>
@@ -116,6 +143,7 @@ export function ContactDetailsCard() {
               value={form.firstName}
               onChange={handleChange}
               autoComplete="given-name"
+              disabled={busy || done}
               required
             />
           </div>
@@ -129,6 +157,7 @@ export function ContactDetailsCard() {
               value={form.lastName}
               onChange={handleChange}
               autoComplete="family-name"
+              disabled={busy || done}
               required
             />
           </div>
@@ -139,10 +168,12 @@ export function ContactDetailsCard() {
               id="contact"
               name="contact"
               type="tel"
+              inputMode="tel"
               placeholder="+254 700 000 000"
               value={form.contact}
               onChange={handleChange}
               autoComplete="tel"
+              disabled={busy || done}
               required
             />
           </div>
@@ -153,40 +184,63 @@ export function ContactDetailsCard() {
               id="email"
               name="email"
               type="email"
+              inputMode="email"
               placeholder="you@example.com"
               value={form.email}
               onChange={handleChange}
               autoComplete="email"
+              disabled={busy || done}
               required
             />
           </div>
         </div>
 
-        {status === "success" && (
-          <div className="flex items-start gap-2 text-sm text-primary" role="status">
+        {done && (
+          <div
+            role="status"
+            className="flex items-start gap-2 rounded-xl bg-primary/10 px-4 py-3 text-sm text-primary"
+          >
             <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0" />
             <span>
-              Booking received — our team will reach out shortly with a tailored plan.
+              Booking received — our team will reach out shortly with a
+              tailored plan. Redirecting you home…
             </span>
           </div>
         )}
 
         {status === "error" && errorMessage && (
-          <div className="flex items-start gap-2 text-sm text-red-500" role="alert">
+          <div
+            role="alert"
+            className="flex items-start gap-2 rounded-xl bg-red-500/10 px-4 py-3 text-sm text-red-500"
+          >
             <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
             <span>{errorMessage}</span>
           </div>
         )}
 
-        <Button
-          type="submit"
-          size="lg"
-          disabled={status === "submitting" || status === "success"}
-          className="mt-2 w-full md:w-auto md:self-end"
-        >
-          <Send className="h-4 w-4" />
-          {status === "submitting" ? "Sending..." : "Submit booking"}
-        </Button>
+        <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 pt-6 border-t border-outline-variant/15">
+          <Button
+            type="button"
+            variant="ghost"
+            size="lg"
+            onClick={handleCancel}
+            disabled={busy || done}
+            aria-label="Cancel booking and clear trip"
+          >
+            <X className="h-4 w-4" />
+            Cancel booking
+          </Button>
+
+          <Button
+            type="submit"
+            size="lg"
+            disabled={busy || done}
+            className="w-full sm:w-auto"
+          >
+            <Send className="h-4 w-4" />
+            {busy ? "Submitting..." : done ? "Submitted" : "Submit booking"}
+          </Button>
+        </div>
       </form>
     </Card>
   );

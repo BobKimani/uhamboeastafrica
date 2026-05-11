@@ -52,12 +52,12 @@ export default function ResultsPage() {
     <div className="min-h-screen pt-28 pb-24 px-6 md:px-10 max-w-6xl mx-auto">
       <SummaryPanel state={state} />
 
-      <section className="mt-16">
-        <ContactDetailsCard />
+      <section className="mt-12 md:mt-16" aria-labelledby="estimate-heading">
+        <PricingSummary estimate={estimate} />
       </section>
 
-      <section className="mt-16">
-        <PricingSummary estimate={estimate} />
+      <section className="mt-12 md:mt-16" aria-labelledby="details-heading">
+        <ContactDetailsCard />
       </section>
     </div>
   );

@@ -15,7 +15,7 @@ export function HotelCard({
 }) {
   return (
     <Card className="border border-outline-variant/15 flex flex-col overflow-hidden group">
-      <div className="relative aspect-[16/10] overflow-hidden">
+      <div className="relative aspect-16/10 overflow-hidden">
         <Image
           src={hotel.image}
           alt={hotel.name}

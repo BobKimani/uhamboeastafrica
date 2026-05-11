@@ -30,7 +30,7 @@ export function VehicleCard({
           : "border-outline-variant/15"
       }`}
     >
-      <div className="relative aspect-[16/10] overflow-hidden">
+      <div className="relative aspect-16/10 overflow-hidden">
         <Image
           src={vehicle.image}
           alt={vehicle.name}
