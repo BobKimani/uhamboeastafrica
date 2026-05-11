@@ -87,7 +87,7 @@ export default function AboutPage() {
 
       <section className="max-w-6xl mx-auto px-6 md:px-10 py-16 md:py-24">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-14 items-center">
-          <div className="relative aspect-[4/5] rounded-2xl overflow-hidden">
+          <div className="relative aspect-4/5 rounded-2xl overflow-hidden">
             <Image
               src={IMG.aboutUhambo}
               alt="Our story"

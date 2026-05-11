@@ -16,7 +16,7 @@ export function CountryBentoGrid() {
           <Link
             key={c.slug}
             href={`/destinations?country=${c.slug}`}
-            className="group relative aspect-[3/2] overflow-hidden rounded-2xl bg-surface-container-low"
+            className="group relative aspect-3/2 overflow-hidden rounded-2xl bg-surface-container-low"
           >
             <Image
               src={c.image}
@@ -25,7 +25,7 @@ export function CountryBentoGrid() {
               sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover transition-transform duration-700 group-hover:scale-105"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/10 to-transparent" />
             <div className="absolute bottom-6 left-6 right-6">
               <span className="text-primary-fixed font-headline font-bold text-[10px] tracking-widest uppercase block mb-1">
                 Region

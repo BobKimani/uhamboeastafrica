@@ -78,7 +78,10 @@ export default function ContactPage() {
             </div>
           </Card>
 
-          <Card className="relative overflow-hidden border border-outline-variant/15 aspect-[4/3]">
+          <Card
+            className="relative overflow-hidden border border-outline-variant/15"
+            style={{ aspectRatio: "4 / 3" }}
+          >
             <div className="absolute inset-0 sunset-gradient opacity-20" />
             <div className="absolute inset-0 flex items-center justify-center text-center p-8">
               <div>
