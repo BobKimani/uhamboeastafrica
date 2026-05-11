@@ -21,13 +21,18 @@ export function Modal({
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     if (!open) return;
     triggerRef.current = document.activeElement as HTMLElement | null;
 
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") onCloseRef.current();
     };
     document.addEventListener("keydown", onKey);
 
@@ -35,7 +40,7 @@ export function Modal({
     document.body.style.overflow = "hidden";
 
     const focusable = panelRef.current?.querySelector<HTMLElement>(
-      "input, select, textarea, button, [tabindex]:not([tabindex='-1'])"
+      "input:not([type='hidden']), select, textarea, [tabindex]:not([tabindex='-1'])"
     );
     focusable?.focus();
 
@@ -44,7 +49,7 @@ export function Modal({
       document.body.style.overflow = prevOverflow;
       triggerRef.current?.focus?.();
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open) return null;
 

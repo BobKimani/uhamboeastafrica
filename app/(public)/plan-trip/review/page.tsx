@@ -2,7 +2,8 @@
 
 import { WizardShell } from "@/components/wizard/wizard-shell";
 import { useWizard } from "@/lib/wizard/store";
-import { formatCurrency, formatDateRange } from "@/lib/utils";
+import { formatDateRange } from "@/lib/utils";
+import { formatTravelPrice } from "@/lib/currency";
 
 function Row({ label, value }: { label: string; value?: string | number }) {
   return (
@@ -47,10 +48,10 @@ export default function ReviewStep() {
         )}
         <Row
           label="Budget"
-          value={`${formatCurrency(
+          value={`${formatTravelPrice(
             state.budget.min,
             state.budget.currency
-          )} – ${formatCurrency(state.budget.max, state.budget.currency)}`}
+          )} – ${formatTravelPrice(state.budget.max, state.budget.currency)}`}
         />
       </div>
     </WizardShell>

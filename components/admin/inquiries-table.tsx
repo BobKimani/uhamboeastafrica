@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Search, AlertCircle, RefreshCw } from "lucide-react";
-import { StatusBadge } from "@/components/admin/status-badge";
 import {
   TableCard,
   TableToolbar,
@@ -12,44 +11,41 @@ import {
   TableEmpty,
 } from "@/components/admin/data-table";
 import {
-  fetchAdminBookings,
-  updateBookingStatus,
-} from "@/lib/api/bookings";
-import type { Booking, BookingStatus } from "@/types/booking";
-import {
-  cn,
-  formatCurrency,
-  formatDateRange,
-  formatTimestamp,
-} from "@/lib/utils";
+  fetchAdminInquiries,
+  updateInquiryStatus,
+} from "@/lib/api/inquiries";
+import type { Inquiry, InquiryStatus } from "@/types/inquiry";
+import { cn, formatTimestamp } from "@/lib/utils";
 
-const ALL_STATUSES: BookingStatus[] = [
-  "new",
-  "contacted",
-  "quoted",
-  "confirmed",
-  "cancelled",
-  "completed",
-];
+const ALL_STATUSES: InquiryStatus[] = ["new", "read", "replied", "archived"];
+const FILTERS: ("all" | InquiryStatus)[] = ["all", ...ALL_STATUSES];
 
-const FILTERS: ("all" | BookingStatus)[] = ["all", ...ALL_STATUSES];
+const STATUS_STYLES: Record<InquiryStatus, string> = {
+  new: "bg-tertiary-fixed/40 text-on-tertiary-fixed-variant ring-1 ring-inset ring-tertiary-fixed-dim/50",
+  read: "bg-secondary-container text-on-secondary-container ring-1 ring-inset ring-outline-variant/60",
+  replied: "bg-primary/10 text-primary ring-1 ring-inset ring-primary/20",
+  archived: "bg-surface-container-low text-on-surface-variant ring-1 ring-inset ring-outline-variant/30",
+};
 
 function formatLabel(value: string) {
-  return value
-    .split("-")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
-function formatBudgetRange(booking: Booking) {
-  return `${formatCurrency(booking.minimumBudget, "USD")} - ${formatCurrency(
-    booking.maximumBudget,
-    "USD"
-  )}`;
+function InquiryStatusPill({ status }: { status: InquiryStatus }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold",
+        STATUS_STYLES[status]
+      )}
+    >
+      {formatLabel(status)}
+    </span>
+  );
 }
 
-export function BookingsTable() {
-  const [bookings, setBookings] = useState<Booking[]>([]);
+export function InquiriesTable() {
+  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -60,11 +56,11 @@ export function BookingsTable() {
     setLoading(true);
     setErrorMessage(null);
     try {
-      const data = await fetchAdminBookings();
-      setBookings(data);
+      const data = await fetchAdminInquiries();
+      setInquiries(data);
     } catch (error) {
       setErrorMessage(
-        error instanceof Error ? error.message : "Failed to load bookings."
+        error instanceof Error ? error.message : "Failed to load inquiries."
       );
     } finally {
       setLoading(false);
@@ -75,16 +71,16 @@ export function BookingsTable() {
     void load();
   }, []);
 
-  async function handleStatusChange(id: string, status: BookingStatus) {
+  async function handleStatusChange(id: string, status: InquiryStatus) {
     setUpdatingId(id);
-    const previous = bookings;
-    setBookings((rows) =>
-      rows.map((b) => (b.id === id ? { ...b, status } : b))
+    const previous = inquiries;
+    setInquiries((rows) =>
+      rows.map((i) => (i.id === id ? { ...i, status } : i))
     );
     try {
-      await updateBookingStatus(id, status);
+      await updateInquiryStatus(id, status);
     } catch (error) {
-      setBookings(previous);
+      setInquiries(previous);
       setErrorMessage(
         error instanceof Error ? error.message : "Failed to update status."
       );
@@ -95,19 +91,17 @@ export function BookingsTable() {
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return bookings.filter((booking) => {
-      if (filter !== "all" && booking.status !== filter) return false;
+    return inquiries.filter((inquiry) => {
+      if (filter !== "all" && inquiry.status !== filter) return false;
       if (!q) return true;
       return (
-        booking.fullName.toLowerCase().includes(q) ||
-        booking.email.toLowerCase().includes(q) ||
-        booking.phone.toLowerCase().includes(q) ||
-        booking.destination.toLowerCase().includes(q) ||
-        booking.bookingType.toLowerCase().includes(q) ||
-        booking.travellingWith.toLowerCase().includes(q)
+        inquiry.fullName.toLowerCase().includes(q) ||
+        inquiry.email.toLowerCase().includes(q) ||
+        inquiry.contact.toLowerCase().includes(q) ||
+        inquiry.message.toLowerCase().includes(q)
       );
     });
-  }, [bookings, query, filter]);
+  }, [inquiries, query, filter]);
 
   return (
     <TableCard>
@@ -118,8 +112,8 @@ export function BookingsTable() {
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search name, email, phone, destination..."
-            aria-label="Search bookings"
+            placeholder="Search name, email, contact, message..."
+            aria-label="Search inquiries"
             className="flex-1 bg-transparent text-sm text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none"
           />
         </div>
@@ -130,7 +124,7 @@ export function BookingsTable() {
             onClick={() => void load()}
             disabled={loading}
             className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low disabled:opacity-50"
-            aria-label="Refresh bookings"
+            aria-label="Refresh inquiries"
           >
             <RefreshCw className={cn("h-3.5 w-3.5", loading && "animate-spin")} />
             Refresh
@@ -169,70 +163,55 @@ export function BookingsTable() {
       )}
 
       {loading ? (
-        <TableEmpty message="Loading bookings..." />
+        <TableEmpty message="Loading inquiries..." />
       ) : rows.length === 0 ? (
         <TableEmpty
           message={
-            bookings.length === 0
-              ? "No bookings yet."
-              : "No bookings match your filters."
+            inquiries.length === 0
+              ? "No inquiries yet."
+              : "No inquiries match your filters."
           }
         />
       ) : (
         <Table>
           <thead>
             <tr>
-              <Th>Customer</Th>
+              <Th>Sender</Th>
+              <Th>Email</Th>
               <Th>Contact</Th>
-              <Th>Destination</Th>
-              <Th>Dates</Th>
-              <Th>Travelling with</Th>
-              <Th>Booking type</Th>
-              <Th>Travellers</Th>
-              <Th>Rooms</Th>
-              <Th>Budget</Th>
+              <Th>Message</Th>
               <Th>Submitted</Th>
               <Th>Status</Th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((booking) => (
+            {rows.map((inquiry) => (
               <tr
-                key={booking.id}
-                className="hover:bg-surface-container-low/60 transition-colors"
+                key={inquiry.id}
+                className="hover:bg-surface-container-low/60 transition-colors align-top"
               >
                 <Td>
-                  <span className="font-medium">{booking.fullName}</span>
+                  <span className="font-medium">{inquiry.fullName}</span>
                 </Td>
-                <Td>
-                  <span className="block text-on-surface">{booking.email}</span>
-                  <span className="block text-xs text-on-surface-variant mt-0.5">
-                    {booking.phone}
-                  </span>
+                <Td>{inquiry.email}</Td>
+                <Td className="text-on-surface-variant">{inquiry.contact}</Td>
+                <Td className="max-w-md whitespace-normal text-on-surface-variant">
+                  {inquiry.message}
                 </Td>
-                <Td>{booking.destination}</Td>
                 <Td className="text-on-surface-variant">
-                  {formatDateRange(booking.travelStartDate, booking.travelEndDate)}
-                </Td>
-                <Td>{formatLabel(booking.travellingWith)}</Td>
-                <Td>{formatLabel(booking.bookingType)}</Td>
-                <Td className="text-right">{booking.numberOfTravellers}</Td>
-                <Td className="text-right">{booking.numberOfRooms}</Td>
-                <Td className="font-semibold">{formatBudgetRange(booking)}</Td>
-                <Td className="text-on-surface-variant">
-                  {formatTimestamp(booking.createdAt)}
+                  {formatTimestamp(inquiry.createdAt)}
                 </Td>
                 <Td>
                   <div className="flex items-center gap-2">
-                    <StatusBadge status={booking.status} />
+                    <InquiryStatusPill status={inquiry.status} />
                     <select
-                      aria-label={`Change status for ${booking.fullName}`}
-                      value={booking.status}
-                      disabled={updatingId === booking.id}
+                      aria-label={`Change status for ${inquiry.fullName}`}
+                      value={inquiry.status}
+                      disabled={updatingId === inquiry.id}
                       onChange={(e) =>
                         void handleStatusChange(
-                          booking.id,
-                          e.target.value as BookingStatus
+                          inquiry.id,
+                          e.target.value as InquiryStatus
                         )
                       }
                       className="h-8 px-2 rounded-lg text-xs font-semibold bg-surface-container-low text-on-surface border border-outline-variant/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 disabled:opacity-50"
@@ -253,7 +232,7 @@ export function BookingsTable() {
 
       <div className="px-5 py-3 border-t border-outline-variant/25 text-xs text-on-surface-variant">
         Showing <span className="font-semibold text-on-surface">{rows.length}</span>{" "}
-        of {bookings.length} bookings
+        of {inquiries.length} inquiries
       </div>
     </TableCard>
   );

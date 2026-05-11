@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { formatCurrency } from "@/lib/utils";
+import { formatTravelPrice } from "@/lib/currency";
 import type { TripEstimate } from "@/lib/pricing/estimate-trip";
 
 export function PricingSummary({ estimate }: { estimate: TripEstimate }) {
@@ -30,7 +30,7 @@ export function PricingSummary({ estimate }: { estimate: TripEstimate }) {
           >
             <span className="text-sm">{line.label}</span>
             <span className="font-bold">
-              {formatCurrency(line.amount, currency)}
+              {formatTravelPrice(line.amount, currency)}
             </span>
           </div>
         ))}
@@ -42,7 +42,7 @@ export function PricingSummary({ estimate }: { estimate: TripEstimate }) {
             Total
           </p>
           <p className="font-headline font-extrabold text-5xl mt-1">
-            {formatCurrency(total, currency)}
+            {formatTravelPrice(total, currency)}
           </p>
         </div>
       </div>
@@ -53,14 +53,14 @@ export function PricingSummary({ estimate }: { estimate: TripEstimate }) {
           variant="secondary"
           className="flex-1 bg-white text-primary hover:bg-white/90"
         >
-          Request Booking
+          Confirm Booking
         </Button>
         <Button
           size="lg"
           variant="outline"
           className="flex-1 border-white/30 text-white hover:bg-white/10"
         >
-          Contact Advisor
+          Cancel draft booking
         </Button>
       </div>
     </Card>

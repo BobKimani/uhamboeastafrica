@@ -28,7 +28,7 @@ export function AdminHeader({
         <Search className="h-4 w-4" aria-hidden />
         <input
           type="search"
-          placeholder="Search bookings, hotels…"
+          placeholder="Search bookings..."
           aria-label="Search"
           className="flex-1 bg-transparent text-sm text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none"
         />
