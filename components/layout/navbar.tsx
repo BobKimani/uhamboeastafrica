@@ -73,14 +73,50 @@ export function Navbar() {
         <div className="flex items-center gap-2">
           <ThemeToggle />
           <button
+            type="button"
             aria-label="Toggle menu"
-            onClick={() => setOpenPathname((path) => (path ? null : pathname))}
-            className="lg:hidden p-2 text-on-surface"
+            aria-expanded={open}
+            aria-controls="mobile-navigation"
+            onClick={() =>
+              setOpenPathname((current) => (current === pathname ? null : pathname))
+            }
+            className="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg text-on-surface hover:bg-surface-container-low transition-colors"
           >
-            {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
+
+      {open && (
+        <div
+          id="mobile-navigation"
+          className="lg:hidden border-t border-outline-variant/30 bg-background/95 px-6 pb-6 pt-2 shadow-[0_16px_30px_rgba(27,28,26,0.08)] backdrop-blur-xl"
+        >
+          <ul className="mx-auto flex max-w-7xl flex-col gap-1 font-headline tracking-wide">
+            {NAV.map((item) => {
+              const active = isActive(item.href);
+
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    aria-current={active ? "page" : undefined}
+                    onClick={() => setOpenPathname(null)}
+                    className={cn(
+                      "block rounded-lg px-3 py-3 text-sm font-medium transition-colors",
+                      active
+                        ? "bg-primary/10 text-primary font-bold"
+                        : "text-on-surface-variant hover:bg-surface-container-low hover:text-primary"
+                    )}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
     </nav>
   );
 }

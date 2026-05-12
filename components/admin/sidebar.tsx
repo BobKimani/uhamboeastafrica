@@ -10,7 +10,7 @@ import {
   Bus,
   LogOut,
 } from "lucide-react";
-import { signOutUser } from "@/lib/auth";
+import { signOutUser, useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -23,7 +23,11 @@ const NAV = [
 export function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { user } = useAuth();
   const [signingOut, setSigningOut] = useState(false);
+  const adminName = getAdminName(user?.displayName, user?.email);
+  const adminDetail = user?.displayName && user.email ? user.email : "Admin";
+  const initials = getInitials(adminName);
 
   const isActive = (href: string) =>
     href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
@@ -88,13 +92,15 @@ export function AdminSidebar() {
             className="h-9 w-9 rounded-full bg-primary/15 text-primary grid place-items-center font-bold text-sm"
             aria-hidden
           >
-            BK
+            {initials}
           </div>
           <div className="min-w-0">
             <p className="text-sm font-semibold text-on-surface truncate">
-              Bob Kimani
+              {adminName}
             </p>
-            <p className="text-xs text-on-surface-variant truncate">Operator</p>
+            <p className="text-xs text-on-surface-variant truncate">
+              {adminDetail}
+            </p>
           </div>
         </div>
         <button
@@ -109,4 +115,24 @@ export function AdminSidebar() {
       </div>
     </aside>
   );
+}
+
+function getAdminName(displayName?: string | null, email?: string | null) {
+  const name = displayName?.trim();
+  if (name) return name;
+
+  return email?.trim() || "Admin";
+}
+
+function getInitials(name: string) {
+  const parts = name
+    .replace(/@.*/, "")
+    .split(/[\s._-]+/)
+    .filter(Boolean);
+
+  return parts
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
 }
