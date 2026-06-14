@@ -8,6 +8,7 @@ import {
   TransportForm,
   type TransportFormValues,
 } from "@/components/transport/transport-form";
+import { TransportMap } from "@/components/transport/transport-map";
 import { useCurrencyPreference } from "@/lib/use-currency-preference";
 import { useVehicles } from "@/lib/use-vehicles";
 
@@ -25,20 +26,25 @@ export default function TransportPage() {
   const { vehicles: fleet } = useVehicles();
   const resultsRef = useRef<HTMLDivElement>(null);
 
-  const vehicleTypes = useMemo(
-    () => Array.from(new Set(fleet.map((v) => v.type))),
+  const availableFleet = useMemo(
+    () => fleet.filter((v) => v.isAvailable),
     [fleet]
   );
 
+  const vehicleTypes = useMemo(
+    () => Array.from(new Set(availableFleet.map((v) => v.type))),
+    [availableFleet]
+  );
+
   const vehicles = useMemo(() => {
-    const filtered = fleet.filter((v) => v.capacity >= values.people);
+    const filtered = availableFleet.filter((v) => v.capacity >= values.people);
     if (values.vehicleType === "Any") return filtered;
     return [...filtered].sort((a, b) => {
       if (a.type === values.vehicleType) return -1;
       if (b.type === values.vehicleType) return 1;
       return 0;
     });
-  }, [fleet, values.people, values.vehicleType]);
+  }, [availableFleet, values.people, values.vehicleType]);
 
   const scrollToResults = () => {
     resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -72,6 +78,10 @@ export default function TransportPage() {
         </div>
 
         <div ref={resultsRef} className="lg:col-span-3">
+          <div className="mb-6">
+            <TransportMap from={values.from} to={values.to} />
+          </div>
+
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-2xl md:text-3xl font-headline font-extrabold tracking-tight">

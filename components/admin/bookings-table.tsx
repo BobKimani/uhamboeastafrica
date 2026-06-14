@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Search, AlertCircle, RefreshCw } from "lucide-react";
+import { Search, AlertCircle, RefreshCw, Trash2 } from "lucide-react";
 import { StatusBadge } from "@/components/admin/status-badge";
 import {
   TableCard,
@@ -14,6 +14,7 @@ import {
 import {
   fetchAdminBookings,
   updateBookingStatus,
+  deleteBooking,
 } from "@/lib/api/bookings";
 import type { Booking, BookingStatus } from "@/types/booking";
 import {
@@ -55,6 +56,7 @@ export function BookingsTable() {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   async function load() {
     setLoading(true);
@@ -90,6 +92,28 @@ export function BookingsTable() {
       );
     } finally {
       setUpdatingId(null);
+    }
+  }
+
+  async function handleDelete(booking: Booking) {
+    const confirmed = window.confirm(
+      `Delete booking for ${booking.fullName}? This action cannot be undone.`
+    );
+    if (!confirmed) return;
+
+    setDeletingId(booking.id);
+    const previous = bookings;
+    setBookings((rows) => rows.filter((b) => b.id !== booking.id));
+
+    try {
+      await deleteBooking(booking.id);
+    } catch (error) {
+      setBookings(previous);
+      setErrorMessage(
+        error instanceof Error ? error.message : "Failed to delete booking."
+      );
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -193,6 +217,7 @@ export function BookingsTable() {
               <Th>Budget</Th>
               <Th>Submitted</Th>
               <Th>Status</Th>
+              <Th className="text-right">Actions</Th>
             </tr>
           </thead>
           <tbody>
@@ -244,6 +269,17 @@ export function BookingsTable() {
                       ))}
                     </select>
                   </div>
+                </Td>
+                <Td className="text-right">
+                  <button
+                    type="button"
+                    onClick={() => void handleDelete(booking)}
+                    disabled={deletingId === booking.id}
+                    aria-label={`Delete booking for ${booking.fullName}`}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-red-500 transition-colors disabled:opacity-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                 </Td>
               </tr>
             ))}

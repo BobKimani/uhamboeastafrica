@@ -1,25 +1,52 @@
 "use client";
 
+import { useEffect, useMemo } from "react";
 import { WizardShell } from "@/components/wizard/wizard-shell";
 import { useWizard } from "@/lib/wizard/store";
 import { Input, Label } from "@/components/ui/input";
 import { RoomType } from "@/lib/wizard/types";
-import { VEHICLES } from "@/lib/data/vehicles";
 import { cn } from "@/lib/utils";
+import { useVehicles } from "@/lib/use-vehicles";
+import { TransportMap } from "@/components/transport/transport-map";
 
 const ROOMS: RoomType[] = ["Single", "Twin", "Double", "Triple"];
 
 export default function DetailsStep() {
   const { state, update } = useWizard();
+  const { vehicles } = useVehicles();
   const showAcc =
     state.serviceType === "accommodation" || state.serviceType === "both";
   const showTrp =
     state.serviceType === "transport" || state.serviceType === "both";
 
+  const availableVehicles = useMemo(
+    () => vehicles.filter((vehicle) => vehicle.isAvailable),
+    [vehicles]
+  );
+
+  const selectedVehicleIsAvailable = availableVehicles.some(
+    (vehicle) => vehicle.type === state.transport?.vehicleType
+  );
+
+  useEffect(() => {
+    if (!showTrp) return;
+    if (!state.transport?.vehicleType) return;
+    if (selectedVehicleIsAvailable) return;
+
+    update({
+      transport: {
+        ...state.transport,
+        vehicleType: undefined,
+      },
+    });
+  }, [showTrp, selectedVehicleIsAvailable, state.transport, update]);
+
   const canContinue = showAcc
     ? !!state.accommodation?.roomType
     : showTrp
-    ? !!state.transport?.vehicleType && !!state.transport?.from && !!state.transport?.to
+    ? selectedVehicleIsAvailable &&
+      !!state.transport?.from &&
+      !!state.transport?.to
     : true;
 
   return (
@@ -39,7 +66,6 @@ export default function DetailsStep() {
               <div>
                 <Label className="block mb-2">Region or City (optional)</Label>
                 <Input
-                  placeholder="e.g. Maasai Mara, Zanzibar, Kigali"
                   value={state.accommodation?.region ?? ""}
                   onChange={(e) =>
                     update({
@@ -114,6 +140,12 @@ export default function DetailsStep() {
                   />
                 </div>
               </div>
+
+              <TransportMap
+                from={state.transport?.from ?? ""}
+                to={state.transport?.to ?? ""}
+              />
+
               <div>
                 <Label className="block mb-2">Number of Days</Label>
                 <Input
@@ -133,7 +165,7 @@ export default function DetailsStep() {
               <div>
                 <Label className="block mb-3">Vehicle</Label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {VEHICLES.map((v) => {
+                  {availableVehicles.map((v) => {
                     const selected = state.transport?.vehicleType === v.type;
                     return (
                       <button
@@ -161,6 +193,11 @@ export default function DetailsStep() {
                     );
                   })}
                 </div>
+                {availableVehicles.length === 0 && (
+                  <p className="text-xs text-on-surface-variant mt-2">
+                    No vehicles are currently available. Please check back soon.
+                  </p>
+                )}
               </div>
             </div>
           </section>

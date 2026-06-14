@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import { Input, Label } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,17 @@ export function TransportForm({
   onSearch: () => void;
   vehicleTypes: string[];
 }) {
+  const [daysInput, setDaysInput] = useState(String(values.days));
+  const [peopleInput, setPeopleInput] = useState(String(values.people));
+
+  useEffect(() => {
+    setDaysInput(String(values.days));
+  }, [values.days]);
+
+  useEffect(() => {
+    setPeopleInput(String(values.people));
+  }, [values.people]);
+
   return (
     <Card className="p-8 md:p-10 border border-outline-variant/15">
       <span className="text-primary font-headline font-bold text-xs tracking-widest uppercase">
@@ -55,10 +67,23 @@ export function TransportForm({
           <Input
             type="number"
             min={1}
-            value={values.days}
-            onChange={(e) =>
-              onChange({ days: Math.max(1, Number(e.target.value) || 1) })
-            }
+            value={daysInput}
+            onChange={(e) => {
+              const next = e.target.value;
+              setDaysInput(next);
+
+              if (!next) return;
+
+              const parsed = Number(next);
+              if (!Number.isNaN(parsed)) {
+                onChange({ days: Math.max(1, parsed) });
+              }
+            }}
+            onBlur={() => {
+              const normalized = Math.max(1, Number(daysInput) || 1);
+              setDaysInput(String(normalized));
+              onChange({ days: normalized });
+            }}
           />
         </div>
         <div className="flex flex-col gap-2">
@@ -66,10 +91,23 @@ export function TransportForm({
           <Input
             type="number"
             min={1}
-            value={values.people}
-            onChange={(e) =>
-              onChange({ people: Math.max(1, Number(e.target.value) || 1) })
-            }
+            value={peopleInput}
+            onChange={(e) => {
+              const next = e.target.value;
+              setPeopleInput(next);
+
+              if (!next) return;
+
+              const parsed = Number(next);
+              if (!Number.isNaN(parsed)) {
+                onChange({ people: Math.max(1, parsed) });
+              }
+            }}
+            onBlur={() => {
+              const normalized = Math.max(1, Number(peopleInput) || 1);
+              setPeopleInput(String(normalized));
+              onChange({ people: normalized });
+            }}
           />
         </div>
         <div className="flex flex-col gap-2 md:col-span-2">

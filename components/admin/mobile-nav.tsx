@@ -8,6 +8,7 @@ import {
   CalendarCheck,
   MessageSquare,
   Bus,
+  Building2,
   Menu,
   X,
 } from "lucide-react";
@@ -17,7 +18,8 @@ const NAV = [
   { href: "/admin", label: "Home", icon: LayoutDashboard },
   { href: "/admin/bookings", label: "Bookings", icon: CalendarCheck },
   { href: "/admin/inquiries", label: "Inquiries", icon: MessageSquare },
-  { href: "/admin/transport", label: "Transport", icon: Bus },
+  { href: "/admin/hotels", label: "Hotels", icon: Building2 },
+  { href: "/admin/transport", label: "Vehicles", icon: Bus },
 ];
 
 export function AdminMobileNav() {

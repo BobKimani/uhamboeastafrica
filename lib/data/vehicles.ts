@@ -10,6 +10,7 @@ export type Vehicle = {
   features: string[];
   image: string;
   region: string;
+  isAvailable: boolean;
 };
 
 export const VEHICLES: Vehicle[] = [
@@ -23,6 +24,7 @@ export const VEHICLES: Vehicle[] = [
     features: ["6 Seats", "In-car Wi-Fi", "Full A/C", "Cooler Box"],
     image: IMG.landCruiser,
     region: "All regions",
+    isAvailable: true,
   },
   {
     id: "v2",
@@ -34,6 +36,7 @@ export const VEHICLES: Vehicle[] = [
     features: ["4 VIP Seats", "Mini Bar", "Leg Rest", "Premium Audio"],
     image: IMG.alphard,
     region: "City / Airports",
+    isAvailable: true,
   },
   {
     id: "v3",
@@ -45,6 +48,7 @@ export const VEHICLES: Vehicle[] = [
     features: ["10 Seats", "A/C", "Luggage space"],
     image: IMG.tenSeaterVan,
     region: "All regions",
+    isAvailable: true,
   },
   {
     id: "v5",
@@ -56,6 +60,7 @@ export const VEHICLES: Vehicle[] = [
     features: ["28 Seats", "A/C", "PA system"],
     image: IMG.coaster,
     region: "All regions",
+    isAvailable: true,
   },
   {
     id: "v6",
@@ -67,6 +72,7 @@ export const VEHICLES: Vehicle[] = [
     features: ["7 Seats", "A/C", "Economical"],
     image: IMG.noah,
     region: "City",
+    isAvailable: true,
   },
   {
     id: "v7",
@@ -78,5 +84,6 @@ export const VEHICLES: Vehicle[] = [
     features: ["22 Seats", "Overland kit", "High clearance"],
     image: IMG.expeditionTruck,
     region: "Cross-border",
+    isAvailable: true,
   },
 ];

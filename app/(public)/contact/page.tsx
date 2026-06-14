@@ -1,4 +1,4 @@
-import { Phone, Mail, Clock, MapPin } from "lucide-react";
+import { Phone, Mail, Clock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { ContactForm } from "@/components/contact/contact-form";
 
@@ -6,7 +6,7 @@ const CONTACT_ITEMS = [
   {
     icon: Phone,
     label: "Phone",
-    value: "+254 795 337 981",
+    value: "+254 750 811 117",
     hint: "Mon–Sat, 8am – 6pm EAT",
   },
   {
@@ -14,12 +14,6 @@ const CONTACT_ITEMS = [
     label: "Email",
     value: "tours@uhamboeastafrica.com",
     hint: "We reply within 24 hours",
-  },
-  {
-    icon: MapPin,
-    label: "Office",
-    value: "Westlands, Nairobi, Kenya",
-    hint: "Visits by appointment",
   },
   {
     icon: Clock,
@@ -78,23 +72,6 @@ export default function ContactPage() {
             </div>
           </Card>
 
-          <Card
-            className="relative overflow-hidden border border-outline-variant/15"
-            style={{ aspectRatio: "4 / 3" }}
-          >
-            <div className="absolute inset-0 sunset-gradient opacity-20" />
-            <div className="absolute inset-0 flex items-center justify-center text-center p-8">
-              <div>
-                <MapPin className="h-8 w-8 text-primary mx-auto" />
-                <p className="font-headline font-extrabold text-xl mt-3 text-on-background">
-                  Nairobi HQ
-                </p>
-                <p className="text-on-surface-variant text-sm mt-1">
-                  Map coming soon
-                </p>
-              </div>
-            </div>
-          </Card>
         </div>
       </section>
     </div>

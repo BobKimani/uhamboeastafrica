@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { User, Users, UsersRound, User2 } from "lucide-react";
 import { WizardShell } from "@/components/wizard/wizard-shell";
 import { useWizard } from "@/lib/wizard/store";
@@ -16,6 +17,24 @@ const GROUPS: { value: GroupType; icon: typeof User; description: string }[] = [
 
 export default function TravelersStep() {
   const { state, update } = useWizard();
+  const [paxInput, setPaxInput] = useState(String(state.paxCount));
+
+  useEffect(() => {
+    setPaxInput(String(state.paxCount));
+  }, [state.paxCount]);
+
+  useEffect(() => {
+    if (state.group === "Solo" && state.paxCount !== 1) {
+      update({ paxCount: 1 });
+      return;
+    }
+
+    if (state.group === "Couple" && state.paxCount !== 2) {
+      update({ paxCount: 2 });
+    }
+  }, [state.group, state.paxCount, update]);
+
+  const isFixedPax = state.group === "Solo" || state.group === "Couple";
   const canContinue = !!state.group && state.paxCount > 0;
   return (
     <WizardShell
@@ -60,12 +79,33 @@ export default function TravelersStep() {
           type="number"
           min={1}
           max={50}
-          value={state.paxCount}
-          onChange={(e) =>
-            update({ paxCount: Math.max(1, Number(e.target.value) || 1) })
-          }
+          disabled={isFixedPax}
+          value={paxInput}
+          onChange={(e) => {
+            const next = e.target.value;
+            setPaxInput(next);
+
+            if (!next) return;
+
+            const parsed = Number(next);
+            if (!Number.isNaN(parsed)) {
+              update({ paxCount: Math.max(1, parsed) });
+            }
+          }}
+          onBlur={() => {
+            const normalized = Math.max(1, Number(paxInput) || 1);
+            setPaxInput(String(normalized));
+            update({ paxCount: normalized });
+          }}
           className="text-center font-headline font-bold text-xl"
         />
+        {isFixedPax && (
+          <p className="mt-2 text-center text-xs text-on-surface-variant">
+            {state.group === "Solo"
+              ? "Solo trips always use 1 traveler."
+              : "Couple trips always use 2 travelers."}
+          </p>
+        )}
       </div>
     </WizardShell>
   );
