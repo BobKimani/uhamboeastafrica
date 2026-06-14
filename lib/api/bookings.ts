@@ -66,3 +66,28 @@ export async function updateBookingStatus(id: string, status: BookingStatus) {
 
     return result;
 }
+
+export async function deleteBooking(id: string) {
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+        throw new Error("Admin is not logged in");
+    }
+
+    const token = await currentUser.getIdToken();
+
+    const response = await fetch(`/api/bookings/${id}`, {
+        method: "DELETE",
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        throw new Error(result.error || "Failed to delete booking");
+    }
+
+    return result as { success: true; message: string };
+}

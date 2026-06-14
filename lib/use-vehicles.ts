@@ -14,7 +14,24 @@ function readVehicles() {
     if (!raw) return VEHICLES;
 
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? (parsed as Vehicle[]) : VEHICLES;
+    if (!Array.isArray(parsed)) return VEHICLES;
+
+    return parsed.map((vehicle) => {
+      const candidate = vehicle as Partial<Vehicle>;
+      return {
+        ...candidate,
+        id: candidate.id ?? `v-${Date.now()}`,
+        name: candidate.name ?? "Untitled vehicle",
+        type: candidate.type ?? "Vehicle",
+        capacity: candidate.capacity ?? 1,
+        pricePerDay: candidate.pricePerDay ?? 0,
+        bestFor: candidate.bestFor ?? "General transport",
+        features: Array.isArray(candidate.features) ? candidate.features : [],
+        image: candidate.image ?? VEHICLES[0].image,
+        region: candidate.region ?? "All regions",
+        isAvailable: candidate.isAvailable ?? true,
+      } as Vehicle;
+    });
   } catch {
     return VEHICLES;
   }
@@ -52,5 +69,11 @@ export function useVehicles() {
     writeVehicles(nextVehicles);
   }
 
-  return { vehicles, saveVehicle };
+  function deleteVehicle(id: string) {
+    const nextVehicles = vehicles.filter((vehicle) => vehicle.id !== id);
+    setVehicles(nextVehicles);
+    writeVehicles(nextVehicles);
+  }
+
+  return { vehicles, saveVehicle, deleteVehicle };
 }
