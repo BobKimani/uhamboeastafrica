@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Pencil, Search, Users } from "lucide-react";
+import { Pencil, Plus, Search, Trash2, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 import { Modal } from "@/components/admin/modal";
@@ -27,6 +27,8 @@ type VehicleDraft = {
   pricePerDay: number | "";
   region: string;
   bestFor: string;
+  image: string;
+  isAvailable: boolean;
 };
 
 const EMPTY: VehicleDraft = {
@@ -37,6 +39,8 @@ const EMPTY: VehicleDraft = {
   pricePerDay: "",
   region: "",
   bestFor: "",
+  image: "",
+  isAvailable: true,
 };
 
 const KES_PER_USD = 130;
@@ -53,8 +57,9 @@ export function TransportManager() {
   const [query, setQuery] = useState("");
   const [currency, setCurrency] = useState<DisplayCurrency>("KES");
   const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState<"create" | "edit">("edit");
   const [draft, setDraft] = useState<VehicleDraft>(EMPTY);
-  const { vehicles, saveVehicle } = useVehicles();
+  const { vehicles, saveVehicle, deleteVehicle } = useVehicles();
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -69,6 +74,7 @@ export function TransportManager() {
   }, [query, vehicles]);
 
   const openEdit = (v: Vehicle) => {
+    setMode("edit");
     setDraft({
       id: v.id,
       name: v.name,
@@ -77,8 +83,24 @@ export function TransportManager() {
       pricePerDay: getDisplayPrice(v.pricePerDay, currency),
       region: v.region,
       bestFor: v.bestFor,
+      image: v.image,
+      isAvailable: v.isAvailable,
     });
     setOpen(true);
+  };
+
+  const openCreate = () => {
+    setMode("create");
+    setDraft(EMPTY);
+    setOpen(true);
+  };
+
+  const handleDelete = (vehicle: Vehicle) => {
+    const confirmed = window.confirm(
+      `Delete ${vehicle.name}? This action cannot be undone.`
+    );
+    if (!confirmed) return;
+    deleteVehicle(vehicle.id);
   };
 
   const handleCurrencyChange = (nextCurrency: DisplayCurrency) => {
@@ -96,21 +118,17 @@ export function TransportManager() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (
-      !draft.id ||
-      !draft.name ||
-      !draft.type ||
-      draft.capacity === "" ||
-      draft.pricePerDay === ""
-    ) {
+    if (!draft.name || !draft.type || draft.capacity === "" || draft.pricePerDay === "") {
       return;
     }
 
-    const existingVehicle = vehicles.find((vehicle) => vehicle.id === draft.id);
+    const vehicleId = draft.id.trim() || `v-${Date.now()}`;
+
+    const existingVehicle = vehicles.find((vehicle) => vehicle.id === vehicleId);
     const fallbackVehicle = VEHICLES[0];
 
     saveVehicle({
-      id: draft.id,
+      id: vehicleId,
       name: draft.name,
       type: draft.type,
       capacity: draft.capacity,
@@ -118,10 +136,32 @@ export function TransportManager() {
       region: draft.region,
       bestFor: draft.bestFor,
       features: existingVehicle?.features ?? fallbackVehicle.features,
-      image: existingVehicle?.image ?? fallbackVehicle.image,
+      image: draft.image.trim() || existingVehicle?.image || fallbackVehicle.image,
+      isAvailable: draft.isAvailable,
     });
 
     setOpen(false);
+    setDraft(EMPTY);
+  };
+
+  const handleAvailabilityToggle = (vehicle: Vehicle) => {
+    saveVehicle({
+      ...vehicle,
+      isAvailable: !vehicle.isAvailable,
+    });
+  };
+
+  const handleImageUpload = async (file: File | null) => {
+    if (!file) return;
+
+    const dataUrl = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result ?? ""));
+      reader.onerror = () => reject(new Error("Failed to read image."));
+      reader.readAsDataURL(file);
+    });
+
+    setDraft((current) => ({ ...current, image: dataUrl }));
   };
 
   return (
@@ -162,6 +202,10 @@ export function TransportManager() {
                 </button>
               ))}
             </div>
+            <Button type="button" size="sm" onClick={openCreate}>
+              <Plus className="h-4 w-4" />
+              Add vehicle
+            </Button>
           </div>
         </TableToolbar>
 
@@ -175,6 +219,7 @@ export function TransportManager() {
                 <Th>Capacity</Th>
                 <Th>Region</Th>
                 <Th>Best for</Th>
+                <Th>Availability</Th>
                 <Th className="text-right">
                   Price / day ({currency === "KES" ? "KSh" : currency})
                 </Th>
@@ -203,6 +248,20 @@ export function TransportManager() {
                   </Td>
                   <Td className="text-on-surface-variant">{v.region}</Td>
                   <Td className="text-on-surface-variant">{v.bestFor}</Td>
+                  <Td>
+                    <button
+                      type="button"
+                      onClick={() => handleAvailabilityToggle(v)}
+                      className={cn(
+                        "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold transition-colors",
+                        v.isAvailable
+                          ? "bg-green-500/15 text-green-600"
+                          : "bg-outline-variant/25 text-on-surface-variant"
+                      )}
+                    >
+                      {v.isAvailable ? "Available" : "Hidden"}
+                    </button>
+                  </Td>
                   <Td className="text-right font-semibold">
                     {formatCurrency(
                       getDisplayPrice(v.pricePerDay, currency),
@@ -219,6 +278,14 @@ export function TransportManager() {
                       >
                         <Pencil className="h-4 w-4" />
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(v)}
+                        aria-label={`Delete ${v.name}`}
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-red-500 transition-colors"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     </div>
                   </Td>
                 </tr>
@@ -231,10 +298,26 @@ export function TransportManager() {
       <Modal
         open={open}
         onClose={() => setOpen(false)}
-        title="Edit vehicle"
-        description="Update this vehicle's details."
+        title={mode === "create" ? "Add vehicle" : "Edit vehicle"}
+        description={
+          mode === "create"
+            ? "Create a new vehicle in your fleet."
+            : "Update this vehicle's details."
+        }
       >
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          {mode === "edit" && (
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="vehicle-id">Vehicle ID</Label>
+              <Input
+                id="vehicle-id"
+                value={draft.id}
+                disabled
+                className="opacity-70"
+              />
+            </div>
+          )}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col gap-2">
               <Label htmlFor="vehicle-name">Display name</Label>
@@ -321,17 +404,44 @@ export function TransportManager() {
             />
           </div>
 
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="vehicle-image-upload">Upload vehicle image</Label>
+            <Input
+              id="vehicle-image-upload"
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                void handleImageUpload(e.target.files?.[0] ?? null);
+              }}
+            />
+          </div>
+
+          <label className="inline-flex items-center gap-2 text-sm text-on-surface">
+            <input
+              type="checkbox"
+              checked={draft.isAvailable}
+              onChange={(e) =>
+                setDraft({ ...draft, isAvailable: e.target.checked })
+              }
+              className="h-4 w-4 rounded border-outline-variant/40"
+            />
+            Show this vehicle on the public transport page
+          </label>
+
           <div className="flex justify-end gap-2 pt-2 border-t border-outline-variant/25 -mx-6 px-6 mt-2">
             <Button
               type="button"
               variant="ghost"
               size="sm"
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setOpen(false);
+                setDraft(EMPTY);
+              }}
             >
               Cancel
             </Button>
             <Button type="submit" size="sm">
-              Save changes
+              {mode === "create" ? "Add vehicle" : "Save changes"}
             </Button>
           </div>
         </form>
