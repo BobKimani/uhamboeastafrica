@@ -8,6 +8,7 @@ import {
   TransportForm,
   type TransportFormValues,
 } from "@/components/transport/transport-form";
+import { TransportMap } from "@/components/transport/transport-map";
 import { useCurrencyPreference } from "@/lib/use-currency-preference";
 import { useVehicles } from "@/lib/use-vehicles";
 
@@ -72,6 +73,10 @@ export default function TransportPage() {
         </div>
 
         <div ref={resultsRef} className="lg:col-span-3">
+          <div className="mb-6">
+            <TransportMap from={values.from} to={values.to} />
+          </div>
+
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-2xl md:text-3xl font-headline font-extrabold tracking-tight">
