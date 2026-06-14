@@ -53,3 +53,33 @@ export async function PATCH(request: Request, { params }: Params) {
         );
     }
 }
+
+export async function DELETE(request: Request, { params }: Params) {
+    try {
+        const authHeader = request.headers.get("authorization");
+
+        if (!authHeader?.startsWith("Bearer ")) {
+            return NextResponse.json(
+                { success: false, error: "Unauthorized" },
+                { status: 401 }
+            );
+        }
+
+        const token = authHeader.split("Bearer ")[1];
+        await getAdminAuth().verifyIdToken(token);
+
+        const { id } = await params;
+        await getAdminDb().collection("bookings").doc(id).delete();
+
+        return NextResponse.json({
+            success: true,
+            message: "Booking deleted successfully",
+        });
+    } catch (error) {
+        console.error("Delete booking error:", error);
+        return NextResponse.json(
+            { success: false, error: "Failed to delete booking" },
+            { status: 500 }
+        );
+    }
+}
