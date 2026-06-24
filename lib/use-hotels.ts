@@ -5,6 +5,7 @@ import { HOTELS, type Hotel } from "@/lib/data/hotels";
 
 const STORAGE_KEY = "uhambo-admin-hotels";
 const HOTELS_CHANGED_EVENT = "uhambo-hotels-changed";
+const LEGACY_PLACEHOLDER_IDS = new Set(["h1", "h2", "h3", "h4", "h5", "h6"]);
 
 function readHotels(): Hotel[] {
   if (typeof window === "undefined") return HOTELS;
@@ -12,7 +13,35 @@ function readHotels(): Hotel[] {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return HOTELS;
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? (parsed as Hotel[]) : HOTELS;
+    if (!Array.isArray(parsed)) return HOTELS;
+    if (
+      parsed.some(
+        (hotel) =>
+          hotel &&
+          typeof hotel === "object" &&
+          LEGACY_PLACEHOLDER_IDS.has(String((hotel as Partial<Hotel>).id ?? ""))
+      )
+    ) {
+      return HOTELS;
+    }
+
+    return parsed.map((hotel) => {
+      const candidate = hotel as Partial<Hotel>;
+      return {
+        id: candidate.id ?? `h-${Date.now()}`,
+        name: candidate.name ?? "Untitled hotel",
+        country: candidate.country ?? "",
+        region: candidate.region ?? "",
+        destination: candidate.destination ?? "",
+        pricePerNight: candidate.pricePerNight ?? 0,
+        rating: candidate.rating ?? 0,
+        image: candidate.image ?? HOTELS[0].image,
+        tags: Array.isArray(candidate.tags) ? candidate.tags : [],
+        description: candidate.description ?? "",
+        topRated: candidate.topRated ?? false,
+        isAvailable: candidate.isAvailable ?? true,
+      } as Hotel;
+    });
   } catch {
     return HOTELS;
   }
@@ -25,9 +54,13 @@ function writeHotels(hotels: Hotel[]) {
 
 export function useHotels() {
   const [hotels, setHotels] = useState<Hotel[]>(HOTELS);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    const sync = () => setHotels(readHotels());
+    const sync = () => {
+      setHotels(readHotels());
+      setHydrated(true);
+    };
     sync();
     window.addEventListener("storage", sync);
     window.addEventListener(HOTELS_CHANGED_EVENT, sync);
@@ -51,5 +84,5 @@ export function useHotels() {
     writeHotels(nextHotels);
   }
 
-  return { hotels, saveHotel, deleteHotel };
+  return { hotels, saveHotel, deleteHotel, hydrated };
 }
