@@ -42,7 +42,7 @@ export function FilterBar({
         <div className="relative md:ml-auto md:w-80">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-on-surface-variant/60 pointer-events-none" />
           <Input
-            placeholder="Search destinations"
+            placeholder="Search hotels"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="pl-11"

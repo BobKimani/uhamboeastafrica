@@ -31,6 +31,7 @@ type HotelDraft = {
   description: string;
   topRated: boolean;
   image: string;
+  isAvailable: boolean;
 };
 
 const EMPTY: HotelDraft = {
@@ -45,6 +46,7 @@ const EMPTY: HotelDraft = {
   description: "",
   topRated: false,
   image: "",
+  isAvailable: true,
 };
 
 const KES_PER_USD = 130;
@@ -102,8 +104,22 @@ export function HotelManager() {
       description: h.description,
       topRated: h.topRated ?? false,
       image: h.image,
+      isAvailable: h.isAvailable,
     });
     setEditOpen(true);
+  };
+
+  const handleImageUpload = async (file: File | null) => {
+    if (!file) return;
+
+    const dataUrl = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result ?? ""));
+      reader.onerror = () => reject(new Error("Failed to read image."));
+      reader.readAsDataURL(file);
+    });
+
+    setDraft((current) => ({ ...current, image: dataUrl }));
   };
 
   const handleCurrencyChange = (next: DisplayCurrency) => {
@@ -120,7 +136,14 @@ export function HotelManager() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!draft.id || !draft.name || draft.pricePerNight === "" || draft.rating === "") return;
+    if (
+      !draft.id ||
+      !draft.name ||
+      !draft.destination ||
+      draft.pricePerNight === "" ||
+      draft.rating === ""
+    )
+      return;
 
     const existing = hotels.find((h) => h.id === draft.id);
     saveHotel({
@@ -137,7 +160,8 @@ export function HotelManager() {
         .filter(Boolean),
       description: draft.description.trim(),
       topRated: draft.topRated,
-      image: existing?.image ?? HOTELS[0].image,
+      image: draft.image || existing?.image || HOTELS[0].image,
+      isAvailable: draft.isAvailable,
     });
     setEditOpen(false);
   };
@@ -208,6 +232,7 @@ export function HotelManager() {
                 <Th>Hotel</Th>
                 <Th>Location</Th>
                 <Th>Rating</Th>
+                <Th>Availability</Th>
                 <Th className="text-right">
                   Price / night ({currency === "KES" ? "KSh" : currency})
                 </Th>
@@ -224,7 +249,7 @@ export function HotelManager() {
                     <div className="flex flex-col">
                       <span className="font-medium">{h.name}</span>
                       <span className="text-xs text-on-surface-variant mt-0.5 flex items-center gap-1.5">
-                        <span className="capitalize">{h.destination.replace(/-/g, " ")}</span>
+                        <span>{h.destination}</span>
                         {h.topRated && (
                           <span className="inline-flex items-center gap-0.5 text-amber-500 font-medium">
                             <Star className="h-3 w-3 fill-current" aria-hidden />
@@ -244,6 +269,18 @@ export function HotelManager() {
                     <span className="inline-flex items-center gap-1.5">
                       <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" aria-hidden />
                       <span className="font-semibold">{h.rating.toFixed(1)}</span>
+                    </span>
+                  </Td>
+                  <Td>
+                    <span
+                      className={cn(
+                        "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold",
+                        h.isAvailable
+                          ? "bg-green-500/15 text-green-600"
+                          : "bg-outline-variant/25 text-on-surface-variant"
+                      )}
+                    >
+                      {h.isAvailable ? "Available" : "Hidden"}
                     </span>
                   </Td>
                   <Td className="text-right font-semibold">
@@ -330,8 +367,22 @@ export function HotelManager() {
               id="hotel-destination"
               required
               value={draft.destination}
-              onChange={(e) => setDraft({ ...draft, destination: e.target.value })}
-              placeholder="maasai-mara"
+              onChange={(e) =>
+                setDraft({ ...draft, destination: e.target.value })
+              }
+              placeholder="Maasai Mara, Stone Town, Volcanoes National Park"
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="hotel-image-upload">Upload hotel image</Label>
+            <Input
+              id="hotel-image-upload"
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                void handleImageUpload(e.target.files?.[0] ?? null);
+              }}
             />
           </div>
 
@@ -437,6 +488,21 @@ export function HotelManager() {
             <span className="text-sm font-medium text-on-surface flex items-center gap-1.5">
               <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" aria-hidden />
               Mark as top rated
+            </span>
+          </label>
+
+          <label className="flex items-center gap-3 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              id="hotel-available"
+              checked={draft.isAvailable}
+              onChange={(e) =>
+                setDraft({ ...draft, isAvailable: e.target.checked })
+              }
+              className="h-4 w-4 rounded border-outline-variant/40 accent-primary"
+            />
+            <span className="text-sm font-medium text-on-surface">
+              Available on client website
             </span>
           </label>
 

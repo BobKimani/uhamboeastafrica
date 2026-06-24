@@ -144,13 +144,6 @@ export function TransportManager() {
     setDraft(EMPTY);
   };
 
-  const handleAvailabilityToggle = (vehicle: Vehicle) => {
-    saveVehicle({
-      ...vehicle,
-      isAvailable: !vehicle.isAvailable,
-    });
-  };
-
   const handleImageUpload = async (file: File | null) => {
     if (!file) return;
 
@@ -249,18 +242,16 @@ export function TransportManager() {
                   <Td className="text-on-surface-variant">{v.region}</Td>
                   <Td className="text-on-surface-variant">{v.bestFor}</Td>
                   <Td>
-                    <button
-                      type="button"
-                      onClick={() => handleAvailabilityToggle(v)}
+                    <span
                       className={cn(
-                        "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold transition-colors",
+                        "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold",
                         v.isAvailable
                           ? "bg-green-500/15 text-green-600"
                           : "bg-outline-variant/25 text-on-surface-variant"
                       )}
                     >
                       {v.isAvailable ? "Available" : "Hidden"}
-                    </button>
+                    </span>
                   </Td>
                   <Td className="text-right font-semibold">
                     {formatCurrency(
