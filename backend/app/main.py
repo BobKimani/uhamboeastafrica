@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 
-from app.routers import bookings, inquiries, payments
+from app.routers import bookings, currency, inquiries, payments
 
 app = FastAPI(title="Uhambo API")
 
@@ -20,5 +20,6 @@ async def health():
 
 
 app.include_router(bookings.router)
+app.include_router(currency.router)
 app.include_router(inquiries.router)
 app.include_router(payments.router)

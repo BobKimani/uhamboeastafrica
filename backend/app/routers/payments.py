@@ -7,23 +7,24 @@ from pydantic import ValidationError
 
 from app.config import settings
 from app.firebase import get_db
-from app.payments.mpesa import (
-    MpesaClient,
-    MpesaConfigurationError,
-    MpesaRequestError,
+from app.payments.kcb import (
+    KcbClient,
+    KcbConfigurationError,
+    KcbRequestError,
     normalize_kenyan_phone,
     parse_stk_callback,
 )
-from app.schemas import InitiateMpesaPayment
+from app.schemas import InitiateKcbPayment
+from app.services.currency import convert_usd_to_kes
 
 logger = logging.getLogger(__name__)
-router = APIRouter(prefix="/api/payments/mpesa", tags=["payments"])
+router = APIRouter(prefix="/api/payments/kcb", tags=["payments"])
 
 
 @router.post("/stk-push")
 async def initiate_stk_push(request: Request, db=Depends(get_db)):
     try:
-        data = InitiateMpesaPayment.model_validate(await request.json())
+        data = InitiateKcbPayment.model_validate(await request.json())
         phone = normalize_kenyan_phone(data.phone)
     except (ValidationError, ValueError) as exc:
         return JSONResponse(
@@ -40,7 +41,12 @@ async def initiate_stk_push(request: Request, db=Depends(get_db)):
         )
 
     booking = booking_snapshot.to_dict()
-    amount = booking.get("transportAmountKes")
+    amount = booking.get("amount_kes") or booking.get("transportAmountKes")
+    payment_rate = None
+    if not amount and booking.get("amount_usd"):
+        payment_rate = await convert_usd_to_kes(float(booking["amount_usd"]))
+        amount = payment_rate["amountKes"]
+
     if not amount:
         return JSONResponse(
             status_code=400,
@@ -56,40 +62,51 @@ async def initiate_stk_push(request: Request, db=Depends(get_db)):
             status_code=409,
             content={
                 "success": False,
-                "error": "An M-PESA request is already waiting for confirmation",
+                "error": "A KCB payment request is already waiting for confirmation",
             },
         )
 
     try:
-        response = await MpesaClient(settings).initiate_stk_push(
+        response = await KcbClient(settings).initiate_stk_push(
             phone=phone, amount=int(amount), booking_id=data.bookingId
         )
         booking_ref.update(
             {
                 "paymentStatus": "pending",
-                "mpesaPhone": phone,
-                "mpesaMerchantRequestId": response.get("MerchantRequestID"),
-                "mpesaCheckoutRequestId": response["CheckoutRequestID"],
+                "kcbPhone": phone,
+                "kcbMerchantRequestId": response.get("MerchantRequestID"),
+                "kcbCheckoutRequestId": response["CheckoutRequestID"],
                 "paymentUpdatedAt": firestore.SERVER_TIMESTAMP,
                 "updatedAt": firestore.SERVER_TIMESTAMP,
+                **(
+                    {
+                        "exchange_rate": payment_rate["exchangeRate"],
+                        "amount_kes": payment_rate["amountKes"],
+                        "transportAmountKes": payment_rate["amountKes"],
+                        "currency_source": payment_rate["source"],
+                        "rate_locked_at": firestore.SERVER_TIMESTAMP,
+                    }
+                    if payment_rate
+                    else {}
+                ),
             }
         )
         return {
             "success": True,
-            "message": "Check your phone and enter your M-PESA PIN",
+            "message": "Check your phone and enter your M-Pesa PIN",
             "checkoutRequestId": response["CheckoutRequestID"],
         }
-    except MpesaConfigurationError:
-        logger.exception("M-PESA configuration error")
+    except KcbConfigurationError:
+        logger.exception("KCB Buni configuration error")
         return JSONResponse(
             status_code=503,
             content={
                 "success": False,
-                "error": "Online M-PESA payment is not configured. Use the Paybill instructions instead.",
+                "error": "Online KCB payment is not configured. Use the Paybill instructions instead.",
             },
         )
-    except MpesaRequestError as exc:
-        logger.warning("M-PESA rejected STK push: %s", exc)
+    except KcbRequestError as exc:
+        logger.warning("KCB rejected STK push: %s", exc)
         return JSONResponse(
             status_code=502,
             content={"success": False, "error": str(exc)},
@@ -97,13 +114,13 @@ async def initiate_stk_push(request: Request, db=Depends(get_db)):
 
 
 @router.post("/callback")
-async def mpesa_callback(request: Request, db=Depends(get_db)):
+async def kcb_callback(request: Request, db=Depends(get_db)):
     try:
         result = parse_stk_callback(await request.json())
         matches = list(
             db.collection("bookings")
             .where(
-                "mpesaCheckoutRequestId",
+                "kcbCheckoutRequestId",
                 "==",
                 result["checkoutRequestId"],
             )
@@ -112,14 +129,17 @@ async def mpesa_callback(request: Request, db=Depends(get_db)):
         )
         if not matches:
             logger.warning(
-                "M-PESA callback has unknown checkout request ID %s",
+                "KCB callback has unknown checkout request ID %s",
                 result["checkoutRequestId"],
             )
             return {"ResultCode": 0, "ResultDesc": "Accepted"}
 
         booking_document = matches[0]
         booking_ref = booking_document.reference
-        expected_amount = booking_document.to_dict().get("transportAmountKes")
+        booking_data = booking_document.to_dict()
+        expected_amount = booking_data.get("amount_kes") or booking_data.get(
+            "transportAmountKes"
+        )
         payment_status = result["status"]
         result_description = result["resultDescription"]
         if payment_status == "paid" and int(result["amount"] or 0) != int(
@@ -130,32 +150,39 @@ async def mpesa_callback(request: Request, db=Depends(get_db)):
         booking_ref.update(
             {
                 "paymentStatus": payment_status,
-                "mpesaResultCode": result["resultCode"],
-                "mpesaResultDescription": result_description,
-                "mpesaReceiptNumber": result["receiptNumber"],
-                "mpesaPaidAmount": result["amount"],
-                "mpesaTransactionDate": result["transactionDate"],
+                "kcbResultCode": result["resultCode"],
+                "kcbResultDescription": result_description,
+                "kcbReceiptNumber": result["receiptNumber"],
+                "kcbPaidAmount": result["amount"],
+                "kcbTransactionDate": result["transactionDate"],
                 "paymentUpdatedAt": firestore.SERVER_TIMESTAMP,
                 "updatedAt": firestore.SERVER_TIMESTAMP,
             }
         )
     except Exception:
-        logger.exception("Invalid M-PESA callback")
-    # Acknowledge callbacks so Daraja does not retry malformed/unknown events forever.
+        logger.exception("Invalid KCB callback")
+    # Acknowledge callbacks so the provider does not retry malformed/unknown events forever.
     return {"ResultCode": 0, "ResultDesc": "Accepted"}
 
 
 @router.get("/status/{booking_id}")
 async def payment_status(booking_id: str, db=Depends(get_db)):
-    snapshot = db.collection("bookings").document(booking_id).get()
-    if not snapshot.exists:
+    try:
+        snapshot = db.collection("bookings").document(booking_id).get()
+        if not snapshot.exists:
+            return JSONResponse(
+                status_code=404,
+                content={"success": False, "error": "Booking not found"},
+            )
+        booking = snapshot.to_dict()
+        return {
+            "success": True,
+            "status": booking.get("paymentStatus", "unpaid"),
+            "receiptNumber": booking.get("kcbReceiptNumber"),
+        }
+    except Exception:
+        logger.exception("Fetch KCB payment status error")
         return JSONResponse(
-            status_code=404,
-            content={"success": False, "error": "Booking not found"},
+            status_code=500,
+            content={"success": False, "error": "Failed to fetch payment status"},
         )
-    booking = snapshot.to_dict()
-    return {
-        "success": True,
-        "status": booking.get("paymentStatus", "unpaid"),
-        "receiptNumber": booking.get("mpesaReceiptNumber"),
-    }

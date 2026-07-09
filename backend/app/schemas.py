@@ -21,6 +21,7 @@ class CreateBooking(BaseModel):
     transportTo: str | None = Field(default=None, min_length=2)
     transportDays: int | None = Field(default=None, ge=1, le=365)
     vehicleType: str | None = Field(default=None, min_length=2)
+    transportAmountKes: int | None = Field(default=None, ge=1)
 
     @model_validator(mode="after")
     def _check_budget_and_dates(self):
@@ -49,7 +50,7 @@ class CreateBooking(BaseModel):
         return self
 
 
-class InitiateMpesaPayment(BaseModel):
+class InitiateKcbPayment(BaseModel):
     bookingId: str = Field(min_length=1, max_length=128)
     phone: str = Field(min_length=9, max_length=20)
 

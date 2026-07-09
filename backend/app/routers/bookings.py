@@ -8,7 +8,7 @@ from pydantic import ValidationError
 from app.auth import get_current_user
 from app.firebase import get_db
 from app.schemas import CreateBooking, UpdateBookingStatus
-from app.payments.pricing import UnknownVehicleError, transport_amount_kes
+from app.services.currency import convert_usd_to_kes
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/bookings", tags=["bookings"])
@@ -30,15 +30,20 @@ async def create_booking(request: Request, db=Depends(get_db)):
         )
     try:
         amount_due_kes = None
+        payment_rate = None
         if data.bookingType in {"transport", "both"}:
-            amount_due_kes = transport_amount_kes(
-                data.vehicleType or "", data.transportDays or 0
-            )
+            payment_rate = await convert_usd_to_kes(data.minimumBudget)
+            amount_due_kes = payment_rate["amountKes"]
         booking = {
             **data.model_dump(),
             "status": "new",
             "paymentStatus": "unpaid" if amount_due_kes else "not_required",
             "transportAmountKes": amount_due_kes,
+            "amount_usd": payment_rate["amountUsd"] if payment_rate else None,
+            "exchange_rate": payment_rate["exchangeRate"] if payment_rate else None,
+            "amount_kes": amount_due_kes,
+            "currency_source": payment_rate["source"] if payment_rate else None,
+            "rate_locked_at": firestore.SERVER_TIMESTAMP if payment_rate else None,
             "createdAt": firestore.SERVER_TIMESTAMP,
             "updatedAt": firestore.SERVER_TIMESTAMP,
         }
@@ -54,11 +59,6 @@ async def create_booking(request: Request, db=Depends(get_db)):
                     "amountKes": amount_due_kes,
                 },
             },
-        )
-    except UnknownVehicleError as exc:
-        return JSONResponse(
-            status_code=400,
-            content={"success": False, "error": str(exc)},
         )
     except Exception:
         logger.exception("Create booking error")
