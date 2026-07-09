@@ -1,16 +1,15 @@
-from decimal import Decimal, ROUND_HALF_UP
+from typing import TypedDict
 
-
-USD_TO_KES = Decimal("130")
+from app.services.currency import convert_usd_to_kes
 
 # Keep this server-owned catalog aligned with frontend/lib/data/vehicles.ts.
-VEHICLE_DAILY_RATES_USD = {
-    "4x4 Land Cruiser": Decimal("250"),
-    "Alphard": Decimal("180"),
-    "10-seater Van": Decimal("210"),
-    "Coaster": Decimal("360"),
-    "Noah": Decimal("140"),
-    "Truck": Decimal("420"),
+VEHICLE_DAILY_RATES_USD: dict[str, float] = {
+    "4x4 Land Cruiser": 250,
+    "Alphard": 180,
+    "10-seater Van": 210,
+    "Coaster": 360,
+    "Noah": 140,
+    "Truck": 420,
 }
 
 
@@ -18,11 +17,19 @@ class UnknownVehicleError(ValueError):
     pass
 
 
-def transport_amount_kes(vehicle_type: str, days: int) -> int:
+class TransportPrice(TypedDict):
+    amountUsd: float
+    exchangeRate: float
+    amountKes: int
+    source: str
+    rateDate: str
+
+
+async def transport_price(vehicle_type: str, days: int) -> TransportPrice:
     try:
         daily_rate = VEHICLE_DAILY_RATES_USD[vehicle_type]
     except KeyError as exc:
         raise UnknownVehicleError("Selected vehicle cannot be priced") from exc
 
-    amount = daily_rate * Decimal(days) * USD_TO_KES
-    return int(amount.quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+    amount_usd = daily_rate * days
+    return await convert_usd_to_kes(amount_usd)
