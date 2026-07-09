@@ -12,8 +12,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 import {
-  fetchMpesaPaymentStatus,
-  initiateMpesaPayment,
+  fetchKcbPaymentStatus,
+  initiateKcbPayment,
   type PaymentStatus,
 } from "@/lib/api/payments";
 
@@ -34,7 +34,7 @@ function formatKes(amount: number) {
   }).format(amount);
 }
 
-export function MpesaPayment({
+export function KcbPayment({
   bookingId,
   initialPhone,
   amountKes,
@@ -62,7 +62,7 @@ export function MpesaPayment({
     if (status !== "pending") return;
     const interval = window.setInterval(async () => {
       try {
-        const result = await fetchMpesaPaymentStatus(bookingId);
+        const result = await fetchKcbPaymentStatus(bookingId);
         setStatus(result.status);
         setReceipt(result.receiptNumber);
         if (result.status === "paid") {
@@ -88,7 +88,7 @@ export function MpesaPayment({
     setMessage(null);
     setStatus("pending");
     try {
-      const result = await initiateMpesaPayment(bookingId, phone);
+      const result = await initiateKcbPayment(bookingId, phone);
       setMessage(result.message);
     } catch (error) {
       setStatus("failed");
@@ -100,17 +100,17 @@ export function MpesaPayment({
 
   return (
     <section
-      aria-label="M-PESA payment"
-      className="overflow-hidden rounded-2xl border border-mpesa/20 bg-surface-container-lowest"
+      aria-label="KCB payment"
+      className="overflow-hidden rounded-2xl border border-kcb/20 bg-surface-container-lowest"
     >
       {/* Brand header */}
-      <header className="flex items-center gap-3 border-b border-mpesa/15 bg-mpesa/[0.06] px-5 py-4 md:px-6">
-        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-mpesa/12 text-mpesa">
+      <header className="flex items-center gap-3 border-b border-kcb/15 bg-kcb/[0.06] px-5 py-4 md:px-6">
+        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-kcb/12 text-kcb">
           <Smartphone className="h-5 w-5" aria-hidden="true" />
         </span>
         <div className="min-w-0">
-          <p className="text-xs font-bold uppercase tracking-widest text-mpesa">
-            M-PESA payment
+          <p className="text-xs font-bold uppercase tracking-widest text-kcb">
+            payment
           </p>
           <p className="text-sm text-on-surface-variant">
             {status === "paid"
@@ -128,14 +128,14 @@ export function MpesaPayment({
             aria-live="polite"
             className="flex flex-col items-center text-center"
           >
-            <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-mpesa/12 text-mpesa animate-in zoom-in fade-in duration-300">
+            <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-kcb/12 text-kcb animate-in zoom-in fade-in duration-300">
               <CheckCircle2 className="h-9 w-9" aria-hidden="true" />
             </span>
             <h3 className="mt-4 font-headline text-2xl font-extrabold text-on-surface">
               Payment received
             </h3>
             <p className="mt-1 text-on-surface-variant">
-              <span className="font-bold text-mpesa">{formattedAmount}</span> paid
+              <span className="font-bold text-kcb">{formattedAmount}</span> paid
               successfully
             </p>
             {receipt && (
@@ -149,7 +149,7 @@ export function MpesaPayment({
             <Button
               type="button"
               size="lg"
-              variant="mpesa"
+              variant="kcb"
               className="mt-6 w-full"
               onClick={onClose}
             >
@@ -160,8 +160,8 @@ export function MpesaPayment({
           /* ---- PENDING ----------------------------------------------- */
           <div role="status" aria-live="polite" className="flex flex-col items-center text-center">
             <span className="relative inline-flex h-16 w-16 items-center justify-center">
-              <span className="absolute inset-0 rounded-full bg-mpesa/15 animate-ping" />
-              <span className="relative inline-flex h-16 w-16 items-center justify-center rounded-full bg-mpesa/12 text-mpesa">
+              <span className="absolute inset-0 rounded-full bg-kcb/15 animate-ping" />
+              <span className="relative inline-flex h-16 w-16 items-center justify-center rounded-full bg-kcb/12 text-kcb">
                 <Smartphone className="h-8 w-8" aria-hidden="true" />
               </span>
             </span>
@@ -173,7 +173,7 @@ export function MpesaPayment({
               <span className="font-bold text-on-surface">{formattedAmount}</span>.
               The prompt was sent to {phone}.
             </p>
-            <p className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-mpesa">
+            <p className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-kcb">
               <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
               Waiting for confirmation…
             </p>
@@ -189,9 +189,9 @@ export function MpesaPayment({
             </p>
 
             <div className="mt-6">
-              <Label htmlFor="mpesaPhone">M-PESA phone number</Label>
+              <Label htmlFor="kcbPhone">M-Pesa Phone Number</Label>
               <Input
-                id="mpesaPhone"
+                id="kcbPhone"
                 type="tel"
                 inputMode="tel"
                 autoComplete="tel"
@@ -200,12 +200,12 @@ export function MpesaPayment({
                 onBlur={() => setPhoneTouched(true)}
                 placeholder="0712 345 678"
                 aria-invalid={showPhoneError}
-                aria-describedby={showPhoneError ? "mpesaPhoneError" : undefined}
+                aria-describedby={showPhoneError ? "kcbPhoneError" : undefined}
                 className="mt-2"
               />
               {showPhoneError && (
                 <p
-                  id="mpesaPhoneError"
+                  id="kcbPhoneError"
                   role="alert"
                   className="mt-2 text-xs font-semibold text-error"
                 >
@@ -227,7 +227,7 @@ export function MpesaPayment({
             <Button
               type="button"
               size="lg"
-              variant="mpesa"
+              variant="kcb"
               onClick={handlePay}
               disabled={!phoneValid}
               className="mt-5 w-full"
@@ -238,7 +238,7 @@ export function MpesaPayment({
                   Try again
                 </>
               ) : (
-                <>Pay {formattedAmount} with M-PESA</>
+                <>Pay {formattedAmount} </>
               )}
             </Button>
           </div>
@@ -252,7 +252,7 @@ export function MpesaPayment({
               onClick={() => setPaybillOpen((open) => !open)}
               aria-expanded={paybillOpen}
               aria-controls="paybillDetails"
-              className="flex w-full items-center justify-between gap-2 text-sm font-bold text-on-surface transition-colors hover:text-mpesa"
+              className="flex w-full items-center justify-between gap-2 text-sm font-bold text-on-surface transition-colors hover:text-kcb"
             >
               Pay manually with Paybill
               <ChevronDown

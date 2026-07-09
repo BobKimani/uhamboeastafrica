@@ -23,6 +23,7 @@ export const createBookingSchema = z
         transportTo: z.string().min(2).optional(),
         transportDays: z.coerce.number().int().min(1).optional(),
         vehicleType: z.string().min(2).optional(),
+        transportAmountKes: z.coerce.number().int().min(1).optional(),
     })
     .refine((data) => data.maximumBudget >= data.minimumBudget, {
         message: "Maximum budget must be greater than or equal to minimum budget",

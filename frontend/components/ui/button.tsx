@@ -1,7 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-type Variant = "primary" | "secondary" | "tertiary" | "ghost" | "outline" | "mpesa";
+type Variant = "primary" | "secondary" | "tertiary" | "ghost" | "outline" | "kcb";
 type Size = "sm" | "md" | "lg";
 
 export interface ButtonProps
@@ -24,8 +24,8 @@ const variants: Record<Variant, string> = {
   ghost: "text-on-surface hover:bg-surface-container-low",
   outline:
     "bg-transparent text-on-surface hover:bg-surface-container-low border border-outline-variant/30",
-  mpesa:
-    "bg-mpesa text-on-mpesa shadow-lg shadow-mpesa/25 hover:bg-mpesa-hover hover:shadow-mpesa/30",
+  kcb:
+    "bg-kcb text-on-kcb shadow-lg shadow-kcb/25 hover:bg-kcb-hover hover:shadow-kcb/30",
 };
 
 const sizes: Record<Size, string> = {

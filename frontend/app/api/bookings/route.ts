@@ -19,9 +19,16 @@ export async function POST(request: Request) {
             );
         }
 
+        const amountKes =
+            parsed.data.bookingType === "transport" || parsed.data.bookingType === "both"
+                ? parsed.data.transportAmountKes ?? null
+                : null;
+
         const bookingData = {
             ...parsed.data,
             status: "new" as const,
+            paymentStatus: amountKes ? "unpaid" : "not_required",
+            transportAmountKes: amountKes,
             createdAt: FieldValue.serverTimestamp(),
             updatedAt: FieldValue.serverTimestamp(),
         };
@@ -33,6 +40,10 @@ export async function POST(request: Request) {
                 success: true,
                 message: "Booking submitted successfully",
                 id: docRef.id,
+                payment: {
+                    required: amountKes !== null,
+                    amountKes,
+                },
             },
             { status: 201 }
         );

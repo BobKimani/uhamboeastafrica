@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AlertCircle, CheckCircle2, Send } from "lucide-react";
-import { MpesaPayment } from "@/components/payments/mpesa-payment";
+import { KcbPayment } from "@/components/payments/kcb-payment";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 import { submitBooking } from "@/lib/api/bookings";
-import { formatTravelPrice } from "@/lib/currency";
+import { fetchUsdKesRate } from "@/lib/api/currency";
+import { USD_TO_KES } from "@/lib/currency";
 import type { Vehicle } from "@/lib/data/vehicles";
 import type { CreateBookingInput, TravellingWith } from "@/types/booking";
 
@@ -38,6 +39,14 @@ function travellingWith(people: number): TravellingWith {
   return "group";
 }
 
+function formatKes(amount: number) {
+  return new Intl.NumberFormat("en-KE", {
+    style: "currency",
+    currency: "KES",
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
 export function DirectTransportBooking({
   vehicle,
   from,
@@ -56,9 +65,27 @@ export function DirectTransportBooking({
   const [error, setError] = useState<string | null>(null);
   const [payment, setPayment] = useState<BookingPayment | null>(null);
   const [paymentComplete, setPaymentComplete] = useState(false);
+  const [exchangeRate, setExchangeRate] = useState(USD_TO_KES);
 
   const transportPriceUsd = vehicle.pricePerDay * days;
+  const transportAmountKes = Math.round(transportPriceUsd * exchangeRate);
   const today = new Date().toLocaleDateString("en-CA");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetchUsdKesRate()
+      .then((result) => {
+        if (!cancelled) setExchangeRate(result.rate);
+      })
+      .catch(() => {
+        if (!cancelled) setExchangeRate(USD_TO_KES);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     setForm((current) => ({
@@ -93,6 +120,7 @@ export function DirectTransportBooking({
       transportTo: to.trim(),
       transportDays: days,
       vehicleType: vehicle.type,
+      transportAmountKes,
     };
 
     setSubmitting(true);
@@ -136,7 +164,7 @@ export function DirectTransportBooking({
         <div>
           <p className="text-xs text-on-surface-variant">Transport total</p>
           <p className="font-bold mt-1">
-            {formatTravelPrice(transportPriceUsd, "KES")}
+            {formatKes(transportAmountKes)}
           </p>
         </div>
       </div>
@@ -209,7 +237,7 @@ export function DirectTransportBooking({
         </form>
       ) : (
         <div className="mt-6">
-          <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-mpesa">
+          <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-kcb">
             <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden="true" />
             <span>
               {paymentComplete
@@ -217,7 +245,7 @@ export function DirectTransportBooking({
                 : "Booking confirmed — one step left: payment"}
             </span>
           </div>
-          <MpesaPayment
+          <KcbPayment
             bookingId={payment.bookingId}
             initialPhone={payment.phone}
             amountKes={payment.amountKes}

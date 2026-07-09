@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useWizard } from "@/lib/wizard/store";
 import { submitBooking } from "@/lib/api/bookings";
 import type { CreateBookingInput, TravellingWith } from "@/types/booking";
-import { MpesaPayment } from "@/components/payments/mpesa-payment";
+import { KcbPayment } from "@/components/payments/kcb-payment";
 
 const INITIAL_CONTACT = {
   firstName: "",
@@ -275,7 +275,7 @@ export function ContactDetailsCard() {
       </form>
 
       {payment && (
-        <MpesaPayment
+        <KcbPayment
           bookingId={payment.bookingId}
           initialPhone={payment.phone}
           amountKes={payment.amountKes}

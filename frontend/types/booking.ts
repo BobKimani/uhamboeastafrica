@@ -42,7 +42,7 @@ export type Booking = {
     vehicleType?: string;
     transportAmountKes?: number;
     paymentStatus?: "not_required" | "unpaid" | "pending" | "paid" | "failed";
-    mpesaReceiptNumber?: string;
+    kcbReceiptNumber?: string;
 
     status: BookingStatus;
 
@@ -73,6 +73,7 @@ export type CreateBookingInput = {
     transportTo?: string;
     transportDays?: number;
     vehicleType?: string;
+    transportAmountKes?: number;
 };
 
 export type CreateBookingResult = {

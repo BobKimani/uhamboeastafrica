@@ -6,6 +6,29 @@ import type {
     BookingStatus,
 } from "@/types/booking";
 
+async function readJson(response: Response, fallbackMessage: string): Promise<any> {
+    const text = await response.text();
+    let result: { error?: string } = {};
+
+    if (text) {
+        try {
+            result = JSON.parse(text);
+        } catch {
+            throw new Error(
+                response.ok
+                    ? "Server returned an invalid response"
+                    : text.slice(0, 300)
+            );
+        }
+    }
+
+    if (!response.ok) {
+        throw new Error(result.error || fallbackMessage);
+    }
+
+    return result;
+}
+
 export async function submitBooking(formData: CreateBookingInput) {
     const response = await fetch("/api/bookings", {
         method: "POST",
@@ -13,11 +36,7 @@ export async function submitBooking(formData: CreateBookingInput) {
         body: JSON.stringify(formData),
     });
 
-    const result = await response.json();
-
-    if (!response.ok) {
-        throw new Error(result.error || "Failed to submit booking");
-    }
+    const result = await readJson(response, "Failed to submit booking");
 
     return result as CreateBookingResult;
 }
@@ -36,11 +55,7 @@ export async function fetchAdminBookings(): Promise<Booking[]> {
         headers: { Authorization: `Bearer ${token}` },
     });
 
-    const result = await response.json();
-
-    if (!response.ok) {
-        throw new Error(result.error || "Failed to fetch bookings");
-    }
+    const result = await readJson(response, "Failed to fetch bookings");
 
     return result.bookings as Booking[];
 }
@@ -63,11 +78,7 @@ export async function updateBookingStatus(id: string, status: BookingStatus) {
         body: JSON.stringify({ status }),
     });
 
-    const result = await response.json();
-
-    if (!response.ok) {
-        throw new Error(result.error || "Failed to update booking status");
-    }
+    const result = await readJson(response, "Failed to update booking status");
 
     return result;
 }
@@ -88,11 +99,7 @@ export async function deleteBooking(id: string) {
         },
     });
 
-    const result = await response.json();
-
-    if (!response.ok) {
-        throw new Error(result.error || "Failed to delete booking");
-    }
+    const result = await readJson(response, "Failed to delete booking");
 
     return result as { success: true; message: string };
 }

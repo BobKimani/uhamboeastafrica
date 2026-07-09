@@ -1,15 +1,27 @@
 export type PaymentStatus = "unpaid" | "pending" | "paid" | "failed";
 
 async function readJson(response: Response) {
-  const result = await response.json();
+  const text = await response.text();
+  let result: { error?: string } = {};
+
+  if (text) {
+    try {
+      result = JSON.parse(text);
+    } catch {
+      throw new Error(
+        response.ok ? "KCB returned an invalid response" : text.slice(0, 300)
+      );
+    }
+  }
+
   if (!response.ok) {
-    throw new Error(result.error || "M-PESA payment request failed");
+    throw new Error(result.error || "KCB payment request failed");
   }
   return result;
 }
 
-export async function initiateMpesaPayment(bookingId: string, phone: string) {
-  const response = await fetch("/api/payments/mpesa/stk-push", {
+export async function initiateKcbPayment(bookingId: string, phone: string) {
+  const response = await fetch("/api/payments/kcb/stk-push", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ bookingId, phone }),
@@ -21,8 +33,8 @@ export async function initiateMpesaPayment(bookingId: string, phone: string) {
   }>;
 }
 
-export async function fetchMpesaPaymentStatus(bookingId: string) {
-  const response = await fetch(`/api/payments/mpesa/status/${bookingId}`, {
+export async function fetchKcbPaymentStatus(bookingId: string) {
+  const response = await fetch(`/api/payments/kcb/status/${bookingId}`, {
     cache: "no-store",
   });
   return readJson(response) as Promise<{

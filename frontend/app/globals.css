@@ -55,10 +55,10 @@
   --color-on-error: #ffffff;
   --color-on-error-container: #93000a;
 
-  /* M-PESA brand accent — accessible green (white text passes WCAG AA on it) */
-  --color-mpesa: #157a34;
-  --color-mpesa-hover: #11652b;
-  --color-on-mpesa: #ffffff;
+  /* KCB brand accent — darkened slightly so white text passes WCAG AA */
+  --color-kcb: #006b5b;
+  --color-kcb-hover: #005548;
+  --color-on-kcb: #ffffff;
 
   --color-outline: #8c7166;
   --color-outline-variant: #e0c0b2;
