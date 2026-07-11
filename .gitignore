@@ -24,6 +24,7 @@ backend/__pycache__/
 **/__pycache__/
 *.py[cod]
 .pytest_cache/
+backend/.env.example
 
 # build artifacts (also ignored in frontend/.gitignore)
 .next/
@@ -33,3 +34,5 @@ frontend/*.tsbuildinfo
 
 # vercel
 .vercel
+
+#mds
