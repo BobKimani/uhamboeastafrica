@@ -53,6 +53,7 @@ class CreateBooking(BaseModel):
 class InitiateKcbPayment(BaseModel):
     bookingId: str = Field(min_length=1, max_length=128)
     phone: str = Field(min_length=9, max_length=20)
+    amountKes: int | None = Field(default=None, ge=1)
 
 
 class UpdateBookingStatus(BaseModel):

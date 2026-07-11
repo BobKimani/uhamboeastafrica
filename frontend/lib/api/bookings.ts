@@ -5,40 +5,21 @@ import type {
     CreateBookingResult,
     BookingStatus,
 } from "@/types/booking";
-
-async function readJson(response: Response, fallbackMessage: string): Promise<any> {
-    const text = await response.text();
-    let result: { error?: string } = {};
-
-    if (text) {
-        try {
-            result = JSON.parse(text);
-        } catch {
-            throw new Error(
-                response.ok
-                    ? "Server returned an invalid response"
-                    : text.slice(0, 300)
-            );
-        }
-    }
-
-    if (!response.ok) {
-        throw new Error(result.error || fallbackMessage);
-    }
-
-    return result;
-}
+import { apiUrl, readJson } from "@/lib/api/client";
 
 export async function submitBooking(formData: CreateBookingInput) {
-    const response = await fetch("/api/bookings", {
+    const response = await fetch(apiUrl("/api/bookings"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
     });
 
-    const result = await readJson(response, "Failed to submit booking");
+    const result = await readJson<CreateBookingResult>(
+        response,
+        "Failed to submit booking"
+    );
 
-    return result as CreateBookingResult;
+    return result;
 }
 
 export async function fetchAdminBookings(): Promise<Booking[]> {
@@ -50,14 +31,17 @@ export async function fetchAdminBookings(): Promise<Booking[]> {
 
     const token = await currentUser.getIdToken();
 
-    const response = await fetch("/api/bookings", {
+    const response = await fetch(apiUrl("/api/bookings"), {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
     });
 
-    const result = await readJson(response, "Failed to fetch bookings");
+    const result = await readJson<{ bookings: Booking[] }>(
+        response,
+        "Failed to fetch bookings"
+    );
 
-    return result.bookings as Booking[];
+    return result.bookings;
 }
 
 export async function updateBookingStatus(id: string, status: BookingStatus) {
@@ -69,7 +53,7 @@ export async function updateBookingStatus(id: string, status: BookingStatus) {
 
     const token = await currentUser.getIdToken();
 
-    const response = await fetch(`/api/bookings/${id}`, {
+    const response = await fetch(apiUrl(`/api/bookings/${id}`), {
         method: "PATCH",
         headers: {
             "Content-Type": "application/json",
@@ -92,14 +76,17 @@ export async function deleteBooking(id: string) {
 
     const token = await currentUser.getIdToken();
 
-    const response = await fetch(`/api/bookings/${id}`, {
+    const response = await fetch(apiUrl(`/api/bookings/${id}`), {
         method: "DELETE",
         headers: {
             Authorization: `Bearer ${token}`,
         },
     });
 
-    const result = await readJson(response, "Failed to delete booking");
+    const result = await readJson<{ success: true; message: string }>(
+        response,
+        "Failed to delete booking"
+    );
 
-    return result as { success: true; message: string };
+    return result;
 }

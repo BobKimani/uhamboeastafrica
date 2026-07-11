@@ -41,9 +41,11 @@ async def initiate_stk_push(request: Request, db=Depends(get_db)):
         )
 
     booking = booking_snapshot.to_dict()
-    amount = booking.get("amount_kes") or booking.get("transportAmountKes")
+    amount = data.amountKes or booking.get("amount_kes") or booking.get(
+        "transportAmountKes"
+    )
     payment_rate = None
-    if not amount and booking.get("amount_usd"):
+    if not data.amountKes and not amount and booking.get("amount_usd"):
         payment_rate = await convert_usd_to_kes(float(booking["amount_usd"]))
         amount = payment_rate["amountKes"]
 
@@ -76,6 +78,7 @@ async def initiate_stk_push(request: Request, db=Depends(get_db)):
                 "kcbPhone": phone,
                 "kcbMerchantRequestId": response.get("MerchantRequestID"),
                 "kcbCheckoutRequestId": response["CheckoutRequestID"],
+                "kcbAmountKes": int(amount),
                 "paymentUpdatedAt": firestore.SERVER_TIMESTAMP,
                 "updatedAt": firestore.SERVER_TIMESTAMP,
                 **(
@@ -137,8 +140,10 @@ async def kcb_callback(request: Request, db=Depends(get_db)):
         booking_document = matches[0]
         booking_ref = booking_document.reference
         booking_data = booking_document.to_dict()
-        expected_amount = booking_data.get("amount_kes") or booking_data.get(
-            "transportAmountKes"
+        expected_amount = (
+            booking_data.get("kcbAmountKes")
+            or booking_data.get("amount_kes")
+            or booking_data.get("transportAmountKes")
         )
         payment_status = result["status"]
         result_description = result["resultDescription"]

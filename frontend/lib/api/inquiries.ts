@@ -4,21 +4,21 @@ import type {
     CreateInquiryInput,
     InquiryStatus,
 } from "@/types/inquiry";
+import { apiUrl, readJson } from "@/lib/api/client";
 
 export async function submitInquiry(formData: CreateInquiryInput) {
-    const response = await fetch("/api/inquiries", {
+    const response = await fetch(apiUrl("/api/inquiries"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
     });
 
-    const result = await response.json();
+    const result = await readJson<{ success: true; message: string; id: string }>(
+        response,
+        "Failed to submit inquiry"
+    );
 
-    if (!response.ok) {
-        throw new Error(result.error || "Failed to submit inquiry");
-    }
-
-    return result as { success: true; message: string; id: string };
+    return result;
 }
 
 export async function fetchAdminInquiries(): Promise<Inquiry[]> {
@@ -30,18 +30,17 @@ export async function fetchAdminInquiries(): Promise<Inquiry[]> {
 
     const token = await currentUser.getIdToken();
 
-    const response = await fetch("/api/inquiries", {
+    const response = await fetch(apiUrl("/api/inquiries"), {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
     });
 
-    const result = await response.json();
+    const result = await readJson<{ inquiries: Inquiry[] }>(
+        response,
+        "Failed to fetch inquiries"
+    );
 
-    if (!response.ok) {
-        throw new Error(result.error || "Failed to fetch inquiries");
-    }
-
-    return result.inquiries as Inquiry[];
+    return result.inquiries;
 }
 
 export async function updateInquiryStatus(id: string, status: InquiryStatus) {
@@ -53,7 +52,7 @@ export async function updateInquiryStatus(id: string, status: InquiryStatus) {
 
     const token = await currentUser.getIdToken();
 
-    const response = await fetch(`/api/inquiries/${id}`, {
+    const response = await fetch(apiUrl(`/api/inquiries/${id}`), {
         method: "PATCH",
         headers: {
             "Content-Type": "application/json",
@@ -62,11 +61,7 @@ export async function updateInquiryStatus(id: string, status: InquiryStatus) {
         body: JSON.stringify({ status }),
     });
 
-    const result = await response.json();
-
-    if (!response.ok) {
-        throw new Error(result.error || "Failed to update inquiry status");
-    }
+    const result = await readJson(response, "Failed to update inquiry status");
 
     return result;
 }

@@ -86,6 +86,25 @@ async def list_bookings(db=Depends(get_db), user=Depends(get_current_user)):
         )
 
 
+@router.get("/{booking_id}")
+async def get_booking(booking_id: str, db=Depends(get_db), user=Depends(get_current_user)):
+    try:
+        snapshot = db.collection("bookings").document(booking_id).get()
+        if not snapshot.exists:
+            return JSONResponse(
+                status_code=404,
+                content={"success": False, "error": "Booking not found"},
+            )
+
+        return {"success": True, "booking": {"id": snapshot.id, **snapshot.to_dict()}}
+    except Exception:
+        logger.exception("Fetch booking error")
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": "Failed to fetch booking"},
+        )
+
+
 @router.patch("/{booking_id}")
 async def update_booking_status(
     booking_id: str, request: Request, db=Depends(get_db), user=Depends(get_current_user)

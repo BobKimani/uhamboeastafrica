@@ -1,45 +1,31 @@
+import { apiUrl, readJson } from "@/lib/api/client";
+
 export type PaymentStatus = "unpaid" | "pending" | "paid" | "failed";
 
-async function readJson(response: Response) {
-  const text = await response.text();
-  let result: { error?: string } = {};
-
-  if (text) {
-    try {
-      result = JSON.parse(text);
-    } catch {
-      throw new Error(
-        response.ok ? "KCB returned an invalid response" : text.slice(0, 300)
-      );
-    }
-  }
-
-  if (!response.ok) {
-    throw new Error(result.error || "KCB payment request failed");
-  }
-  return result;
-}
-
-export async function initiateKcbPayment(bookingId: string, phone: string) {
-  const response = await fetch("/api/payments/kcb/stk-push", {
+export async function initiateKcbPayment(
+  bookingId: string,
+  phone: string,
+  amountKes?: number
+) {
+  const response = await fetch(apiUrl("/api/payments/kcb/stk-push"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ bookingId, phone }),
+    body: JSON.stringify({ bookingId, phone, amountKes }),
   });
-  return readJson(response) as Promise<{
+  return readJson<{
     success: true;
     message: string;
     checkoutRequestId: string;
-  }>;
+  }>(response, "KCB payment request failed");
 }
 
 export async function fetchKcbPaymentStatus(bookingId: string) {
-  const response = await fetch(`/api/payments/kcb/status/${bookingId}`, {
+  const response = await fetch(apiUrl(`/api/payments/kcb/status/${bookingId}`), {
     cache: "no-store",
   });
-  return readJson(response) as Promise<{
+  return readJson<{
     success: true;
     status: PaymentStatus;
     receiptNumber: string | null;
-  }>;
+  }>(response, "Failed to fetch KCB payment status");
 }

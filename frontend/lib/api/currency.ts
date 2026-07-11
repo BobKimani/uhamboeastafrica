@@ -1,34 +1,36 @@
-async function readJson(response: Response): Promise<any> {
-  const text = await response.text();
-  let result: { error?: string } = {};
-
-  if (text) {
-    try {
-      result = JSON.parse(text);
-    } catch {
-      throw new Error(
-        response.ok ? "Currency returned an invalid response" : text.slice(0, 300)
-      );
-    }
-  }
-
-  if (!response.ok) {
-    throw new Error(result.error || "Failed to fetch exchange rate");
-  }
-
-  return result;
-}
+import { apiUrl, readJson } from "@/lib/api/client";
 
 export async function fetchUsdKesRate() {
-  const response = await fetch("/api/currency/usd-kes", {
+  const response = await fetch(apiUrl("/api/currency/usd-kes"), {
     cache: "no-store",
   });
-  const result = await readJson(response);
+  const result = await readJson<{
+    data: {
+      rate: number;
+      source: string;
+      date: string;
+      cached: boolean;
+    };
+  }>(response, "Failed to fetch exchange rate");
 
-  return result.data as {
-    rate: number;
-    source: string;
-    date: string;
-    cached: boolean;
-  };
+  return result.data;
+}
+
+export async function convertUsdToKes(amountUsd: number) {
+  const response = await fetch(apiUrl("/api/currency/convert-usd-to-kes"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ amountUsd }),
+  });
+  const result = await readJson<{
+    data: {
+      amountUsd: number;
+      exchangeRate: number;
+      amountKes: number;
+      source: string;
+      rateDate: string;
+    };
+  }>(response, "Failed to convert currency");
+
+  return result.data;
 }

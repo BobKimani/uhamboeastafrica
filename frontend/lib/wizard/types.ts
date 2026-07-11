@@ -5,15 +5,30 @@ export type Currency = "USD" | "KES";
 
 export const STEPS = [
   { slug: "destination", title: "Destination", label: "Exploring Horizons" },
-  { slug: "dates", title: "Dates", label: "Pick Your Window" },
-  { slug: "travelers", title: "Travel Group", label: "Who's Coming" },
-  { slug: "service", title: "Service Type", label: "What You Need" },
-  { slug: "details", title: "Details", label: "Fine-tune" },
-  { slug: "budget", title: "Budget", label: "Set the Tone" },
-  { slug: "review", title: "Review", label: "Almost There" },
+  { slug: "basics", title: "Trip Basics", label: "When & Who" },
+  { slug: "services", title: "Services", label: "What You Need" },
+  { slug: "review", title: "Budget & Review", label: "Almost There" },
 ] as const;
 
 export type StepSlug = (typeof STEPS)[number]["slug"];
+
+export function totalRooms(
+  rooms?: Partial<Record<RoomType, number>>
+): number {
+  return Object.values(rooms ?? {}).reduce(
+    (sum, count) => sum + (count ?? 0),
+    0
+  );
+}
+
+export function formatRooms(
+  rooms?: Partial<Record<RoomType, number>>
+): string {
+  const parts = Object.entries(rooms ?? {})
+    .filter(([, count]) => (count ?? 0) > 0)
+    .map(([type, count]) => `${count} ${type}`);
+  return parts.length ? parts.join(", ") : "—";
+}
 
 export type WizardState = {
   destination?: string;
@@ -24,7 +39,7 @@ export type WizardState = {
   serviceType?: ServiceType;
   accommodation?: {
     region?: string;
-    roomType?: RoomType;
+    rooms?: Partial<Record<RoomType, number>>;
   };
   transport?: {
     from?: string;

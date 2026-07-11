@@ -11,6 +11,15 @@ class Settings:
     firebase_client_email = os.environ.get("FIREBASE_CLIENT_EMAIL")
     firebase_private_key = os.environ.get("FIREBASE_PRIVATE_KEY")
 
+    cors_allowed_origins = [
+        origin.strip()
+        for origin in os.environ.get(
+            "CORS_ALLOWED_ORIGINS",
+            "http://localhost:3000,http://127.0.0.1:3000",
+        ).split(",")
+        if origin.strip()
+    ]
+
     default_usd_to_kes_rate = float(os.environ.get("DEFAULT_USD_TO_KES_RATE", "129.0"))
     currency_cache_seconds = int(os.environ.get("CURRENCY_CACHE_SECONDS", "21600"))
 
