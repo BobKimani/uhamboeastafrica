@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Input, Label } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useWizard } from "@/lib/wizard/store";
+import { totalRooms } from "@/lib/wizard/types";
 import { submitBooking } from "@/lib/api/bookings";
 import type { CreateBookingInput, TravellingWith } from "@/types/booking";
 import { KcbPayment } from "@/components/payments/kcb-payment";
@@ -66,9 +67,12 @@ export function ContactDetailsCard() {
     }
 
     const fullName = `${form.firstName} ${form.lastName}`.trim();
+    const selectedRooms = totalRooms(state.accommodation?.rooms);
     const numberOfRooms =
       state.serviceType === "transport"
         ? 0
+        : selectedRooms > 0
+        ? selectedRooms
         : Math.max(1, Math.ceil(state.paxCount / 2));
 
     const payload: CreateBookingInput = {

@@ -8,6 +8,7 @@ import {
   RefreshCw,
   Smartphone,
   TriangleAlert,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
@@ -53,10 +54,16 @@ export function KcbPayment({
   const [message, setMessage] = useState<string | null>(null);
   const [receipt, setReceipt] = useState<string | null>(null);
   const [paybillOpen, setPaybillOpen] = useState(false);
+  const [testAmount, setTestAmount] = useState(String(amountKes));
 
   const phoneValid = isValidKenyanPhone(phone);
   const showPhoneError = phoneTouched && phone.length > 0 && !phoneValid;
-  const formattedAmount = formatKes(amountKes);
+  const parsedTestAmount = Number(testAmount);
+  const effectiveAmountKes =
+    Number.isFinite(parsedTestAmount) && parsedTestAmount > 0
+      ? Math.round(parsedTestAmount)
+      : amountKes;
+  const formattedAmount = formatKes(effectiveAmountKes);
 
   useEffect(() => {
     if (status !== "pending") return;
@@ -88,7 +95,11 @@ export function KcbPayment({
     setMessage(null);
     setStatus("pending");
     try {
-      const result = await initiateKcbPayment(bookingId, phone);
+      const result = await initiateKcbPayment(
+        bookingId,
+        phone,
+        effectiveAmountKes
+      );
       setMessage(result.message);
     } catch (error) {
       setStatus("failed");
@@ -96,6 +107,12 @@ export function KcbPayment({
         error instanceof Error ? error.message : "Payment request failed."
       );
     }
+  }
+
+  function handleCancelPayment() {
+    setStatus("unpaid");
+    setMessage("Payment cancelled. You can start a new request when ready.");
+    onClose?.();
   }
 
   return (
@@ -177,6 +194,16 @@ export function KcbPayment({
               <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
               Waiting for confirmation…
             </p>
+            <Button
+              type="button"
+              variant="outline"
+              size="md"
+              className="mt-6 w-full"
+              onClick={handleCancelPayment}
+            >
+              <X className="h-4 w-4" aria-hidden="true" />
+              Cancel payment
+            </Button>
           </div>
         ) : (
           /* ---- IDLE / UNPAID ----------------------------------------- */
@@ -214,12 +241,37 @@ export function KcbPayment({
               )}
             </div>
 
-            {status === "failed" && message && (
+            <div className="mt-4">
+              <Label htmlFor="kcbTestAmount">Test amount (KES)</Label>
+              <Input
+                id="kcbTestAmount"
+                type="number"
+                inputMode="numeric"
+                min={1}
+                step={1}
+                value={testAmount}
+                onChange={(event) => setTestAmount(event.target.value)}
+                className="mt-2"
+              />
+            </div>
+
+            {message && (
               <div
-                role="alert"
-                className="mt-4 flex items-start gap-2 rounded-xl bg-error-container px-4 py-3 text-sm text-on-error-container"
+                role={status === "failed" ? "alert" : "status"}
+                className={`mt-4 flex items-start gap-2 rounded-xl px-4 py-3 text-sm ${
+                  status === "failed"
+                    ? "bg-error-container text-on-error-container"
+                    : "bg-surface-container-low text-on-surface-variant"
+                }`}
               >
-                <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                {status === "failed" ? (
+                  <TriangleAlert
+                    className="mt-0.5 h-4 w-4 shrink-0"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <X className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                )}
                 <span>{message}</span>
               </div>
             )}
@@ -240,6 +292,16 @@ export function KcbPayment({
               ) : (
                 <>Pay {formattedAmount} </>
               )}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="md"
+              className="mt-3 w-full"
+              onClick={handleCancelPayment}
+            >
+              <X className="h-4 w-4" aria-hidden="true" />
+              Cancel payment
             </Button>
           </div>
         )}
