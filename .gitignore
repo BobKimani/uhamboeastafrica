@@ -36,3 +36,4 @@ frontend/*.tsbuildinfo
 .vercel
 
 #mds
+docs/
