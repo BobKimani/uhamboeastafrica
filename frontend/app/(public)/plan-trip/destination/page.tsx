@@ -14,7 +14,7 @@ export default function DestinationStep() {
 
   function handleCountryClick(slug: string) {
     if (state.destination === slug) {
-      router.push("/plan-trip/dates");
+      router.push("/plan-trip/basics");
       return;
     }
 
