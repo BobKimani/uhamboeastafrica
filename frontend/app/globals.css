@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-headline: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+
+  --color-background: #fbf9f5;
+  --color-surface: #fbf9f5;
+  --color-surface-bright: #fbf9f5;
+  --color-surface-dim: #dbdad6;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f5f3ef;
+  --color-surface-container: #efeeea;
+  --color-surface-container-high: #eae8e4;
+  --color-surface-container-highest: #e4e2de;
+  --color-surface-variant: #e4e2de;
+
+  --color-on-background: #1b1c1a;
+  --color-on-surface: #1b1c1a;
+  --color-on-surface-variant: #594238;
+
+  --color-primary: #9e3d00;
+  --color-primary-container: #c64f00;
+  --color-primary-fixed: #ffdbcd;
+  --color-primary-fixed-dim: #ffb595;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #fffbff;
+  --color-on-primary-fixed: #351000;
+  --color-on-primary-fixed-variant: #7c2e00;
+  --color-inverse-primary: #ffb595;
+
+  --color-secondary: #655d54;
+  --color-secondary-container: #e9ded2;
+  --color-secondary-fixed: #ece1d5;
+  --color-secondary-fixed-dim: #cfc5b9;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #696158;
+  --color-on-secondary-fixed: #201b13;
+  --color-on-secondary-fixed-variant: #4c463d;
+
+  --color-tertiary: #4c5e71;
+  --color-tertiary-container: #64768a;
+  --color-tertiary-fixed: #d1e4fb;
+  --color-tertiary-fixed-dim: #b5c8df;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #fdfcff;
+  --color-on-tertiary-fixed: #091d2e;
+  --color-on-tertiary-fixed-variant: #36485b;
+
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #93000a;
+
+  /* KCB brand accent — darkened slightly so white text passes WCAG AA */
+  --color-kcb: #006b5b;
+  --color-kcb-hover: #005548;
+  --color-on-kcb: #ffffff;
+
+  --color-outline: #8c7166;
+  --color-outline-variant: #e0c0b2;
+  --color-inverse-surface: #30312e;
+  --color-inverse-on-surface: #f2f0ed;
+  --color-surface-tint: #a23f00;
+
+  --radius-sm: 0.125rem;
+  --radius-DEFAULT: 0.125rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.5rem;
+  --radius-2xl: 0.75rem;
+  --radius-full: 9999px;
+}
+
+.dark {
+  --color-background: #151614;
+  --color-surface: #1b1c1a;
+  --color-surface-bright: #30312e;
+  --color-surface-dim: #151614;
+  --color-surface-container-lowest: #0f100e;
+  --color-surface-container-low: #1f201d;
+  --color-surface-container: #232421;
+  --color-surface-container-high: #2c2d2b;
+  --color-surface-container-highest: #37383536;
+  --color-surface-variant: #594238;
+  --color-on-background: #f2f0ed;
+  --color-on-surface: #f2f0ed;
+  --color-on-surface-variant: #e0c0b2;
+  --color-primary: #ffb595;
+  --color-primary-container: #7c2e00;
+  --color-on-primary: #351000;
+  --color-on-primary-container: #ffdbcd;
+  --color-secondary: #cfc5b9;
+  --color-on-secondary: #322b24;
+  --color-secondary-container: #4c463d;
+  --color-on-secondary-container: #ece1d5;
+  --color-outline: #a99588;
+  --color-outline-variant: #594238;
+}
+
+@layer base {
+  html, body {
+    background: var(--color-background);
+    color: var(--color-on-background);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--color-primary) 25%, transparent);
+  }
+}
+
+@layer components {
+  .sunset-gradient {
+    background: linear-gradient(135deg, #9e3d00 0%, #c64f00 100%);
+  }
+  .cinematic-overlay {
+    background: linear-gradient(
+      to bottom,
+      rgba(27, 28, 26, 0.55) 0%,
+      rgba(27, 28, 26, 0.1) 40%,
+      rgba(27, 28, 26, 0.75) 100%
+    );
+  }
+  .tonal-shift {
+    background: var(--color-surface-container-low);
+  }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
