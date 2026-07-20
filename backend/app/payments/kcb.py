@@ -1,4 +1,5 @@
 import json
+import logging
 import re
 import uuid
 from typing import Any
@@ -6,6 +7,8 @@ from typing import Any
 import httpx
 
 from app.config import Settings
+
+logger = logging.getLogger(__name__)
 
 
 class KcbConfigurationError(RuntimeError):
@@ -42,18 +45,41 @@ def as_bool(value: Any) -> bool:
     return bool(value)
 
 
+def mask_phone(phone: str) -> str:
+    if len(phone) <= 4:
+        return "****"
+
+    return f"{phone[:4]}{'X' * (len(phone) - 4)}"
+
+
+def mask_phone_numbers(text: str) -> str:
+    return re.sub(
+        r"\b254[71]\d{8}\b",
+        lambda match: mask_phone(match.group(0)),
+        text,
+    )
+
+
 def response_preview(response: httpx.Response, limit: int = 300) -> str:
     try:
         data = response.json()
     except ValueError:
-        return response.text[:limit]
+        return mask_phone_numbers(response.text)[:limit]
 
     if isinstance(data, dict):
         for key in ("access_token", "token", "Authorization", "authorization"):
             if key in data:
                 data[key] = "***hidden***"
 
-    return json.dumps(data)[:limit]
+    return mask_phone_numbers(json.dumps(data))[:limit]
+
+
+def safe_stk_payload(payload: dict[str, Any]) -> dict[str, Any]:
+    return {
+        **payload,
+        "phoneNumber": mask_phone(str(payload.get("phoneNumber") or "")),
+        "orgPassKey": "***hidden***" if payload.get("orgPassKey") else "",
+    }
 
 
 class KcbClient:
@@ -90,8 +116,8 @@ class KcbClient:
 
         shared_shortcode = as_bool(self.settings.kcb_shared_shortcode)
 
-        if shared_shortcode and not self.settings.kcb_till_number:
-            missing.append("KCB_TILL_NUMBER")
+        if shared_shortcode and not self.settings.kcb_org_shortcode:
+            missing.append("KCB_ORG_SHORTCODE")
 
         if not shared_shortcode:
             if not self.settings.kcb_org_shortcode:
@@ -123,9 +149,9 @@ class KcbClient:
             },
         )
 
-        print("KCB TOKEN URL:", token_url)
-        print("KCB TOKEN STATUS CODE:", response.status_code)
-        print("KCB TOKEN RESPONSE PREVIEW:", response_preview(response))
+        logger.debug("KCB token URL: %s", token_url)
+        logger.debug("KCB token status code: %s", response.status_code)
+        logger.debug("KCB token response preview: %s", response_preview(response))
 
         try:
             data = response.json()
@@ -176,24 +202,25 @@ class KcbClient:
             "Accept": "application/json",
         }
 
-    def _invoice_number(self, booking_id: str) -> str:
-        clean_booking_ref = re.sub(r"[^A-Za-z0-9]", "", booking_id) or uuid.uuid4().hex
-        till_number = str(self.settings.kcb_till_number).strip()
+    def _invoice_number(self, account_reference: str) -> str:
+        account_number = str(self.settings.kcb_org_shortcode).strip()
+        if not account_number:
+            raise KcbConfigurationError("KCB_ORG_SHORTCODE is required")
 
-        # KCB PDF format: KCBTILLNO-YOURACCREF.
-        # Keep it short enough for KCB/OpenAPI constraints.
-        max_invoice_length = 24
-        separator = "-"
-        max_ref_length = max_invoice_length - len(till_number) - len(separator)
+        account_reference = str(account_reference).strip()
+        if not account_reference:
+            raise ValueError("KCB account reference is required")
 
-        if max_ref_length < 1:
-            raise KcbConfigurationError(
-                "KCB_TILL_NUMBER is too long to build a valid invoiceNumber"
+        sanitized_reference = re.sub(r"[^A-Za-z0-9_-]", "-", account_reference)
+        prefixed_value = f"{account_number}-"
+        if sanitized_reference == account_number:
+            raise ValueError(
+                "KCB account reference must include more than the account number"
             )
+        if sanitized_reference.startswith(prefixed_value):
+            return sanitized_reference
 
-        clean_booking_ref = clean_booking_ref[:max_ref_length]
-
-        return f"{till_number}{separator}{clean_booking_ref}"
+        return f"{account_number}-{sanitized_reference}"
 
     async def initiate_stk_push(
         self, *, phone: str, amount: int, booking_id: str
@@ -216,7 +243,7 @@ class KcbClient:
             "orgShortCode": (self.settings.kcb_org_shortcode or "").strip(),
             "orgPassKey": (self.settings.kcb_org_passkey or "").strip(),
             "callbackUrl": self.settings.kcb_callback_url.strip(),
-            "transactionDescription": "Transport Pay",
+            "transactionDescription": "Uhambo booking payment",
         }
 
         owns_client = self._http_client is None
@@ -229,16 +256,11 @@ class KcbClient:
             safe_headers = dict(headers)
             safe_headers["Authorization"] = "***hidden***"
 
-            print("KCB STK URL:", stk_url)
-            print("KCB HEADERS:", safe_headers)
-            print("KCB CALLBACK URL:", repr(payload["callbackUrl"]))
-            print(
-                "KCB PAYLOAD:",
-                {
-                    **payload,
-                    "orgPassKey": "***hidden***",
-                },
-            )
+            logger.debug("KCB STK URL: %s", stk_url)
+            logger.debug("KCB STK headers: %s", safe_headers)
+
+            print("KCB SANDBOX STK PUSH PAYLOAD:")
+            print(json.dumps(safe_stk_payload(payload), indent=2))
 
             response = await client.post(
                 stk_url,
@@ -246,8 +268,8 @@ class KcbClient:
                 json=payload,
             )
 
-            print("KCB STATUS CODE:", response.status_code)
-            print("KCB RAW RESPONSE:", response.text)
+            logger.debug("KCB STK status code: %s", response.status_code)
+            logger.debug("KCB STK response preview: %s", response_preview(response))
 
             try:
                 data = response.json()

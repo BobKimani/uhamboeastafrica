@@ -25,22 +25,26 @@ class Settings:
 
     kcb_base_url = os.environ.get(
         "KCB_BASE_URL", "https://uat.buni.kcbgroup.com/mm/api/request/1.0.0"
-    ).rstrip("/")
+    ).strip().rstrip("/")
     kcb_token_url = os.environ.get(
         "KCB_TOKEN_URL",
         "https://uat.buni.kcbgroup.com/token?grant_type=client_credentials",
-    )
+    ).strip()
     kcb_consumer_key = os.environ.get("KCB_CONSUMER_KEY")
     kcb_consumer_secret = os.environ.get("KCB_CONSUMER_SECRET")
-    kcb_route_code = os.environ.get("KCB_ROUTE_CODE", "207")
-    kcb_operation = os.environ.get("KCB_OPERATION", "STKPush")
+    kcb_route_code = os.environ.get("KCB_ROUTE_CODE", "207").strip()
+    kcb_operation = os.environ.get("KCB_OPERATION", "STKPush").strip()
     kcb_shared_shortcode = (
-        os.environ.get("KCB_SHARED_SHORTCODE", "true").lower() == "true"
+        os.environ.get("KCB_SHARED_SHORTCODE", "true").strip().lower() == "true"
     )
-    kcb_till_number = os.environ.get("KCB_TILL_NUMBER", "")
-    kcb_org_shortcode = os.environ.get("KCB_ORG_SHORTCODE", "")
-    kcb_org_passkey = os.environ.get("KCB_ORG_PASSKEY", "")
-    kcb_callback_url = os.environ.get("KCB_CALLBACK_URL")
+    kcb_till_number = os.environ.get("KCB_TILL_NUMBER", "").strip()
+    kcb_org_shortcode = os.environ.get("KCB_ORG_SHORTCODE", "").strip()
+    kcb_org_passkey = os.environ.get("KCB_ORG_PASSKEY", "").strip()
+    kcb_callback_url = (
+        callback_url.strip()
+        if (callback_url := os.environ.get("KCB_CALLBACK_URL")) is not None
+        else None
+    )
 
 
 settings = Settings()
