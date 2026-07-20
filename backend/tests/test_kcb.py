@@ -1,10 +1,33 @@
 import asyncio
 import json
+from dataclasses import dataclass
 
 import httpx
 import pytest
 
-from app.payments.kcb import KcbClient, normalize_kenyan_phone, parse_stk_callback
+from app.payments.kcb import (
+    KcbClient,
+    KcbConfigurationError,
+    normalize_kenyan_phone,
+    parse_stk_callback,
+)
+
+
+@dataclass
+class KcbTestSettings:
+    kcb_base_url: str = "https://uat.buni.kcbgroup.com/mm/api/request/1.0.0"
+    kcb_token_url: str = (
+        "https://uat.buni.kcbgroup.com/token?grant_type=client_credentials"
+    )
+    kcb_consumer_key: str = "consumer-key"
+    kcb_consumer_secret: str = "consumer-secret"
+    kcb_route_code: str = "207"
+    kcb_operation: str = "STKPush"
+    kcb_shared_shortcode: bool = True
+    kcb_till_number: str = "522522"
+    kcb_org_shortcode: str = "7698390"
+    kcb_org_passkey: str = ""
+    kcb_callback_url: str = "https://example.com/api/payments/kcb/callback"
 
 
 def test_normalizes_common_kenyan_phone_formats():
@@ -66,6 +89,39 @@ def test_parses_cancelled_stk_callback_without_metadata():
     assert result["receiptNumber"] is None
 
 
+def test_builds_invoice_number_with_normal_reference():
+    assert (
+        KcbClient(KcbTestSettings())._invoice_number("aqTBHRFNQylK6EHBkrKL")
+        == "7698390-aqTBHRFNQylK6EHBkrKL"
+    )
+
+
+def test_builds_invoice_number_with_spaces_in_reference():
+    assert (
+        KcbClient(KcbTestSettings())._invoice_number(" UHAMBO TEST 001 ")
+        == "7698390-UHAMBO-TEST-001"
+    )
+
+
+def test_rejects_missing_invoice_reference():
+    with pytest.raises(ValueError, match="account reference"):
+        KcbClient(KcbTestSettings())._invoice_number("  ")
+
+
+def test_rejects_missing_account_number():
+    with pytest.raises(KcbConfigurationError, match="KCB_ORG_SHORTCODE"):
+        KcbClient(KcbTestSettings(kcb_org_shortcode="  "))._invoice_number(
+            "UHAMBO-TEST-001"
+        )
+
+
+def test_does_not_duplicate_already_prefixed_invoice_reference():
+    assert (
+        KcbClient(KcbTestSettings())._invoice_number("7698390-aqTBHRFNQylK6EHBkrKL")
+        == "7698390-aqTBHRFNQylK6EHBkrKL"
+    )
+
+
 def test_sends_kcb_buni_stk_push_contract():
     captured = {}
 
@@ -89,28 +145,14 @@ def test_sends_kcb_buni_stk_push_contract():
             },
         )
 
-    class TestSettings:
-        kcb_base_url = "https://uat.buni.kcbgroup.com/mm/api/request/1.0.0"
-        kcb_token_url = (
-            "https://uat.buni.kcbgroup.com/token?grant_type=client_credentials"
-        )
-        kcb_consumer_key = "consumer-key"
-        kcb_consumer_secret = "consumer-secret"
-        kcb_route_code = "207"
-        kcb_operation = "STKPush"
-        kcb_shared_shortcode = True
-        kcb_till_number = "123456"
-        kcb_org_shortcode = ""
-        kcb_org_passkey = ""
-        kcb_callback_url = "https://example.com/api/payments/kcb/callback"
-
     async def run_request():
         async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
-            return await KcbClient(TestSettings(), client).initiate_stk_push(
-                phone="254712345678", amount=23400, booking_id="booking-123456789"
+            return await KcbClient(KcbTestSettings(), client).initiate_stk_push(
+                phone="254712345678", amount=23400, booking_id="aqTBHRFNQylK6EHBkrKL"
             )
 
     result = asyncio.run(run_request())
+
     token_request = captured["token_request"]
     request = captured["stk_request"]
     assert result["CheckoutRequestID"] == "checkout-1"
@@ -126,12 +168,12 @@ def test_sends_kcb_buni_stk_push_contract():
     assert json.loads(request.content) == {
         "phoneNumber": "254712345678",
         "amount": "23400",
-        "invoiceNumber": "123456-booking123456789",
+        "invoiceNumber": "7698390-aqTBHRFNQylK6EHBkrKL",
         "sharedShortCode": True,
-        "orgShortCode": "",
+        "orgShortCode": "7698390",
         "orgPassKey": "",
         "callbackUrl": "https://example.com/api/payments/kcb/callback",
-        "transactionDescription": "Transport Pay",
+        "transactionDescription": "Uhambo booking payment",
     }
 
 
