@@ -2,7 +2,7 @@
 
 > **"The Breath of the Savanna"** — Tailored safaris, transport, and stays across Kenya, Tanzania, Uganda, and Rwanda.
 
-Uhambo is a travel platform that lets visitors plan multi-leg East Africa trips through a guided multi-step wizard, browse curated destinations and experiences, submit bookings and inquiries, and manage all operations through a protected admin dashboard. It is structured as a **monorepo**: a Next.js / TypeScript **frontend** (`frontend/`) and a Python **FastAPI backend** (`backend/`). Bookings and inquiries persist to Cloud Firestore through the FastAPI service; the frontend reaches it via a same-origin `/api/*` proxy, so the browser experience is unchanged.
+Uhambo is a travel platform that lets visitors plan multi-leg East Africa trips through a guided multi-step wizard, browse curated destinations and experiences, submit bookings and inquiries, pay for direct transport bookings, and manage all operations through a protected admin dashboard. It is structured as a **monorepo**: a Next.js / TypeScript **frontend** (`frontend/`) and a Python **FastAPI backend** (`backend/`). Bookings, inquiries, transport payments, hotels, and vehicles persist to AWS Aurora PostgreSQL through the FastAPI service; API traffic reaches the backend through the frontend API client and same-origin `/api/*` proxy.
 
 ---
 
@@ -15,12 +15,12 @@ Uhambo is a travel platform that lets visitors plan multi-leg East Africa trips 
 | Styling | Tailwind CSS v4 |
 | UI Components | Custom component library (Lucide React icons) |
 | Forms | React Hook Form + Zod |
-| Authentication | [Firebase Auth](https://firebase.google.com/docs/auth) |
-| Database | [Cloud Firestore](https://firebase.google.com/docs/firestore) |
-| Backend | [FastAPI](https://fastapi.tiangolo.com) (Python) + `firebase-admin` |
+| Authentication | AWS Cognito Hosted UI + signed HTTP-only admin session cookies |
+| Database | AWS Aurora PostgreSQL Serverless with IAM database authentication |
+| Backend | [FastAPI](https://fastapi.tiangolo.com) (Python) + SQLAlchemy |
 | Backend server | `uvicorn` |
 | Server validation | Pydantic (frontend forms still use Zod) |
-| Frontend → backend | Next.js `rewrites()` proxy (`/api/*` → `BACKEND_API_URL`) |
+| Frontend → backend | `NEXT_PUBLIC_API_URL` client helpers + Next.js `rewrites()` proxy (`/api/*` → `BACKEND_API_URL`) |
 | Fonts | Plus Jakarta Sans · Manrope (Google Fonts via `next/font`) |
 | Theme | `next-themes` (light / dark) |
 | Date utilities | `date-fns` |
@@ -38,17 +38,19 @@ The repository is a monorepo with two top-level apps:
 │   ├── app/
 │   │   ├── main.py            # FastAPI app + HTTPException handler + router registration
 │   │   ├── config.py          # env loading (python-dotenv)
-│   │   ├── firebase.py        # Admin credential init + get_db() (port of lib/firebase-admin.ts)
-│   │   ├── auth.py            # Bearer-token dependency (verify_id_token)
+│   │   ├── db/                # SQLAlchemy engine/session/models using Aurora IAM auth
+│   │   ├── cognito.py         # Cognito OAuth client registration
+│   │   ├── auth.py            # Signed admin-session cookie helpers
 │   │   ├── schemas.py         # Pydantic models (ported from the Zod schemas)
 │   │   ├── payments/          # Server-owned pricing + KCB Buni client/callback parser
 │   │   └── routers/
 │   │       ├── bookings.py    # POST/GET /api/bookings, PATCH/DELETE /api/bookings/{id}
 │   │       ├── inquiries.py   # POST/GET /api/inquiries, PATCH /api/inquiries/{id}
+│   │       ├── auth.py        # Cognito login, callback, /auth/me, logout
 │   │       └── payments.py    # KCB Buni STK Push, callback, and payment status
-│   ├── tests/                 # pytest contract tests (Firestore + auth mocked)
+│   ├── tests/                 # pytest contract tests
 │   ├── requirements.txt
-│   └── .env                   # FIREBASE_PROJECT_ID / CLIENT_EMAIL / PRIVATE_KEY
+│   └── .env                   # server-only backend environment
 ├── docs/                  # Internal documentation (specs, plans)
 └── README.md
 ```
@@ -60,16 +62,13 @@ frontend/
 ├── app/
 │   ├── (public)/          # All public-facing routes (navbar + footer layout)
 │   │   ├── page.tsx       # Homepage
-│   │   ├── plan-trip/     # Multi-step trip wizard (7 steps)
+│   │   ├── plan-trip/     # Multi-step trip wizard (4 steps)
 │   │   │   ├── destination/
-│   │   │   ├── dates/
-│   │   │   ├── travelers/
-│   │   │   ├── service/
-│   │   │   ├── details/
-│   │   │   ├── budget/
+│   │   │   ├── basics/
+│   │   │   ├── services/
 │   │   │   └── review/
-│   │   ├── results/       # Trip estimate, pricing, and booking submission
-│   │   ├── transport/     # Standalone transport booking
+│   │   ├── results/       # Trip estimate, pricing, and booking request submission
+│   │   ├── transport/     # Standalone transport booking with KCB payment
 │   │   ├── destinations/  # Browseable destination grid
 │   │   ├── experiences/   # Categorised experience listings
 │   │   ├── about/
@@ -80,7 +79,7 @@ frontend/
 │   │   ├── inquiries/     # Inquiries table with status updates
 │   │   └── transport/     # Vehicle fleet manager
 │   │                      # (the former app/api/* handlers now live in backend/)
-│   └── auth/              # Sign-in / Sign-up / Password reset
+│   └── auth/              # Admin auth entry page
 │
 ├── components/
 │   ├── home/              # Hero, CountryBentoGrid, ServicesSection,
@@ -92,7 +91,8 @@ frontend/
 │   │                      # ContactDetailsCard (booking submit)
 │   ├── destinations/      # DestinationCard, FilterBar
 │   ├── experiences/       # ExperienceCard, CategoryTabs
-│   ├── transport/         # TransportForm
+│   ├── transport/         # TransportForm, DirectTransportBooking
+│   ├── payments/          # KCB payment module used by direct transport only
 │   ├── contact/           # ContactForm (inquiry submit)
 │   ├── admin/             # Sidebar, Header, MobileNav, MetricCard,
 │   │                      # BookingsTable, InquiriesTable,
@@ -101,9 +101,7 @@ frontend/
 │   └── ui/                # Button, Input, Card, Badge, Accordion
 │
 ├── lib/
-│   ├── firebase.ts        # Firebase client app + Firestore + analytics
-│   ├── firebase-admin.ts  # (legacy) Admin SDK init — superseded by backend/app/firebase.py; no longer imported
-│   ├── auth.ts            # Auth helpers + useAuth hook
+│   ├── auth.ts            # Cognito session helpers + useAuth hook
 │   ├── api/
 │   │   ├── bookings.ts    # Client helpers: submit, fetch, update status
 │   │   └── inquiries.ts
@@ -140,17 +138,17 @@ frontend/
 | Page | Description |
 |---|---|
 | **Homepage** | Hero section, country bento grid (Kenya, Tanzania, Uganda, Rwanda), service cards, featured experiences, trending scroller, testimonials, and FAQ accordion |
-| **Plan Trip** | 7-step guided wizard: Destination → Dates → Travel Group → Service Type → Details → Budget → Review |
-| **Results** | Trip summary → all-in pricing estimate → contact details, submitted as a real booking to Firestore |
-| **Transport** | Standalone form for direct vehicle booking (Van, Alphard, Coaster, Land Cruiser, etc.) |
+| **Plan Trip** | 4-step guided wizard: Destination → Basics → Services → Budget & Review |
+| **Results** | Trip summary → all-in pricing estimate → contact details, submitted as a booking request to Aurora PostgreSQL. No payment module is shown here. |
+| **Transport** | Standalone direct vehicle booking (Van, Alphard, Coaster, Land Cruiser, etc.) with KCB STK Push payment |
 | **Destinations** | Filterable grid of East Africa destinations (country filter + search) |
 | **Experiences** | Tabbed experience categories: Safari, Beach, Culture, City |
-| **Contact** | Inquiry form that persists to Firestore for follow-up |
+| **Contact** | Inquiry form that persists to Aurora PostgreSQL for follow-up |
 | **About** | Company story |
 
 ### Admin Dashboard (`/admin`)
 
-Protected by Firebase Auth — unauthenticated users are redirected to `/auth`. All admin endpoints verify a Firebase ID token via `firebase-admin` before returning data.
+Protected by AWS Cognito admin login — unauthenticated users are redirected to `/auth`. The backend creates a signed HTTP-only session cookie after a successful Cognito callback, and `/auth/me` verifies that cookie before admin data is shown.
 
 | Section | Functionality |
 |---|---|
@@ -166,18 +164,15 @@ Protected by Firebase Auth — unauthenticated users are redirected to `/auth`. 
 | Step | Slug | What it collects |
 |---|---|---|
 | 1 | `destination` | Country / destination selection |
-| 2 | `dates` | Start and end date (validated, no past dates) |
-| 3 | `travelers` | Group type (Solo / Couple / Family / Group) + pax count |
-| 4 | `service` | Service scope: Accommodation, Transport, or Both |
-| 5 | `details` | Hotel region & room type **and/or** transport route & vehicle |
-| 6 | `budget` | Currency (USD / KES / EUR) + budget range |
-| 7 | `review` | Full summary; continues to `/results` for submission |
+| 2 | `basics` | Start date, end date, group type, and pax count |
+| 3 | `services` | Service scope plus accommodation and/or transport details |
+| 4 | `review` | Budget range, defaulting to KSh display, plus full summary; continues to `/results` for submission |
 
 ---
 
 ## Bookings & Inquiries — API
 
-All persistence flows through the **FastAPI backend** (`backend/app/routers/`), reached from the browser via the same-origin `/api/*` proxy. Public clients write through `POST`; only admins (verified by Firebase ID token) can `GET`, `PATCH`, or `DELETE`. The HTTP contract (paths, methods, status codes, and JSON shapes) is identical to the previous Next.js Route Handlers.
+All persistence flows through the **FastAPI backend** (`backend/app/routers/`). Public clients write through `POST`; only admins with a valid Cognito-backed session cookie can `GET`, `PATCH`, or `DELETE`.
 
 | Method | Route | Auth | Purpose |
 |---|---|---|---|
@@ -188,33 +183,17 @@ All persistence flows through the **FastAPI backend** (`backend/app/routers/`), 
 | `POST` | `/api/inquiries` | Public | Submit a contact-form inquiry |
 | `GET` | `/api/inquiries` | Admin | List inquiries, newest first |
 | `PATCH` | `/api/inquiries/[id]` | Admin | Update an inquiry's status |
-| `POST` | `/api/payments/kcb/stk-push` | Public | Initiate the booking's server-priced KCB payment |
+| `POST` | `/api/payments/kcb/stk-push` | Public | Initiate a direct transport booking's server-priced KCB payment |
 | `POST` | `/api/payments/kcb/callback` | KCB Buni | Receive the asynchronous STK Push result |
 | `GET` | `/api/payments/kcb/status/[booking_id]` | Public | Return only payment status and receipt for UI polling |
 
-**Validation.** Every request body is parsed through a Pydantic model (`backend/app/schemas.py`) before it touches Firestore. Public POST routes accept only user-supplied fields — `status`, `createdAt`, and `updatedAt` are set server-side. (The frontend forms still validate with the matching Zod schemas in `frontend/lib/validations/`.)
+**Validation.** Every request body is parsed through a Pydantic model (`backend/app/schemas.py`) before it touches Aurora PostgreSQL. Public POST routes accept only user-supplied fields — `status`, `createdAt`, and `updatedAt` are set server-side. (The frontend forms still validate with the matching Zod schemas in `frontend/lib/validations/`.)
 
-**Auth.** Admin routes read `Authorization: Bearer <id-token>`, call `verify_id_token()` on the `firebase-admin` Python SDK, and reject with 401 if missing or invalid. The browser helpers in `frontend/lib/api/*` attach the current Firebase user's ID token automatically; the proxy forwards the header unchanged.
+**Auth.** Admin pages call `/auth/me` with `credentials: "include"`. The backend reads the signed admin session cookie, confirms the user belongs to an allowed Cognito admin group, and returns 401 only when the cookie is missing, invalid, expired, or not an admin session.
 
-**Firestore collections.**
+**Payments.** KCB payment UI is intentionally limited to the standalone Transport page. The trip-planning Results page submits a booking request for follow-up and does not show a payment module. Direct transport bookings calculate the payable KES amount from the selected vehicle type, daily rate, number of days, and USD→KES rate; the frontend does not send a test amount override.
 
-| Collection | Document shape | Status values |
-|---|---|---|
-| `bookings` | `CreateBookingInput` + `status`, `createdAt`, `updatedAt` | `new`, `contacted`, `quoted`, `confirmed`, `cancelled`, `completed` |
-| `inquiries` | `CreateInquiryInput` + `status`, `createdAt`, `updatedAt` | `new`, `read`, `replied`, `archived` |
-
-**Firestore security rules.** Because every read and write goes through the Admin SDK (which bypasses rules), the database can be fully locked down:
-
-```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if false;
-    }
-  }
-}
-```
+**Database.** The backend uses SQLAlchemy with the `postgresql+psycopg` driver. Aurora PostgreSQL access uses IAM database authentication; no permanent database password is required or stored.
 
 ---
 
@@ -224,10 +203,10 @@ service cloud.firestore {
 
 - Node.js 20+
 - Python 3.11+
-- A Firebase project with Email/Password authentication **and** Cloud Firestore (Native mode) enabled
-- A Firebase service-account JSON for the Admin SDK (Project settings → Service accounts → Generate new private key)
+- An AWS Cognito user pool with a hosted UI app client
+- An Aurora PostgreSQL database user configured for IAM database authentication
 
-The dev setup runs **two processes**: the FastAPI backend on `:8000` and the Next.js frontend on `:3000`. The frontend proxies all `/api/*` requests to `BACKEND_API_URL` (default `http://localhost:8000`), so both must be running together.
+The dev setup runs **two processes**: the FastAPI backend on `:8000` and the Next.js frontend on `:3000`. The frontend proxies `/api/*` requests to `BACKEND_API_URL` and calls admin auth endpoints through `NEXT_PUBLIC_API_URL` (both default to `http://localhost:8000` locally), so both processes must be running together.
 
 ### 1. Backend (FastAPI)
 
@@ -242,30 +221,60 @@ uvicorn app.main:app --reload --port 8000
 Create `backend/.env` (never commit — see [`backend/.env.example`](backend/.env.example)):
 
 ```env
-# Firebase Admin SDK (server-only)
-FIREBASE_PROJECT_ID=<your-project-id>
-FIREBASE_CLIENT_EMAIL=<service-account@your-project.iam.gserviceaccount.com>
-FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nMIIE...\n-----END PRIVATE KEY-----\n"
+# Admin authentication (AWS Cognito)
+COGNITO_CLIENT_ID=<cognito_app_client_id>
+COGNITO_CLIENT_SECRET=<cognito_app_client_secret>
+COGNITO_USER_POOL_ID=<cognito_user_pool_id>
+COGNITO_REGION=eu-north-1
+COGNITO_DOMAIN=https://<your-cognito-domain>.auth.eu-north-1.amazoncognito.com
+COGNITO_METADATA_URL=https://cognito-idp.eu-north-1.amazonaws.com/<cognito_user_pool_id>/.well-known/openid-configuration
+COGNITO_REDIRECT_URI=http://localhost:8000/auth/callback
+COGNITO_LOGOUT_REDIRECT_URI=http://localhost:3000/auth
+COGNITO_ADMIN_GROUPS=admin,admins
+SESSION_SECRET=<long-random-session-secret>
+SESSION_COOKIE_NAME=uhambo_admin_session
+OAUTH_STATE_COOKIE_NAME=uhambo_oauth_state
+SESSION_MAX_AGE_SECONDS=86400
+SESSION_HTTPS_ONLY=false
+FRONTEND_URL=http://localhost:3000
+CORS_ALLOWED_ORIGINS=http://localhost:3000
+
+# Aurora PostgreSQL IAM auth
+DB_HOST=<aurora-writer-endpoint>
+DB_PORT=5432
+DB_NAME=<aurora_database_name>
+DB_USER=<iam_database_user>
+DB_SSLMODE=require
+AWS_REGION=eu-north-1
+S3_BUCKET=uhambo-s3-bucket
+S3_PUBLIC_BASE_URL=https://uhambo-s3-bucket.s3.eu-north-1.amazonaws.com
+
+# Currency conversion
+DEFAULT_USD_TO_KES_RATE=129.0
+CURRENCY_CACHE_SECONDS=21600
 
 # KCB Buni M-Pesa Express (server-only)
+KCB_ENVIRONMENT=sandbox
 KCB_BASE_URL=https://uat.buni.kcbgroup.com/mm/api/request/1.0.0
-KCB_ACCESS_TOKEN=<oauth-access-token>
-KCB_API_KEY=<application-api-key>
-KCB_USERNAME=<application-user>
-KCB_PASSWORD=<application-user-password>
+KCB_TOKEN_URL=https://uat.buni.kcbgroup.com/token?grant_type=client_credentials
+KCB_CONSUMER_KEY=<consumer_key_from_kcb>
+KCB_CONSUMER_SECRET=<consumer_secret_from_kcb>
 KCB_ROUTE_CODE=207
 KCB_OPERATION=STKPush
 KCB_SHARED_SHORTCODE=true
+KCB_TILL_NUMBER=<actual_kcb_till_number>
 KCB_ORG_SHORTCODE=
+KCB_ACCOUNT_REFERENCE=7698390
 KCB_ORG_PASSKEY=
 KCB_CALLBACK_URL=https://your-public-domain.example/api/payments/kcb/callback
 ```
 
-The private key **must** be wrapped in double quotes; the `\n` escape sequences are converted to real newlines at runtime.
-
 The callback URL must be publicly reachable over HTTPS. The attached KCB contract
-uses the UAT host and shared-shortcode mode by default. For production, replace
-the base URL and credentials with those assigned to your KCB Buni application.
+uses the UAT host and shared-shortcode mode by default. For production, set
+`KCB_ENVIRONMENT=production` and replace the token URL, base URL, credentials,
+and merchant identifiers with those assigned to your KCB Buni application. The
+backend refuses to start in production mode if UAT/sandbox hosts or a localhost
+callback are configured.
 The UI keeps Paybill `522522` / account `7698390` available as a manual-payment
 fallback.
 
@@ -282,17 +291,10 @@ npm run dev
 Create `frontend/.env.local` (never commit):
 
 ```env
-# Firebase Web SDK (client-side, safe to expose)
-NEXT_PUBLIC_FIREBASE_API_KEY=<your-api-key>
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=<your-auth-domain>
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=<your-project-id>
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=<your-storage-bucket>
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=<your-messaging-sender-id>
-NEXT_PUBLIC_FIREBASE_APP_ID=<your-app-id>
-NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=<your-measurement-id>
-
-# Points the /api/* proxy at the FastAPI backend
+# Points the /api/* proxy and browser auth/payment API calls at FastAPI
 BACKEND_API_URL=http://localhost:8000
+NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_MEDIA_URL=https://your-distribution.cloudfront.net
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
@@ -319,13 +321,15 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Authentication
 
-Authentication is handled via **Firebase Auth** using email + password. The `useAuth` hook ([`frontend/lib/auth.ts`](frontend/lib/auth.ts)) exposes `signIn`, `signUp`, `signOut`, and `resetPassword`, plus reactive `user` and `loading` state. The admin layout redirects unauthenticated users to `/auth`, and the backend's admin endpoints require a verified Firebase ID token.
+Admin authentication is handled through **AWS Cognito Hosted UI**. The frontend auth helpers ([`frontend/lib/auth.ts`](frontend/lib/auth.ts)) send admins to `http://localhost:8000/auth/login?redirect=/admin` during local development, call `/auth/me` with `credentials: "include"`, and send logout requests to the backend.
+
+After Cognito redirects back to `/auth/callback`, the FastAPI backend creates a signed HTTP-only session cookie (`uhambo_admin_session` by default) with local-development settings of `secure=false`, `samesite="lax"`, `path="/"`, and no `localhost` domain attribute. `/auth/me` returns the authenticated admin user only when that cookie is present, valid, unexpired, and tied to an allowed Cognito admin group.
 
 ---
 
 ## Image Hosting
 
-Remote images are sourced from **Unsplash** (`images.unsplash.com` and `source.unsplash.com`), permitted in `frontend/next.config.ts`.
+Remote images are sourced from **Unsplash** (`images.unsplash.com` and `source.unsplash.com`) and the configured media/CDN host, permitted in `frontend/next.config.ts`.
 
 ---
 
@@ -338,4 +342,6 @@ Remote images are sourced from **Unsplash** (`images.unsplash.com` and `source.u
 - Fixed safari permits & fees: **$420**
 - 10% service charge on the subtotal
 
-Currency display respects the traveller's selected currency (USD / KES / EUR).
+Currency display respects the traveller's selected currency (KES / USD). The plan-trip review step starts in KSh by default.
+
+KCB payment is not part of the plan-trip Results page. It only appears in the standalone Transport page, where the amount charged is the real transport total based on the selected vehicle type, vehicle daily rate, booking days, and the USD→KES conversion rate.
