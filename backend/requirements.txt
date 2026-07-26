@@ -3,5 +3,13 @@ uvicorn[standard]
 firebase-admin
 pydantic[email]
 python-dotenv
+psycopg[binary]
+SQLAlchemy
+boto3
+botocore[crt]
+python-multipart
 pytest
 httpx
+authlib
+werkzeug
+itsdangerous
