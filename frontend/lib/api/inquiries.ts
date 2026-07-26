@@ -1,4 +1,3 @@
-import { auth } from "@/lib/auth";
 import type {
     Inquiry,
     CreateInquiryInput,
@@ -22,17 +21,9 @@ export async function submitInquiry(formData: CreateInquiryInput) {
 }
 
 export async function fetchAdminInquiries(): Promise<Inquiry[]> {
-    const currentUser = auth.currentUser;
-
-    if (!currentUser) {
-        throw new Error("Admin is not logged in");
-    }
-
-    const token = await currentUser.getIdToken();
-
     const response = await fetch(apiUrl("/api/inquiries"), {
         method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
     });
 
     const result = await readJson<{ inquiries: Inquiry[] }>(
@@ -44,24 +35,30 @@ export async function fetchAdminInquiries(): Promise<Inquiry[]> {
 }
 
 export async function updateInquiryStatus(id: string, status: InquiryStatus) {
-    const currentUser = auth.currentUser;
-
-    if (!currentUser) {
-        throw new Error("Admin is not logged in");
-    }
-
-    const token = await currentUser.getIdToken();
-
     const response = await fetch(apiUrl(`/api/inquiries/${id}`), {
         method: "PATCH",
+        credentials: "include",
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ status }),
     });
 
     const result = await readJson(response, "Failed to update inquiry status");
+
+    return result;
+}
+
+export async function deleteInquiry(id: string) {
+    const response = await fetch(apiUrl(`/api/inquiries/${id}`), {
+        method: "DELETE",
+        credentials: "include",
+    });
+
+    const result = await readJson<{ success: true; message: string }>(
+        response,
+        "Failed to delete inquiry"
+    );
 
     return result;
 }

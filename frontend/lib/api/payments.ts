@@ -4,17 +4,20 @@ export type PaymentStatus = "unpaid" | "pending" | "paid" | "failed";
 
 export async function initiateKcbPayment(
   bookingId: string,
-  phone: string,
-  amountKes?: number
+  phone: string
 ) {
   const response = await fetch(apiUrl("/api/payments/kcb/stk-push"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ bookingId, phone, amountKes }),
+    body: JSON.stringify({ bookingId, phone }),
   });
   return readJson<{
     success: true;
     message: string;
+    paymentId: string;
+    paymentReference: string;
+    invoiceNumber: string;
+    status: "pending";
     checkoutRequestId: string;
   }>(response, "KCB payment request failed");
 }

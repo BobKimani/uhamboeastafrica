@@ -1,4 +1,3 @@
-import { auth } from "@/lib/auth";
 import type {
     Booking,
     CreateBookingInput,
@@ -23,17 +22,9 @@ export async function submitBooking(formData: CreateBookingInput) {
 }
 
 export async function fetchAdminBookings(): Promise<Booking[]> {
-    const currentUser = auth.currentUser;
-
-    if (!currentUser) {
-        throw new Error("Admin is not logged in");
-    }
-
-    const token = await currentUser.getIdToken();
-
     const response = await fetch(apiUrl("/api/bookings"), {
         method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
     });
 
     const result = await readJson<{ bookings: Booking[] }>(
@@ -45,19 +36,11 @@ export async function fetchAdminBookings(): Promise<Booking[]> {
 }
 
 export async function updateBookingStatus(id: string, status: BookingStatus) {
-    const currentUser = auth.currentUser;
-
-    if (!currentUser) {
-        throw new Error("Admin is not logged in");
-    }
-
-    const token = await currentUser.getIdToken();
-
     const response = await fetch(apiUrl(`/api/bookings/${id}`), {
         method: "PATCH",
+        credentials: "include",
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ status }),
     });
@@ -68,19 +51,9 @@ export async function updateBookingStatus(id: string, status: BookingStatus) {
 }
 
 export async function deleteBooking(id: string) {
-    const currentUser = auth.currentUser;
-
-    if (!currentUser) {
-        throw new Error("Admin is not logged in");
-    }
-
-    const token = await currentUser.getIdToken();
-
     const response = await fetch(apiUrl(`/api/bookings/${id}`), {
         method: "DELETE",
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
+        credentials: "include",
     });
 
     const result = await readJson<{ success: true; message: string }>(
