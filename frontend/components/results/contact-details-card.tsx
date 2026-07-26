@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { UserCircle, Send, CheckCircle2, AlertCircle, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -10,7 +10,6 @@ import { useWizard } from "@/lib/wizard/store";
 import { totalRooms } from "@/lib/wizard/types";
 import { submitBooking } from "@/lib/api/bookings";
 import type { CreateBookingInput, TravellingWith } from "@/types/booking";
-import { KcbPayment } from "@/components/payments/kcb-payment";
 
 const INITIAL_CONTACT = {
   firstName: "",
@@ -40,12 +39,6 @@ export function ContactDetailsCard() {
   const [form, setForm] = useState(INITIAL_CONTACT);
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [payment, setPayment] = useState<{
-    bookingId: string;
-    amountKes: number;
-    phone: string;
-  } | null>(null);
-  const [paymentComplete, setPaymentComplete] = useState(false);
 
   const busy = status === "submitting";
   const done = status === "success";
@@ -102,19 +95,11 @@ export function ContactDetailsCard() {
     setErrorMessage(null);
 
     try {
-      const result = await submitBooking(payload);
+      await submitBooking(payload);
       setStatus("success");
-      if (result.payment.required && result.payment.amountKes) {
-        setPayment({
-          bookingId: result.id,
-          amountKes: result.payment.amountKes,
-          phone: payload.phone,
-        });
-      } else {
-        setForm(INITIAL_CONTACT);
-        reset();
-        setTimeout(() => router.push("/"), 2000);
-      }
+      setForm(INITIAL_CONTACT);
+      reset();
+      setTimeout(() => router.push("/"), 2000);
     } catch (error) {
       setStatus("error");
       setErrorMessage(
@@ -122,11 +107,6 @@ export function ContactDetailsCard() {
       );
     }
   }
-
-  const handlePaymentComplete = useCallback(() => {
-    setPaymentComplete(true);
-    reset();
-  }, [reset]);
 
   function handleCancel() {
     if (busy || done) return;
@@ -234,11 +214,8 @@ export function ContactDetailsCard() {
           >
             <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0" />
             <span>
-              {payment
-                ? paymentComplete
-                  ? "Booking and payment received — your transport is being confirmed."
-                  : "Booking received — complete the transport payment below."
-                : "Booking received — our team will reach out shortly. Redirecting you home…"}
+              Booking received — our team will reach out shortly. Redirecting
+              you home…
             </span>
           </div>
         )}
@@ -277,15 +254,6 @@ export function ContactDetailsCard() {
           </Button>
         </div>
       </form>
-
-      {payment && (
-        <KcbPayment
-          bookingId={payment.bookingId}
-          initialPhone={payment.phone}
-          amountKes={payment.amountKes}
-          onPaid={handlePaymentComplete}
-        />
-      )}
     </Card>
   );
 }

@@ -7,6 +7,7 @@ import { WizardShell } from "@/components/wizard/wizard-shell";
 import { useWizard } from "@/lib/wizard/store";
 import { RoomType, ServiceType, totalRooms } from "@/lib/wizard/types";
 import { Input, Label } from "@/components/ui/input";
+import { mediaUrl } from "@/lib/media";
 import { cn } from "@/lib/utils";
 import { useVehicles } from "@/lib/use-vehicles";
 import { TransportMap } from "@/components/transport/transport-map";
@@ -289,7 +290,7 @@ export default function ServicesStep() {
                       >
                         <div className="relative aspect-16/9 overflow-hidden">
                           <Image
-                            src={v.image}
+                            src={mediaUrl(v.image)}
                             alt={v.name}
                             fill
                             sizes="(max-width: 768px) 100vw, 33vw"

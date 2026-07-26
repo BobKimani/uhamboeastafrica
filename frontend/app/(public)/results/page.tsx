@@ -8,9 +8,11 @@ import { Card } from "@/components/ui/card";
 import { SummaryPanel } from "@/components/results/summary-panel";
 import { ContactDetailsCard } from "@/components/results/contact-details-card";
 import { PricingSummary } from "@/components/results/pricing-summary";
+import { useVehicles } from "@/lib/use-vehicles";
 
 export default function ResultsPage() {
   const { state, hydrated } = useWizard();
+  const { vehicles } = useVehicles();
 
   if (!hydrated) {
     return (
@@ -46,7 +48,7 @@ export default function ResultsPage() {
     );
   }
 
-  const estimate = estimateTrip(state);
+  const estimate = estimateTrip(state, vehicles);
 
   return (
     <div className="min-h-screen pt-28 pb-24 px-6 md:px-10 max-w-6xl mx-auto">

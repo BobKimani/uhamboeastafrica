@@ -10,8 +10,8 @@ import { cn, formatDateRange } from "@/lib/utils";
 import { formatTravelPrice, USD_TO_KES } from "@/lib/currency";
 
 const CURRENCIES: { code: Currency; label: string }[] = [
-  { code: "USD", label: "USD ($)" },
   { code: "KES", label: "KSh" },
+  { code: "USD", label: "USD ($)" },
 ];
 
 // KSh 200,000 and KSh 1,500,000 expressed in USD (internal unit), floored to step

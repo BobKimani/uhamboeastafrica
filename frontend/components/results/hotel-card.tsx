@@ -3,6 +3,7 @@ import { Star } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { mediaUrl } from "@/lib/media";
 import { formatCurrency } from "@/lib/utils";
 import type { Hotel } from "@/lib/data/hotels";
 
@@ -17,7 +18,7 @@ export function HotelCard({
     <Card className="border border-outline-variant/15 flex flex-col overflow-hidden group">
       <div className="relative aspect-16/10 overflow-hidden">
         <Image
-          src={hotel.image}
+          src={mediaUrl(hotel.image)}
           alt={hotel.name}
           fill
           sizes="(max-width: 768px) 100vw, 33vw"

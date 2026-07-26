@@ -1,9 +1,13 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { HOTELS } from "@/lib/data/hotels";
+import { mediaUrl } from "@/lib/media";
+import { useHotels } from "@/lib/use-hotels";
 
 export function TrendingScroller() {
-  const featuredHotels = HOTELS.filter((hotel) => hotel.isAvailable).slice(0, 8);
+  const { hotels } = useHotels();
+  const featuredHotels = hotels.filter((hotel) => hotel.isAvailable).slice(0, 8);
 
   return (
     <section className="bg-surface-container-lowest py-24 md:py-28 overflow-hidden">
@@ -27,7 +31,7 @@ export function TrendingScroller() {
             <div className="bg-surface-container-low rounded-2xl p-4 hover:-translate-y-1 transition-transform duration-300">
               <div className="relative w-full h-52 rounded-xl overflow-hidden mb-4">
                 <Image
-                  src={hotel.image}
+                  src={mediaUrl(hotel.image)}
                   alt={hotel.name}
                   fill
                   sizes="320px"
