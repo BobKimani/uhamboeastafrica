@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
   LayoutDashboard,
@@ -24,11 +24,10 @@ const NAV = [
 
 export function AdminSidebar() {
   const pathname = usePathname();
-  const router = useRouter();
   const { user } = useAuth();
   const [signingOut, setSigningOut] = useState(false);
-  const adminName = getAdminName(user?.displayName, user?.email);
-  const adminDetail = user?.displayName && user.email ? user.email : "Admin";
+  const adminName = getAdminName(user?.displayName, user?.name, user?.email);
+  const adminDetail = user?.email?.trim() || "No email";
   const initials = getInitials(adminName);
 
   const isActive = (href: string) =>
@@ -39,7 +38,6 @@ export function AdminSidebar() {
 
     try {
       await signOutUser();
-      router.replace("/auth");
     } catch (error) {
       console.error("Failed to sign out", error);
       setSigningOut(false);
@@ -119,11 +117,18 @@ export function AdminSidebar() {
   );
 }
 
-function getAdminName(displayName?: string | null, email?: string | null) {
-  const name = displayName?.trim();
-  if (name) return name;
+function getAdminName(
+  displayName?: string | null,
+  name?: string | null,
+  email?: string | null
+) {
+  const explicitName = displayName?.trim() || name?.trim();
+  if (explicitName && explicitName !== email?.trim()) return explicitName;
 
-  return email?.trim() || "Admin";
+  const username = email?.split("@")[0]?.trim();
+  if (username) return username;
+
+  return "Admin";
 }
 
 function getInitials(name: string) {

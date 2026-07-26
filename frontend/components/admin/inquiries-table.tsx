@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Search, AlertCircle, RefreshCw } from "lucide-react";
+import { Search, AlertCircle, RefreshCw, Trash2 } from "lucide-react";
 import {
   TableCard,
   TableToolbar,
@@ -13,6 +13,7 @@ import {
 import {
   fetchAdminInquiries,
   updateInquiryStatus,
+  deleteInquiry,
 } from "@/lib/api/inquiries";
 import type { Inquiry, InquiryStatus } from "@/types/inquiry";
 import { cn, formatTimestamp } from "@/lib/utils";
@@ -51,6 +52,7 @@ export function InquiriesTable() {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   async function load() {
     setLoading(true);
@@ -86,6 +88,28 @@ export function InquiriesTable() {
       );
     } finally {
       setUpdatingId(null);
+    }
+  }
+
+  async function handleDelete(inquiry: Inquiry) {
+    const confirmed = window.confirm(
+      `Delete inquiry from ${inquiry.fullName}? This action cannot be undone.`
+    );
+    if (!confirmed) return;
+
+    setDeletingId(inquiry.id);
+    const previous = inquiries;
+    setInquiries((rows) => rows.filter((i) => i.id !== inquiry.id));
+
+    try {
+      await deleteInquiry(inquiry.id);
+    } catch (error) {
+      setInquiries(previous);
+      setErrorMessage(
+        error instanceof Error ? error.message : "Failed to delete inquiry."
+      );
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -182,6 +206,7 @@ export function InquiriesTable() {
               <Th>Message</Th>
               <Th>Submitted</Th>
               <Th>Status</Th>
+              <Th className="text-right">Actions</Th>
             </tr>
           </thead>
           <tbody>
@@ -223,6 +248,17 @@ export function InquiriesTable() {
                       ))}
                     </select>
                   </div>
+                </Td>
+                <Td className="text-right">
+                  <button
+                    type="button"
+                    onClick={() => void handleDelete(inquiry)}
+                    disabled={deletingId === inquiry.id}
+                    aria-label={`Delete inquiry from ${inquiry.fullName}`}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-red-500 transition-colors disabled:opacity-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                 </Td>
               </tr>
             ))}
