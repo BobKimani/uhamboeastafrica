@@ -54,16 +54,10 @@ export function KcbPayment({
   const [message, setMessage] = useState<string | null>(null);
   const [receipt, setReceipt] = useState<string | null>(null);
   const [paybillOpen, setPaybillOpen] = useState(false);
-  const [testAmount, setTestAmount] = useState(String(amountKes));
 
   const phoneValid = isValidKenyanPhone(phone);
   const showPhoneError = phoneTouched && phone.length > 0 && !phoneValid;
-  const parsedTestAmount = Number(testAmount);
-  const effectiveAmountKes =
-    Number.isFinite(parsedTestAmount) && parsedTestAmount > 0
-      ? Math.round(parsedTestAmount)
-      : amountKes;
-  const formattedAmount = formatKes(effectiveAmountKes);
+  const formattedAmount = formatKes(amountKes);
 
   useEffect(() => {
     if (status !== "pending") return;
@@ -95,11 +89,7 @@ export function KcbPayment({
     setMessage(null);
     setStatus("pending");
     try {
-      const result = await initiateKcbPayment(
-        bookingId,
-        phone,
-        effectiveAmountKes
-      );
+      const result = await initiateKcbPayment(bookingId, phone);
       setMessage(result.message);
     } catch (error) {
       setStatus("failed");
@@ -239,20 +229,6 @@ export function KcbPayment({
                   Enter a valid Safaricom number, e.g. 0712 345 678.
                 </p>
               )}
-            </div>
-
-            <div className="mt-4">
-              <Label htmlFor="kcbTestAmount">Test amount (KES)</Label>
-              <Input
-                id="kcbTestAmount"
-                type="number"
-                inputMode="numeric"
-                min={1}
-                step={1}
-                value={testAmount}
-                onChange={(event) => setTestAmount(event.target.value)}
-                className="mt-2"
-              />
             </div>
 
             {message && (
