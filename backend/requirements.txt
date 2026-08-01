@@ -1,6 +1,5 @@
 fastapi
 uvicorn[standard]
-firebase-admin
 pydantic[email]
 python-dotenv
 psycopg[binary]
@@ -11,5 +10,4 @@ python-multipart
 pytest
 httpx
 authlib
-werkzeug
 itsdangerous
