@@ -88,14 +88,6 @@ async def _fetch_rate(url: str, source: str) -> ExchangeRate:
     }
 
 
-def _save_database_rate(rate: ExchangeRate) -> None:
-    return None
-
-
-def _database_rate() -> ExchangeRate | None:
-    return None
-
-
 async def get_usd_to_kes_rate() -> ExchangeRate:
     cached = _cached_rate()
     if cached:
@@ -107,7 +99,6 @@ async def get_usd_to_kes_rate() -> ExchangeRate:
     ):
         try:
             rate = await _fetch_rate(url, source)
-            _save_database_rate(rate)
             logger.info("USD to KES rate fetched successfully from %s", source)
             return _store_cache(rate)
         except Exception:
@@ -115,10 +106,6 @@ async def get_usd_to_kes_rate() -> ExchangeRate:
                 logger.exception("Currency primary API failed")
             else:
                 logger.exception("Currency fallback API failed")
-
-    database_rate = _database_rate()
-    if database_rate:
-        return _store_cache(database_rate, cached=True)
 
     logger.warning("Using env fallback exchange rate")
     return _store_cache(

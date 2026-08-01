@@ -118,9 +118,12 @@ async def initiate_stk_push(request: Request, db: Session = Depends(get_db)):
             content={"success": False, "error": "Booking not found"},
         )
 
-    amount = data.amountKes or booking.amount_kes or booking.transport_amount_kes
+    # The amount is always derived server-side from the booking; a
+    # client-supplied amount would let callers underpay and still be
+    # reconciled as paid by the callback.
+    amount = booking.amount_kes or booking.transport_amount_kes
     payment_rate = None
-    if not data.amountKes and not amount and booking.amount_usd:
+    if not amount and booking.amount_usd:
         payment_rate = await convert_usd_to_kes(float(booking.amount_usd))
         amount = payment_rate["amountKes"]
 
@@ -191,6 +194,8 @@ async def initiate_stk_push(request: Request, db: Session = Depends(get_db)):
             booking.transport_amount_kes = payment_rate["amountKes"]
             booking.currency_source = payment_rate["source"]
             booking.rate_locked_at = datetime.now(UTC)
+        # CheckoutRequestID stays server-side: exposing it would let the
+        # initiator forge a matching "paid" callback.
         return {
             "success": True,
             "message": "Check your phone and enter your M-Pesa PIN",
@@ -198,7 +203,6 @@ async def initiate_stk_push(request: Request, db: Session = Depends(get_db)):
             "paymentReference": payment.payment_reference,
             "invoiceNumber": payment.invoice_number,
             "status": payment.status,
-            "checkoutRequestId": response["CheckoutRequestID"],
         }
     except KcbConfigurationError:
         logger.exception("KCB Buni configuration error")

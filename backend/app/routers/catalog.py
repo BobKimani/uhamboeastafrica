@@ -308,7 +308,10 @@ async def upload_catalog_image(
         )
 
     extension = file.filename.rsplit(".", 1)[-1].lower() if file.filename else "bin"
-    key = f"catalog/{datetime.now(UTC).strftime('%Y/%m/%d')}/{datetime.now(UTC).timestamp():.0f}-{_slug(file.filename or 'image')}.{extension}"
+    if not re.fullmatch(r"[a-z0-9]{1,8}", extension):
+        extension = "bin"
+    now = datetime.now(UTC)
+    key = f"catalog/{now.strftime('%Y/%m/%d')}/{now.timestamp():.0f}-{_slug(file.filename or 'image')}.{extension}"
 
     try:
         body = await file.read()

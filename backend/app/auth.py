@@ -6,7 +6,7 @@ from app.config import settings
 SESSION_COOKIE_SALT = "uhambo-admin-session"
 
 
-def _session_serializer() -> URLSafeTimedSerializer:
+def session_serializer() -> URLSafeTimedSerializer:
     return URLSafeTimedSerializer(
         secret_key=settings.session_secret,
         salt=SESSION_COOKIE_SALT,
@@ -18,7 +18,7 @@ def require_authenticated_admin(request: Request) -> dict:
     if not session_value:
         raise HTTPException(status_code=401, detail="Unauthorized")
     try:
-        payload = _session_serializer().loads(
+        payload = session_serializer().loads(
             session_value,
             max_age=settings.session_max_age_seconds,
         )

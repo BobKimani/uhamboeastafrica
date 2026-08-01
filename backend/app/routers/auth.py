@@ -2,20 +2,20 @@ import base64
 import json
 import logging
 from collections.abc import Mapping
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 
 from authlib.integrations.base_client.errors import OAuthError
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse, RedirectResponse
-from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
+from itsdangerous import BadSignature, SignatureExpired
 
+from app.auth import session_serializer
 from app.cognito import oauth
 from app.config import settings
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 logger = logging.getLogger(__name__)
 SESSION_COOKIE_NAME = settings.session_cookie_name
-SESSION_COOKIE_SALT = "uhambo-admin-session"
 
 
 def _safe_frontend_redirect(path: str = "/admin") -> str:
@@ -28,33 +28,33 @@ def _admin_auth_redirect() -> str:
     return f"{settings.frontend_url}/auth?redirect={quote('/admin', safe='')}"
 
 
-def _external_base_url(request: Request) -> str:
-    host = request.headers.get("x-forwarded-host") or request.headers.get("host")
-    proto = request.headers.get("x-forwarded-proto") or request.url.scheme
-    return f"{proto}://{host}"
+def _allowed_forwarded_hosts() -> set[str]:
+    hosts = set()
+    for url in (settings.frontend_url, settings.cognito_redirect_uri):
+        host = urlparse(url or "").netloc
+        if host:
+            hosts.add(host.lower())
+    return hosts
 
 
 def _callback_redirect_uri(request: Request) -> str:
-    forwarded_host = request.headers.get("x-forwarded-host")
-    if forwarded_host:
-        return f"{_external_base_url(request)}/auth/callback"
+    # Only honour X-Forwarded-Host when it matches a host we already trust
+    # from configuration; otherwise an attacker-supplied header would steer
+    # the OAuth redirect_uri.
+    forwarded_host = (request.headers.get("x-forwarded-host") or "").strip().lower()
+    if forwarded_host and forwarded_host in _allowed_forwarded_hosts():
+        proto = request.headers.get("x-forwarded-proto") or request.url.scheme
+        return f"{proto}://{forwarded_host}/auth/callback"
     return settings.cognito_redirect_uri
 
 
-def _session_serializer() -> URLSafeTimedSerializer:
-    return URLSafeTimedSerializer(
-        secret_key=settings.session_secret,
-        salt=SESSION_COOKIE_SALT,
-    )
-
-
 def _create_session_value(user: dict) -> str:
-    return _session_serializer().dumps({"user": user})
+    return session_serializer().dumps({"user": user})
 
 
 def _load_session_user(session_value: str) -> tuple[dict | None, str | None]:
     try:
-        payload = _session_serializer().loads(
+        payload = session_serializer().loads(
             session_value,
             max_age=settings.session_max_age_seconds,
         )
