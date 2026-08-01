@@ -73,7 +73,6 @@ export type CreateBookingInput = {
     transportTo?: string;
     transportDays?: number;
     vehicleType?: string;
-    transportAmountKes?: number;
 };
 
 export type CreateBookingResult = {

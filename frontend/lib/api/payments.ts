@@ -18,7 +18,6 @@ export async function initiateKcbPayment(
     paymentReference: string;
     invoiceNumber: string;
     status: "pending";
-    checkoutRequestId: string;
   }>(response, "KCB payment request failed");
 }
 

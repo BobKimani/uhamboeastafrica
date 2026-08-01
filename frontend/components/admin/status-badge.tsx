@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import type { BookingStatus } from "@/lib/data/bookings";
+import type { BookingStatus } from "@/types/booking";
 
 const STYLES: Record<BookingStatus, string> = {
   new:

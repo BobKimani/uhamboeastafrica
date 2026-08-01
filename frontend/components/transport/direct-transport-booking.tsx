@@ -120,7 +120,6 @@ export function DirectTransportBooking({
       transportTo: to.trim(),
       transportDays: days,
       vehicleType: vehicle.type,
-      transportAmountKes,
     };
 
     setSubmitting(true);
