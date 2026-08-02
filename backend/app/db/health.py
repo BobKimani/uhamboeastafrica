@@ -12,6 +12,6 @@ def check_database_connection() -> bool:
         with SessionLocal() as db:
             db.execute(text("SELECT 1"))
         return True
-    except Exception:
-        logger.warning("Database health check failed")
+    except Exception as exc:
+        logger.warning("Database health check failed: %s", exc.__class__.__name__)
         return False

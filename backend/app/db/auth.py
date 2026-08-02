@@ -1,13 +1,28 @@
 import logging
 
-import boto3
-from botocore.exceptions import (
-    BotoCoreError,
-    ClientError,
-    MissingDependencyException,
-    NoCredentialsError,
-    PartialCredentialsError,
-)
+try:
+    from botocore.exceptions import (
+        BotoCoreError,
+        ClientError,
+        MissingDependencyException,
+        NoCredentialsError,
+        PartialCredentialsError,
+    )
+except ModuleNotFoundError:
+    class BotoCoreError(Exception):
+        pass
+
+    class ClientError(Exception):
+        pass
+
+    class MissingDependencyException(Exception):
+        pass
+
+    class NoCredentialsError(Exception):
+        pass
+
+    class PartialCredentialsError(Exception):
+        pass
 
 from app.config import settings
 
@@ -22,6 +37,17 @@ class DatabaseAuthenticationError(RuntimeError):
     pass
 
 
+def create_rds_client():
+    try:
+        import boto3
+    except ModuleNotFoundError as exc:
+        raise DatabaseAuthenticationError(
+            'Failed to generate IAM database auth token; install "boto3"'
+        ) from exc
+
+    return boto3.client("rds", region_name=settings.aws_region)
+
+
 def generate_iam_auth_token() -> str:
     if not settings.db_host:
         raise DatabaseConfigurationError("DB_HOST is required for IAM database auth")
@@ -31,7 +57,7 @@ def generate_iam_auth_token() -> str:
         raise DatabaseConfigurationError("AWS_REGION is required for IAM database auth")
 
     try:
-        client = boto3.client("rds", region_name=settings.aws_region)
+        client = create_rds_client()
         token = client.generate_db_auth_token(
             DBHostname=settings.db_host,
             Port=settings.db_port,
