@@ -1,6 +1,6 @@
-import { VEHICLES } from "@/lib/data/vehicles";
 import { nightsBetween } from "@/lib/utils";
 import type { WizardState, Currency } from "@/lib/wizard/types";
+import type { Vehicle } from "@/lib/data/vehicles";
 
 export type TripLineItem = { label: string; amount: number };
 export type TripEstimate = {
@@ -11,12 +11,13 @@ export type TripEstimate = {
   currency: Currency;
 };
 
-export function estimateTrip(state: WizardState): TripEstimate {
+export function estimateTrip(state: WizardState, vehicles: Vehicle[] = []): TripEstimate {
   const lines: TripLineItem[] = [];
   const nights = nightsBetween(state.startDate, state.endDate);
   const days = state.transport?.days ?? Math.max(nights, 1);
 
-  const vehicle = VEHICLES.find((v) => v.type === state.transport?.vehicleType) ?? VEHICLES[0];
+  const vehicle =
+    vehicles.find((v) => v.type === state.transport?.vehicleType) ?? vehicles[0];
 
   if (state.serviceType !== "transport") {
     const accLabel = state.accommodation?.region ?? "Accommodation";

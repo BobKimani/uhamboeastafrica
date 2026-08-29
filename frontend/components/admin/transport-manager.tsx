@@ -13,7 +13,8 @@ import {
   Td,
   TableEmpty,
 } from "@/components/admin/data-table";
-import { VEHICLES, type Vehicle } from "@/lib/data/vehicles";
+import type { Vehicle } from "@/lib/data/vehicles";
+import { uploadCatalogImage } from "@/lib/api/catalog";
 import { cn, formatCurrency } from "@/lib/utils";
 import { useVehicles } from "@/lib/use-vehicles";
 
@@ -28,6 +29,7 @@ type VehicleDraft = {
   region: string;
   bestFor: string;
   image: string;
+  imageFile: File | null;
   isAvailable: boolean;
 };
 
@@ -40,6 +42,7 @@ const EMPTY: VehicleDraft = {
   region: "",
   bestFor: "",
   image: "",
+  imageFile: null,
   isAvailable: true,
 };
 
@@ -59,7 +62,7 @@ export function TransportManager() {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<"create" | "edit">("edit");
   const [draft, setDraft] = useState<VehicleDraft>(EMPTY);
-  const { vehicles, saveVehicle, deleteVehicle } = useVehicles();
+  const { vehicles, saveVehicle, deleteVehicle, loading, error } = useVehicles();
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -84,6 +87,7 @@ export function TransportManager() {
       region: v.region,
       bestFor: v.bestFor,
       image: v.image,
+      imageFile: null,
       isAvailable: v.isAvailable,
     });
     setOpen(true);
@@ -95,12 +99,12 @@ export function TransportManager() {
     setOpen(true);
   };
 
-  const handleDelete = (vehicle: Vehicle) => {
+  const handleDelete = async (vehicle: Vehicle) => {
     const confirmed = window.confirm(
       `Delete ${vehicle.name}? This action cannot be undone.`
     );
     if (!confirmed) return;
-    deleteVehicle(vehicle.id);
+    await deleteVehicle(vehicle.id);
   };
 
   const handleCurrencyChange = (nextCurrency: DisplayCurrency) => {
@@ -116,18 +120,23 @@ export function TransportManager() {
     setCurrency(nextCurrency);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!draft.name || !draft.type || draft.capacity === "" || draft.pricePerDay === "") {
       return;
     }
 
-    const vehicleId = draft.id.trim() || `v-${Date.now()}`;
+    const vehicleId = draft.id.trim();
 
     const existingVehicle = vehicles.find((vehicle) => vehicle.id === vehicleId);
-    const fallbackVehicle = VEHICLES[0];
+    const image =
+      draft.imageFile !== null
+        ? (await uploadCatalogImage(draft.imageFile)).url
+        : draft.image.trim() || existingVehicle?.image;
 
-    saveVehicle({
+    if (!image) return;
+
+    await saveVehicle({
       id: vehicleId,
       name: draft.name,
       type: draft.type,
@@ -135,8 +144,8 @@ export function TransportManager() {
       pricePerDay: getUsdPrice(draft.pricePerDay, currency),
       region: draft.region,
       bestFor: draft.bestFor,
-      features: existingVehicle?.features ?? fallbackVehicle.features,
-      image: draft.image.trim() || existingVehicle?.image || fallbackVehicle.image,
+      features: existingVehicle?.features ?? [],
+      image,
       isAvailable: draft.isAvailable,
     });
 
@@ -147,14 +156,11 @@ export function TransportManager() {
   const handleImageUpload = async (file: File | null) => {
     if (!file) return;
 
-    const dataUrl = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result ?? ""));
-      reader.onerror = () => reject(new Error("Failed to read image."));
-      reader.readAsDataURL(file);
-    });
-
-    setDraft((current) => ({ ...current, image: dataUrl }));
+    setDraft((current) => ({
+      ...current,
+      image: URL.createObjectURL(file),
+      imageFile: file,
+    }));
   };
 
   return (
@@ -202,7 +208,15 @@ export function TransportManager() {
           </div>
         </TableToolbar>
 
-        {rows.length === 0 ? (
+        {error && (
+          <div className="px-5 py-3 text-sm text-red-500 border-b border-outline-variant/25">
+            {error}
+          </div>
+        )}
+
+        {loading ? (
+          <TableEmpty message="Loading vehicles..." />
+        ) : rows.length === 0 ? (
           <TableEmpty message="No vehicles match your search." />
         ) : (
           <Table>

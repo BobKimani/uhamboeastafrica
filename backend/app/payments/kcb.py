@@ -2,13 +2,17 @@ import json
 import logging
 import re
 import uuid
+from datetime import UTC, datetime
 from typing import Any
+from urllib.parse import urlparse
+from uuid import UUID
 
 import httpx
 
 from app.config import Settings
 
 logger = logging.getLogger(__name__)
+INVOICE_NUMBER_PATTERN = re.compile(r"^[A-Z0-9-]{1,50}$")
 
 
 class KcbConfigurationError(RuntimeError):
@@ -74,6 +78,135 @@ def response_preview(response: httpx.Response, limit: int = 300) -> str:
     return mask_phone_numbers(json.dumps(data))[:limit]
 
 
+def _url_host(value: str | None) -> str:
+    return urlparse((value or "").strip()).netloc or "<missing>"
+
+
+def _url_scheme(value: str | None) -> str:
+    return urlparse((value or "").strip()).scheme
+
+
+def _contains_non_production_marker(value: str | None) -> bool:
+    text = (value or "").strip().lower()
+    return "uat" in text or "sandbox" in text
+
+
+def _is_local_url(value: str | None) -> bool:
+    host = _url_host(value).split(":", 1)[0].lower()
+    return host in {"localhost", "127.0.0.1", "::1", "<missing>"}
+
+
+def kcb_runtime_summary(settings: Settings) -> dict[str, Any]:
+    base_url = (settings.kcb_base_url or "").strip().rstrip("/")
+    token_url = (settings.kcb_token_url or "").strip()
+    callback_url = (settings.kcb_callback_url or "").strip()
+    return {
+        "environment": settings.kcb_environment,
+        "tokenHost": _url_host(token_url),
+        "stkHost": _url_host(base_url),
+        "stkEndpoint": f"{base_url}/stkpush" if base_url else "<missing>",
+        "routeCode": settings.kcb_route_code,
+        "operation": settings.kcb_operation,
+        "sharedShortCode": as_bool(settings.kcb_shared_shortcode),
+        "orgShortCode": (settings.kcb_org_shortcode or "").strip() or "<missing>",
+        "tillNumber": (settings.kcb_till_number or "").strip() or "<missing>",
+        "callbackHost": _url_host(callback_url),
+        "credentialsPresent": bool(
+            (settings.kcb_consumer_key or "").strip()
+            and (settings.kcb_consumer_secret or "").strip()
+        ),
+        "orgPassKeyPresent": bool((settings.kcb_org_passkey or "").strip()),
+    }
+
+
+def log_kcb_runtime_configuration(settings: Settings) -> None:
+    summary = kcb_runtime_summary(settings)
+    logger.info(
+        "KCB runtime config: environment=%s tokenHost=%s stkHost=%s stkEndpoint=%s "
+        "routeCode=%s operation=%s sharedShortCode=%s orgShortCode=%s tillNumber=%s "
+        "callbackHost=%s credentialsPresent=%s orgPassKeyPresent=%s",
+        summary["environment"],
+        summary["tokenHost"],
+        summary["stkHost"],
+        summary["stkEndpoint"],
+        summary["routeCode"],
+        summary["operation"],
+        summary["sharedShortCode"],
+        summary["orgShortCode"],
+        summary["tillNumber"],
+        summary["callbackHost"],
+        summary["credentialsPresent"],
+        summary["orgPassKeyPresent"],
+    )
+
+
+def validate_kcb_runtime_configuration(settings: Settings) -> None:
+    environment = (settings.kcb_environment or "").strip().lower()
+    if environment not in {"production", "prod", "sandbox", "uat", "test", "development"}:
+        raise KcbConfigurationError(
+            "KCB_ENVIRONMENT must be one of production, sandbox, uat, test, or development"
+        )
+    if environment not in {"production", "prod"}:
+        return
+
+    errors = []
+    if _contains_non_production_marker(settings.kcb_base_url):
+        errors.append("KCB_BASE_URL contains uat/sandbox")
+    if _contains_non_production_marker(settings.kcb_token_url):
+        errors.append("KCB_TOKEN_URL contains uat/sandbox")
+    if not (settings.kcb_consumer_key or "").strip():
+        errors.append("KCB_CONSUMER_KEY is missing")
+    if not (settings.kcb_consumer_secret or "").strip():
+        errors.append("KCB_CONSUMER_SECRET is missing")
+    if not (settings.kcb_org_shortcode or "").strip():
+        errors.append("KCB_ORG_SHORTCODE is missing")
+    if not (settings.kcb_till_number or "").strip():
+        errors.append("KCB_TILL_NUMBER is missing")
+    if not (settings.kcb_account_reference or "").strip():
+        errors.append("KCB_ACCOUNT_REFERENCE is missing")
+    if _url_scheme(settings.kcb_callback_url) != "https":
+        errors.append("KCB_CALLBACK_URL must be HTTPS")
+    if _is_local_url(settings.kcb_callback_url):
+        errors.append("KCB_CALLBACK_URL must not be localhost in production")
+    if not as_bool(settings.kcb_shared_shortcode) and not (
+        settings.kcb_org_passkey or ""
+    ).strip():
+        errors.append("KCB_ORG_PASSKEY is required when shared shortcode is false")
+
+    if errors:
+        raise KcbConfigurationError(
+            f"Invalid KCB production configuration: {', '.join(errors)}"
+        )
+
+
+def build_payment_reference(payment_id: UUID, created_at: datetime) -> str:
+    date_part = created_at.astimezone(UTC).strftime("%Y%m%d")
+    uuid_part = payment_id.hex[-12:-4].upper()
+    return f"UHA-{date_part}-{uuid_part}"
+
+
+def build_kcb_invoice_number(settings: Settings, payment_reference: str) -> str:
+    account_reference = (settings.kcb_account_reference or "").strip()
+    if not account_reference:
+        raise KcbConfigurationError("KCB_ACCOUNT_REFERENCE is required")
+
+    sanitized_reference = re.sub(
+        r"[^A-Za-z0-9-]",
+        "-",
+        payment_reference.strip(),
+    ).upper()
+    if not sanitized_reference:
+        raise ValueError("KCB payment reference is required")
+
+    sanitized_account = re.sub(r"[^A-Za-z0-9-]", "-", account_reference).upper()
+    invoice_number = f"{sanitized_account}-{sanitized_reference}"
+    if not INVOICE_NUMBER_PATTERN.fullmatch(invoice_number):
+        raise ValueError(
+            "KCB invoice number must be 1-50 uppercase letters, numbers, or hyphens"
+        )
+    return invoice_number
+
+
 def safe_stk_payload(payload: dict[str, Any]) -> dict[str, Any]:
     return {
         **payload,
@@ -118,6 +251,9 @@ class KcbClient:
 
         if shared_shortcode and not self.settings.kcb_org_shortcode:
             missing.append("KCB_ORG_SHORTCODE")
+
+        if not self.settings.kcb_account_reference:
+            missing.append("KCB_ACCOUNT_REFERENCE")
 
         if not shared_shortcode:
             if not self.settings.kcb_org_shortcode:
@@ -202,28 +338,17 @@ class KcbClient:
             "Accept": "application/json",
         }
 
-    def _invoice_number(self, account_reference: str) -> str:
-        account_number = str(self.settings.kcb_org_shortcode).strip()
-        if not account_number:
-            raise KcbConfigurationError("KCB_ORG_SHORTCODE is required")
-
-        account_reference = str(account_reference).strip()
-        if not account_reference:
-            raise ValueError("KCB account reference is required")
-
-        sanitized_reference = re.sub(r"[^A-Za-z0-9_-]", "-", account_reference)
-        prefixed_value = f"{account_number}-"
-        if sanitized_reference == account_number:
-            raise ValueError(
-                "KCB account reference must include more than the account number"
-            )
-        if sanitized_reference.startswith(prefixed_value):
-            return sanitized_reference
-
-        return f"{account_number}-{sanitized_reference}"
+    def _invoice_number(self, payment_reference: str) -> str:
+        return build_kcb_invoice_number(self.settings, payment_reference)
 
     async def initiate_stk_push(
-        self, *, phone: str, amount: int, booking_id: str
+        self,
+        *,
+        phone: str,
+        amount: int,
+        booking_id: str,
+        payment_reference: str,
+        invoice_number: str,
     ) -> dict[str, Any]:
         self._validate_configuration()
 
@@ -231,7 +356,8 @@ class KcbClient:
             raise ValueError("Amount must be greater than 0")
 
         normalized_phone = normalize_kenyan_phone(phone)
-        invoice_number = self._invoice_number(booking_id)
+        if invoice_number != self._invoice_number(payment_reference):
+            raise ValueError("KCB invoice number does not match payment reference")
 
         stk_url = f"{self.settings.kcb_base_url.rstrip('/')}/stkpush"
 
@@ -258,9 +384,18 @@ class KcbClient:
 
             logger.debug("KCB STK URL: %s", stk_url)
             logger.debug("KCB STK headers: %s", safe_headers)
-
-            print("KCB SANDBOX STK PUSH PAYLOAD:")
-            print(json.dumps(safe_stk_payload(payload), indent=2))
+            logger.info(
+                "KCB STK request: environment=%s tokenHost=%s stkHost=%s "
+                "paymentReference=%s invoiceNumber=%s amount=%s callbackHost=%s",
+                self.settings.kcb_environment,
+                _url_host(self.settings.kcb_token_url),
+                _url_host(stk_url),
+                payment_reference,
+                invoice_number,
+                amount,
+                _url_host(self.settings.kcb_callback_url),
+            )
+            logger.debug("KCB STK payload preview: %s", safe_stk_payload(payload))
 
             response = await client.post(
                 stk_url,
@@ -313,6 +448,14 @@ class KcbClient:
                     response_code=response_code or None,
                 )
 
+            logger.info(
+                "KCB STK accepted: paymentReference=%s invoiceNumber=%s merchantRequestId=%s checkoutRequestId=%s responseCode=%s",
+                payment_reference,
+                invoice_number,
+                result.get("MerchantRequestID"),
+                result.get("CheckoutRequestID"),
+                response_code,
+            )
             return result
 
         except KcbRequestError:

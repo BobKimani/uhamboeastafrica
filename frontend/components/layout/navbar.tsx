@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
+import { IMG } from "@/lib/images";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./theme-toggle";
 
@@ -45,7 +46,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-6 md:px-10">
         <Link href="/" aria-label="Uhambo East Africa — Home">
           <Image
-            src="/assets/uhambo-logo-v2.png"
+            src={IMG.logo}
             alt="Uhambo East Africa"
             width={44}
             height={44}

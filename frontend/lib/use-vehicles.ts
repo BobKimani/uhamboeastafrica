@@ -1,79 +1,48 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { VEHICLES, type Vehicle } from "@/lib/data/vehicles";
-
-const STORAGE_KEY = "uhambo-admin-vehicles";
-const VEHICLES_CHANGED_EVENT = "uhambo-vehicles-changed";
-
-function readVehicles() {
-  if (typeof window === "undefined") return VEHICLES;
-
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return VEHICLES;
-
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return VEHICLES;
-
-    return parsed.map((vehicle) => {
-      const candidate = vehicle as Partial<Vehicle>;
-      return {
-        ...candidate,
-        id: candidate.id ?? `v-${Date.now()}`,
-        name: candidate.name ?? "Untitled vehicle",
-        type: candidate.type ?? "Vehicle",
-        capacity: candidate.capacity ?? 1,
-        pricePerDay: candidate.pricePerDay ?? 0,
-        bestFor: candidate.bestFor ?? "General transport",
-        features: Array.isArray(candidate.features) ? candidate.features : [],
-        image: candidate.image ?? VEHICLES[0].image,
-        region: candidate.region ?? "All regions",
-        isAvailable: candidate.isAvailable ?? true,
-      } as Vehicle;
-    });
-  } catch {
-    return VEHICLES;
-  }
-}
-
-function writeVehicles(vehicles: Vehicle[]) {
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(vehicles));
-  window.dispatchEvent(new Event(VEHICLES_CHANGED_EVENT));
-}
+import type { Vehicle } from "@/lib/data/vehicles";
+import {
+  deleteVehicle as deleteVehicleRequest,
+  fetchVehicles,
+  saveVehicle as saveVehicleRequest,
+} from "@/lib/api/catalog";
 
 export function useVehicles() {
-  const [vehicles, setVehicles] = useState<Vehicle[]>(VEHICLES);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  async function reload() {
+    setLoading(true);
+    setError(null);
+    try {
+      setVehicles(await fetchVehicles());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load vehicles.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    const syncVehicles = () => setVehicles(readVehicles());
-
-    syncVehicles();
-    window.addEventListener("storage", syncVehicles);
-    window.addEventListener(VEHICLES_CHANGED_EVENT, syncVehicles);
-
-    return () => {
-      window.removeEventListener("storage", syncVehicles);
-      window.removeEventListener(VEHICLES_CHANGED_EVENT, syncVehicles);
-    };
+    void reload();
   }, []);
 
-  function saveVehicle(nextVehicle: Vehicle) {
-    const nextVehicles = vehicles.some((vehicle) => vehicle.id === nextVehicle.id)
-      ? vehicles.map((vehicle) =>
-          vehicle.id === nextVehicle.id ? nextVehicle : vehicle
-        )
-      : [nextVehicle, ...vehicles];
-
-    setVehicles(nextVehicles);
-    writeVehicles(nextVehicles);
+  async function saveVehicle(nextVehicle: Vehicle) {
+    const saved = await saveVehicleRequest(nextVehicle);
+    setVehicles((rows) =>
+      rows.some((vehicle) => vehicle.id === saved.id)
+        ? rows.map((vehicle) => (vehicle.id === saved.id ? saved : vehicle))
+        : [saved, ...rows]
+    );
+    return saved;
   }
 
-  function deleteVehicle(id: string) {
-    const nextVehicles = vehicles.filter((vehicle) => vehicle.id !== id);
-    setVehicles(nextVehicles);
-    writeVehicles(nextVehicles);
+  async function deleteVehicle(id: string) {
+    await deleteVehicleRequest(id);
+    setVehicles((rows) => rows.filter((vehicle) => vehicle.id !== id));
   }
 
-  return { vehicles, saveVehicle, deleteVehicle };
+  return { vehicles, saveVehicle, deleteVehicle, loading, error, reload };
 }

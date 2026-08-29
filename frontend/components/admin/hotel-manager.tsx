@@ -13,7 +13,8 @@ import {
   Td,
   TableEmpty,
 } from "@/components/admin/data-table";
-import { HOTELS, type Hotel } from "@/lib/data/hotels";
+import type { Hotel } from "@/lib/data/hotels";
+import { uploadCatalogImage } from "@/lib/api/catalog";
 import { cn, formatCurrency } from "@/lib/utils";
 import { useHotels } from "@/lib/use-hotels";
 
@@ -31,6 +32,7 @@ type HotelDraft = {
   description: string;
   topRated: boolean;
   image: string;
+  imageFile: File | null;
   isAvailable: boolean;
 };
 
@@ -46,6 +48,7 @@ const EMPTY: HotelDraft = {
   description: "",
   topRated: false,
   image: "",
+  imageFile: null,
   isAvailable: true,
 };
 
@@ -59,17 +62,13 @@ function getUsdPrice(price: number, currency: DisplayCurrency) {
   return currency === "KES" ? price / KES_PER_USD : price;
 }
 
-function generateId() {
-  return `h${Date.now()}`;
-}
-
 export function HotelManager() {
   const [query, setQuery] = useState("");
   const [currency, setCurrency] = useState<DisplayCurrency>("KES");
   const [editOpen, setEditOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [draft, setDraft] = useState<HotelDraft>(EMPTY);
-  const { hotels, saveHotel, deleteHotel } = useHotels();
+  const { hotels, saveHotel, deleteHotel, loading, error } = useHotels();
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -87,7 +86,7 @@ export function HotelManager() {
   const hotelToDelete = hotels.find((h) => h.id === deleteId);
 
   const openAdd = () => {
-    setDraft({ ...EMPTY, id: generateId() });
+    setDraft(EMPTY);
     setEditOpen(true);
   };
 
@@ -104,6 +103,7 @@ export function HotelManager() {
       description: h.description,
       topRated: h.topRated ?? false,
       image: h.image,
+      imageFile: null,
       isAvailable: h.isAvailable,
     });
     setEditOpen(true);
@@ -112,14 +112,11 @@ export function HotelManager() {
   const handleImageUpload = async (file: File | null) => {
     if (!file) return;
 
-    const dataUrl = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result ?? ""));
-      reader.onerror = () => reject(new Error("Failed to read image."));
-      reader.readAsDataURL(file);
-    });
-
-    setDraft((current) => ({ ...current, image: dataUrl }));
+    setDraft((current) => ({
+      ...current,
+      image: URL.createObjectURL(file),
+      imageFile: file,
+    }));
   };
 
   const handleCurrencyChange = (next: DisplayCurrency) => {
@@ -134,10 +131,9 @@ export function HotelManager() {
     setCurrency(next);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (
-      !draft.id ||
       !draft.name ||
       !draft.destination ||
       draft.pricePerNight === "" ||
@@ -146,7 +142,14 @@ export function HotelManager() {
       return;
 
     const existing = hotels.find((h) => h.id === draft.id);
-    saveHotel({
+    const image =
+      draft.imageFile !== null
+        ? (await uploadCatalogImage(draft.imageFile)).url
+        : draft.image || existing?.image;
+
+    if (!image) return;
+
+    await saveHotel({
       id: draft.id,
       name: draft.name,
       country: draft.country.toLowerCase().trim(),
@@ -160,14 +163,14 @@ export function HotelManager() {
         .filter(Boolean),
       description: draft.description.trim(),
       topRated: draft.topRated,
-      image: draft.image || existing?.image || HOTELS[0].image,
+      image,
       isAvailable: draft.isAvailable,
     });
     setEditOpen(false);
   };
 
-  const confirmDelete = () => {
-    if (deleteId) deleteHotel(deleteId);
+  const confirmDelete = async () => {
+    if (deleteId) await deleteHotel(deleteId);
     setDeleteId(null);
   };
 
@@ -217,7 +220,15 @@ export function HotelManager() {
           </div>
         </TableToolbar>
 
-        {rows.length === 0 ? (
+        {error && (
+          <div className="px-5 py-3 text-sm text-red-500 border-b border-outline-variant/25">
+            {error}
+          </div>
+        )}
+
+        {loading ? (
+          <TableEmpty message="Loading hotels..." />
+        ) : rows.length === 0 ? (
           <TableEmpty
             message={
               query

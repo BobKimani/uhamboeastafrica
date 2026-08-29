@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { Hotel } from "@/lib/data/hotels";
 import { formatTravelPrice, type DisplayCurrency } from "@/lib/currency";
+import { mediaUrl } from "@/lib/media";
 import { cn } from "@/lib/utils";
 
 export function DestinationCard({
@@ -18,7 +19,7 @@ export function DestinationCard({
     <Card className="border border-outline-variant/15 flex flex-col overflow-hidden group">
       <div className="relative aspect-4/3 overflow-hidden">
         <Image
-          src={hotel.image}
+          src={mediaUrl(hotel.image)}
           alt={hotel.name}
           fill
           sizes="(max-width: 768px) 100vw, 33vw"

@@ -10,21 +10,15 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env
-.env.*
-!.env.example
-
 # firebase service account (never commit)
 firebase-service-account.json
 
 # backend (python)
 backend/uhambo/
-backend/__pycache__/
+backend/.venv/
 **/__pycache__/
 *.py[cod]
 .pytest_cache/
-backend/.env.example
 
 # build artifacts (also ignored in frontend/.gitignore)
 .next/
@@ -37,3 +31,7 @@ frontend/*.tsbuildinfo
 
 #mds
 docs/
+
+# Env files (keep .env.example tracked)
+frontend/.env
+backend/.env

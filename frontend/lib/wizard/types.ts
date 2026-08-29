@@ -58,5 +58,5 @@ export const INITIAL_STATE: WizardState = {
   paxCount: 2,
   accommodation: {},
   transport: { days: 3 },
-  budget: { currency: "USD", min: 1000, max: 5000 },
+  budget: { currency: "KES", min: 1000, max: 5000 },
 };

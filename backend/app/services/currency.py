@@ -4,10 +4,8 @@ from decimal import Decimal, ROUND_HALF_UP
 from typing import Any, TypedDict
 
 import httpx
-from firebase_admin import firestore
 
 from app.config import settings
-from app.firebase import get_db
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +14,6 @@ PRIMARY_USD_API = (
     "currencies/usd.min.json"
 )
 FALLBACK_USD_API = "https://latest.currency-api.pages.dev/v1/currencies/usd.min.json"
-EXCHANGE_RATE_DOC_ID = "USD_KES"
 
 
 class ExchangeRate(TypedDict):
@@ -91,48 +88,6 @@ async def _fetch_rate(url: str, source: str) -> ExchangeRate:
     }
 
 
-def _save_database_rate(rate: ExchangeRate) -> None:
-    try:
-        db = get_db()
-        db.collection("exchange_rates").document(EXCHANGE_RATE_DOC_ID).set(
-            {
-                "base_currency": "USD",
-                "target_currency": "KES",
-                "rate": rate["rate"],
-                "source": rate["source"],
-                "rate_date": rate["date"],
-                "created_at": firestore.SERVER_TIMESTAMP,
-            }
-        )
-    except Exception:
-        logger.exception("Failed to save USD to KES exchange rate")
-
-
-def _database_rate() -> ExchangeRate | None:
-    try:
-        db = get_db()
-        snapshot = db.collection("exchange_rates").document(EXCHANGE_RATE_DOC_ID).get()
-    except Exception:
-        logger.exception("Failed to read database cached exchange rate")
-        return None
-
-    if not snapshot.exists:
-        return None
-
-    data = snapshot.to_dict() or {}
-    rate = data.get("rate")
-    if rate is None:
-        return None
-
-    logger.info("Using database cached exchange rate")
-    return {
-        "rate": float(rate),
-        "source": "database-cache",
-        "date": str(data.get("rate_date") or ""),
-        "cached": True,
-    }
-
-
 async def get_usd_to_kes_rate() -> ExchangeRate:
     cached = _cached_rate()
     if cached:
@@ -144,7 +99,6 @@ async def get_usd_to_kes_rate() -> ExchangeRate:
     ):
         try:
             rate = await _fetch_rate(url, source)
-            _save_database_rate(rate)
             logger.info("USD to KES rate fetched successfully from %s", source)
             return _store_cache(rate)
         except Exception:
@@ -152,10 +106,6 @@ async def get_usd_to_kes_rate() -> ExchangeRate:
                 logger.exception("Currency primary API failed")
             else:
                 logger.exception("Currency fallback API failed")
-
-    database_rate = _database_rate()
-    if database_rate:
-        return _store_cache(database_rate, cached=True)
 
     logger.warning("Using env fallback exchange rate")
     return _store_cache(

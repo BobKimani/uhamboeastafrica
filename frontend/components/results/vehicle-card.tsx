@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DEFAULT_CURRENCY, formatTravelPrice } from "@/lib/currency";
+import { mediaUrl } from "@/lib/media";
 import { formatCurrency } from "@/lib/utils";
 import type { Vehicle } from "@/lib/data/vehicles";
 
@@ -34,7 +35,7 @@ export function VehicleCard({
     >
       <div className="relative aspect-16/10 overflow-hidden">
         <Image
-          src={vehicle.image}
+          src={mediaUrl(vehicle.image)}
           alt={vehicle.name}
           fill
           sizes="(max-width: 768px) 100vw, 33vw"
