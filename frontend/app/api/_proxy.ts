@@ -1,7 +1,8 @@
-const FASTAPI_BASE_URL =
-  process.env.BACKEND_API_URL ??
-  process.env.NEXT_PUBLIC_API_URL ??
-  "http://localhost:8000";
+import { resolveApiBaseUrl } from "@/lib/api/base-url";
+
+const FASTAPI_BASE_URL = resolveApiBaseUrl({
+  value: process.env.BACKEND_API_URL ?? process.env.NEXT_PUBLIC_API_URL,
+});
 
 export async function proxyToFastApi(request: Request, path: string) {
   const incomingUrl = new URL(request.url);

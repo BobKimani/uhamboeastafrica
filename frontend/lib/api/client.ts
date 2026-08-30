@@ -1,5 +1,8 @@
-export const API_BASE_URL =
-  (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000").replace(/\/+$/, "");
+import { resolveApiBaseUrl } from "./base-url";
+
+export const API_BASE_URL = resolveApiBaseUrl({
+  value: process.env.NEXT_PUBLIC_API_URL,
+});
 
 if (process.env.NODE_ENV !== "production") {
   console.info("[auth] API base URL:", API_BASE_URL);
