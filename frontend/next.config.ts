@@ -1,5 +1,14 @@
 import type { NextConfig } from "next";
 
+const backendApiUrl =
+  process.env.BACKEND_API_URL ??
+  process.env.NEXT_PUBLIC_API_URL ??
+  (process.env.NODE_ENV === "development" ? "http://localhost:8000" : undefined);
+
+if (!backendApiUrl) {
+  throw new Error("NEXT_PUBLIC_API_URL is required in production");
+}
+
 const nextConfig: NextConfig = {
   output: "standalone",
   
@@ -11,16 +20,11 @@ const nextConfig: NextConfig = {
     ],
   },
   async rewrites() {
-    const backendApiUrl =
-      process.env.BACKEND_API_URL ??
-      process.env.NEXT_PUBLIC_API_URL ??
-      "http://localhost:8000";
-
     return {
       beforeFiles: [
         {
           source: "/api/:path*",
-          destination: `${backendApiUrl}/api/:path*`,
+          destination: `${backendApiUrl.replace(/\/+$/, "")}/api/:path*`,
         },
       ],
     };
