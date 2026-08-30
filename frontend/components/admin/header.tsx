@@ -10,7 +10,7 @@ export function AdminHeader({
   description?: string;
 }) {
   return (
-    <header className="sticky top-0 z-30 h-16 flex items-center gap-3 px-4 md:px-8 border-b border-outline-variant/30 bg-background/85 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 h-16 flex items-center gap-3 border-b border-outline-variant/30 bg-background/85 px-4 backdrop-blur-xl md:px-8">
       <AdminMobileNav />
 
       <div className="min-w-0 flex-1">

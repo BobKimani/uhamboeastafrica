@@ -8,7 +8,7 @@ export default function BookingsPage() {
         title="Bookings"
         description="Every trip submitted through the Plan Trip flow."
       />
-      <main className="p-4 md:p-8">
+      <main className="min-w-0 p-4 md:p-8">
         <BookingsTable />
       </main>
     </>

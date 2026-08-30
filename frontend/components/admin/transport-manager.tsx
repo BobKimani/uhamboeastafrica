@@ -167,7 +167,7 @@ export function TransportManager() {
     <>
       <TableCard>
         <TableToolbar>
-          <div className="flex items-center h-10 w-full md:w-80 gap-2 px-3 rounded-xl bg-surface-container-low text-on-surface-variant">
+          <div className="flex h-10 w-full min-w-0 items-center gap-2 rounded-xl bg-surface-container-low px-3 text-on-surface-variant md:w-80">
             <Search className="h-4 w-4" aria-hidden />
             <input
               type="search"
@@ -175,11 +175,11 @@ export function TransportManager() {
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search vehicles…"
               aria-label="Search vehicles"
-              className="flex-1 bg-transparent text-sm text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none"
+              className="min-w-0 flex-1 bg-transparent text-sm text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none"
             />
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex min-w-0 flex-wrap items-center gap-2 md:justify-end">
             <div
               className="inline-flex h-10 rounded-xl bg-surface-container-low p-1"
               aria-label="Display currency"

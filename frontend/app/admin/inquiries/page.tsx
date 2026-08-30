@@ -8,7 +8,7 @@ export default function InquiriesPage() {
         title="Inquiries"
         description="Messages submitted through the Contact form."
       />
-      <main className="p-4 md:p-8">
+      <main className="min-w-0 p-4 md:p-8">
         <InquiriesTable />
       </main>
     </>

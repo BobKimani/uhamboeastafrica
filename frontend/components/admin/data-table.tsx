@@ -10,7 +10,7 @@ export function TableCard({
   return (
     <div
       className={cn(
-        "bg-surface-container-lowest border border-outline-variant/25 rounded-2xl overflow-hidden",
+        "w-full min-w-0 bg-surface-container-lowest border border-outline-variant/25 rounded-2xl overflow-hidden",
         className
       )}
     >
@@ -21,7 +21,7 @@ export function TableCard({
 
 export function TableToolbar({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 px-5 py-4 border-b border-outline-variant/25">
+    <div className="flex min-w-0 flex-col gap-3 border-b border-outline-variant/25 px-4 py-4 md:flex-row md:items-center md:justify-between md:px-5">
       {children}
     </div>
   );
@@ -29,8 +29,8 @@ export function TableToolbar({ children }: { children: React.ReactNode }) {
 
 export function Table({ children }: { children: React.ReactNode }) {
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm text-left border-collapse">
+    <div className="w-full overflow-x-auto">
+      <table className="min-w-max w-full text-sm text-left border-collapse">
         {children}
       </table>
     </div>

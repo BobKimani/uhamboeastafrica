@@ -11,7 +11,7 @@ export default function AdminHotelsPage() {
         title="Hotels"
         description="Manage the hotel catalogue shown to travellers."
       />
-      <main className="p-4 md:p-8">
+      <main className="min-w-0 p-4 md:p-8">
         <div className="mb-4 flex justify-end">
           <Link href="/destinations">
             <Button variant="outline" size="sm">

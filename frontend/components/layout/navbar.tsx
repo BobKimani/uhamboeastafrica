@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { ArrowRight, Menu, X } from "lucide-react";
 import { IMG } from "@/lib/images";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./theme-toggle";
@@ -21,9 +21,8 @@ const NAV = [
 
 export function Navbar() {
   const pathname = usePathname();
-  const [openPathname, setOpenPathname] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const open = openPathname === pathname;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -31,6 +30,23 @@ export function Navbar() {
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -75,12 +91,10 @@ export function Navbar() {
           <ThemeToggle />
           <button
             type="button"
-            aria-label="Toggle menu"
+            aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             aria-controls="mobile-navigation"
-            onClick={() =>
-              setOpenPathname((current) => (current === pathname ? null : pathname))
-            }
+            onClick={() => setOpen((current) => !current)}
             className="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg text-on-surface hover:bg-surface-container-low transition-colors"
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -91,9 +105,46 @@ export function Navbar() {
       {open && (
         <div
           id="mobile-navigation"
-          className="lg:hidden border-t border-outline-variant/30 bg-background/95 px-6 pb-6 pt-2 shadow-[0_16px_30px_rgba(27,28,26,0.08)] backdrop-blur-xl"
+          className="fixed inset-0 z-[60] flex h-[100dvh] flex-col overflow-y-auto bg-[#1b1c1a] px-6 pb-8 text-white lg:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Main navigation"
         >
-          <ul className="mx-auto flex max-w-7xl flex-col gap-1 font-headline tracking-wide">
+          <div className="flex h-16 shrink-0 items-center justify-between border-b border-white/15">
+            <Link
+              href="/"
+              aria-label="Uhambo East Africa — Home"
+              onClick={() => setOpen(false)}
+              className="flex min-w-0 items-center gap-3"
+            >
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-white">
+                <Image
+                  src={IMG.logo}
+                  alt=""
+                  width={34}
+                  height={34}
+                  loading="eager"
+                />
+              </span>
+              <span className="font-headline text-lg font-extrabold tracking-tight text-white">
+                Uhambo
+              </span>
+            </Link>
+
+            <div className="flex items-center gap-2">
+              <ThemeToggle className="text-white hover:bg-white/10 hover:text-inverse-primary" />
+              <button
+                type="button"
+                aria-label="Close menu"
+                onClick={() => setOpen(false)}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-white transition-colors hover:bg-white/10"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+
+          <ul className="flex flex-1 flex-col justify-center gap-2 py-8 font-headline tracking-wide">
             {NAV.map((item) => {
               const active = isActive(item.href);
 
@@ -102,12 +153,12 @@ export function Navbar() {
                   <Link
                     href={item.href}
                     aria-current={active ? "page" : undefined}
-                    onClick={() => setOpenPathname(null)}
+                    onClick={() => setOpen(false)}
                     className={cn(
-                      "block rounded-lg px-3 py-3 text-sm font-medium transition-colors",
+                      "block rounded-lg px-3 py-2.5 text-lg font-semibold transition-colors",
                       active
-                        ? "bg-primary/10 text-primary font-bold"
-                        : "text-on-surface-variant hover:bg-surface-container-low hover:text-primary"
+                        ? "bg-white/10 text-inverse-primary"
+                        : "text-white/80 hover:bg-white/10 hover:text-white"
                     )}
                   >
                     {item.label}
@@ -116,6 +167,24 @@ export function Navbar() {
               );
             })}
           </ul>
+
+          <div className="flex shrink-0 flex-col gap-3 border-t border-white/15 pt-6">
+            <Link
+              href="/plan-trip"
+              onClick={() => setOpen(false)}
+              className="inline-flex h-11 items-center justify-center rounded-lg bg-primary px-4 text-sm font-bold text-on-primary transition-colors hover:bg-primary-container"
+            >
+              Plan My Trip
+            </Link>
+            <Link
+              href="/transport"
+              onClick={() => setOpen(false)}
+              className="inline-flex h-11 items-center justify-center rounded-lg border border-white/20 px-4 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+            >
+              Book Transport
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </Link>
+          </div>
         </div>
       )}
     </nav>

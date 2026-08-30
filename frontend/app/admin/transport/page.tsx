@@ -8,7 +8,7 @@ export default function AdminTransportPage() {
         title="Vehicles"
         description="Manage the vehicle fleet available for trips."
       />
-      <main className="p-4 md:p-8">
+      <main className="min-w-0 p-4 md:p-8">
         <TransportManager />
       </main>
     </>

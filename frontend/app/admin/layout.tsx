@@ -16,7 +16,7 @@ export default function AdminLayout({
     <AuthGuard>
       <div className="min-h-screen bg-background">
         <AdminSidebar />
-        <div className="lg:pl-64 flex flex-col min-h-screen">{children}</div>
+        <div className="flex min-h-screen min-w-0 flex-col lg:pl-64">{children}</div>
       </div>
     </AuthGuard>
   );

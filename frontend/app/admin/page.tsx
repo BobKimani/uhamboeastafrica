@@ -82,7 +82,7 @@ export default function AdminHomePage() {
         title="Dashboard"
         description="Operations overview for Uhambo East Africa."
       />
-      <main className="p-4 md:p-8 flex flex-col gap-8">
+      <main className="flex min-w-0 flex-col gap-8 p-4 md:p-8">
         {errorMessage && (
           <div
             className="flex items-start gap-2 p-4 rounded-xl text-sm text-red-500 bg-surface-container-low"
@@ -126,8 +126,8 @@ export default function AdminHomePage() {
         </section>
 
         <section aria-labelledby="recent-heading" className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <div>
+          <div className="flex min-w-0 items-center justify-between gap-4">
+            <div className="min-w-0">
               <h2
                 id="recent-heading"
                 className="text-lg font-headline font-bold text-on-surface"

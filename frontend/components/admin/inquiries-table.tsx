@@ -130,7 +130,7 @@ export function InquiriesTable() {
   return (
     <TableCard>
       <TableToolbar>
-        <div className="flex items-center h-10 w-full md:w-96 gap-2 px-3 rounded-xl bg-surface-container-low text-on-surface-variant">
+        <div className="flex h-10 w-full min-w-0 items-center gap-2 rounded-xl bg-surface-container-low px-3 text-on-surface-variant md:w-96">
           <Search className="h-4 w-4" aria-hidden />
           <input
             type="search"
@@ -138,11 +138,11 @@ export function InquiriesTable() {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search name, email, contact, message..."
             aria-label="Search inquiries"
-            className="flex-1 bg-transparent text-sm text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none"
+            className="min-w-0 flex-1 bg-transparent text-sm text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none"
           />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 flex-wrap items-center gap-2 md:justify-end">
           <button
             type="button"
             onClick={() => void load()}
@@ -156,7 +156,7 @@ export function InquiriesTable() {
           <div
             role="tablist"
             aria-label="Filter by status"
-            className="flex items-center gap-1 p-1 rounded-xl bg-surface-container-low overflow-x-auto"
+            className="flex max-w-full items-center gap-1 overflow-x-auto rounded-xl bg-surface-container-low p-1"
           >
             {FILTERS.map((item) => (
               <button
