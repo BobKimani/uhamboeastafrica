@@ -33,8 +33,7 @@ export type Booking = {
     numberOfTravellers: number;
     numberOfRooms: number;
 
-    minimumBudget: number;
-    maximumBudget: number;
+    selectedHotelId?: string | null;
 
     transportFrom?: string;
     transportTo?: string;
@@ -66,8 +65,7 @@ export type CreateBookingInput = {
     numberOfTravellers: number;
     numberOfRooms: number;
 
-    minimumBudget: number;
-    maximumBudget: number;
+    selectedHotelId?: string;
 
     transportFrom?: string;
     transportTo?: string;
