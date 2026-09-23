@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Pencil, MapPin, Calendar, Users, Sparkles } from "lucide-react";
+import { Pencil, MapPin, Calendar, Users, Sparkles, Hotel } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { COUNTRIES } from "@/lib/data/countries";
@@ -43,6 +43,15 @@ export function SummaryPanel({ state }: { state: WizardState }) {
       label: "Destination",
       value: prettyLocation(state),
     },
+    ...(state.serviceType !== "transport" && state.accommodation?.hotelName
+      ? [
+          {
+            icon: Hotel,
+            label: "Stay",
+            value: state.accommodation.hotelName,
+          },
+        ]
+      : []),
     {
       icon: Calendar,
       label: "Dates",
@@ -79,7 +88,7 @@ export function SummaryPanel({ state }: { state: WizardState }) {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mt-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-10">
         {items.map(({ icon: Icon, label, value }) => (
           <div
             key={label}

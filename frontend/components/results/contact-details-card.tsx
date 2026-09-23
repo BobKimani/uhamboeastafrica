@@ -79,8 +79,9 @@ export function ContactDetailsCard() {
       bookingType: state.serviceType ?? "both",
       numberOfTravellers: state.paxCount,
       numberOfRooms,
-      minimumBudget: state.budget.min,
-      maximumBudget: state.budget.max,
+      ...(state.serviceType !== "transport" && state.accommodation?.hotelId
+        ? { selectedHotelId: state.accommodation.hotelId }
+        : {}),
       ...(state.serviceType !== "accommodation"
         ? {
             transportFrom: state.transport?.from,

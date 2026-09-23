@@ -381,7 +381,7 @@ export function HotelManager() {
               onChange={(e) =>
                 setDraft({ ...draft, destination: e.target.value })
               }
-              placeholder="Maasai Mara, Stone Town, Volcanoes National Park"
+              placeholder="Maasai Mara, Stone Town, Bwindi"
             />
           </div>
 

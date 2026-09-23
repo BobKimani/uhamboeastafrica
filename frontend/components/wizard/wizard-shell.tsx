@@ -55,7 +55,7 @@ export function WizardShell({
       </div>
 
       <header className="text-center mb-14 max-w-3xl">
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-extrabold tracking-tight text-on-background leading-[1.05]">
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-headline font-extrabold tracking-tight text-on-background leading-[1.08]">
           {title}
         </h1>
         {subtitle && (

@@ -19,7 +19,6 @@ import {
 import type { Booking, BookingStatus } from "@/types/booking";
 import {
   cn,
-  formatCurrency,
   formatDateRange,
   formatTimestamp,
 } from "@/lib/utils";
@@ -40,13 +39,6 @@ function formatLabel(value: string) {
     .split("-")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
-}
-
-function formatBudgetRange(booking: Booking) {
-  return `${formatCurrency(booking.minimumBudget, "USD")} - ${formatCurrency(
-    booking.maximumBudget,
-    "USD"
-  )}`;
 }
 
 export function BookingsTable() {
@@ -214,7 +206,6 @@ export function BookingsTable() {
               <Th>Booking type</Th>
               <Th>Travellers</Th>
               <Th>Rooms</Th>
-              <Th>Budget</Th>
               <Th>Submitted</Th>
               <Th>Status</Th>
               <Th className="text-right">Actions</Th>
@@ -243,7 +234,6 @@ export function BookingsTable() {
                 <Td>{formatLabel(booking.bookingType)}</Td>
                 <Td className="text-right">{booking.numberOfTravellers}</Td>
                 <Td className="text-right">{booking.numberOfRooms}</Td>
-                <Td className="font-semibold">{formatBudgetRange(booking)}</Td>
                 <Td className="text-on-surface-variant">
                   {formatTimestamp(booking.createdAt)}
                 </Td>

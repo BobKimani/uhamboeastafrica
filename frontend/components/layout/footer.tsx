@@ -44,7 +44,7 @@ export function Footer() {
           </div>
           <p className="text-secondary max-w-sm leading-relaxed">
             Tailored safaris, seamless transport and curated stays across Kenya,
-            Tanzania, Uganda and Rwanda. The breath of the savanna.
+            Tanzania and Uganda. The breath of the savanna.
           </p>
           <div className="flex items-center gap-3 mt-6">
             {SOCIAL.map(({ href, icon: Icon, label }) => (
@@ -89,7 +89,7 @@ export function Footer() {
             </li>
             <li className="flex items-center gap-2">
               <Mail className="h-4 w-4 text-primary" />
-              tours@uhamboeastafrica.com
+              Jackndungu3@gmail.com
             </li>
           </ul>
         </div>
