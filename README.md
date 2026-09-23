@@ -1,6 +1,6 @@
 # Uhambo East Africa
 
-> **"The Breath of the Savanna"** — Tailored safaris, transport, and stays across Kenya, Tanzania, Uganda, and Rwanda.
+> **"The Breath of the Savanna"** — Tailored safaris, transport, and stays across Kenya, Tanzania, and Uganda.
 
 Uhambo is a travel platform that lets visitors plan multi-leg East Africa trips through a guided multi-step wizard, browse curated destinations and experiences, submit bookings and inquiries, pay for direct transport bookings, and manage all operations through a protected admin dashboard. It is structured as a **monorepo**: a Next.js / TypeScript **frontend** (`frontend/`) and a Python **FastAPI backend** (`backend/`). Bookings, inquiries, transport payments, hotels, and vehicles persist to AWS Aurora PostgreSQL through the FastAPI service; API traffic reaches the backend through the frontend API client and same-origin `/api/*` proxy.
 
@@ -14,16 +14,15 @@ Uhambo is a travel platform that lets visitors plan multi-leg East Africa trips 
 | Language | TypeScript 5 |
 | Styling | Tailwind CSS v4 |
 | UI Components | Custom component library (Lucide React icons) |
-| Forms | React Hook Form + Zod |
 | Authentication | AWS Cognito Hosted UI + signed HTTP-only admin session cookies |
 | Database | AWS Aurora PostgreSQL Serverless with IAM database authentication |
 | Backend | [FastAPI](https://fastapi.tiangolo.com) (Python) + SQLAlchemy |
 | Backend server | `uvicorn` |
-| Server validation | Pydantic (frontend forms still use Zod) |
+| Server validation | Pydantic |
 | Frontend → backend | `NEXT_PUBLIC_API_URL` client helpers + Next.js `rewrites()` proxy (`/api/*` → `BACKEND_API_URL`) |
-| Fonts | Plus Jakarta Sans · Manrope (Google Fonts via `next/font`) |
+| Fonts | System UI stack configured through Tailwind CSS |
 | Theme | `next-themes` (light / dark) |
-| Date utilities | `date-fns` |
+| Utilities | Local date, currency, class-name, and formatting helpers |
 
 ---
 
@@ -41,7 +40,7 @@ The repository is a monorepo with two top-level apps:
 │   │   ├── db/                # SQLAlchemy engine/session/models using Aurora IAM auth
 │   │   ├── cognito.py         # Cognito OAuth client registration
 │   │   ├── auth.py            # Signed admin-session cookie helpers
-│   │   ├── schemas.py         # Pydantic models (ported from the Zod schemas)
+│   │   ├── schemas.py         # Pydantic request models
 │   │   ├── payments/          # Server-owned pricing + KCB Buni client/callback parser
 │   │   └── routers/
 │   │       ├── bookings.py    # POST/GET /api/bookings, PATCH/DELETE /api/bookings/{id}
@@ -62,10 +61,12 @@ frontend/
 ├── app/
 │   ├── (public)/          # All public-facing routes (navbar + footer layout)
 │   │   ├── page.tsx       # Homepage
-│   │   ├── plan-trip/     # Multi-step trip wizard (4 steps)
+│   │   ├── plan-trip/     # Multi-step trip wizard
 │   │   │   ├── destination/
 │   │   │   ├── basics/
 │   │   │   ├── services/
+│   │   │   ├── accommodation/
+│   │   │   ├── transport/
 │   │   │   └── review/
 │   │   ├── results/       # Trip estimate, pricing, and booking request submission
 │   │   ├── transport/     # Standalone transport booking with KCB payment
@@ -86,7 +87,7 @@ frontend/
 │   │                      # FeaturedExperiences, TrendingScroller,
 │   │                      # Testimonials, FAQSection
 │   ├── layout/            # Navbar, Footer, ThemeToggle
-│   ├── wizard/            # WizardShell (progress bar + step transitions)
+│   ├── wizard/            # WizardShell, HotelPicker, NeedToggle
 │   ├── results/           # SummaryPanel, PricingSummary,
 │   │                      # ContactDetailsCard (booking submit)
 │   ├── destinations/      # DestinationCard, FilterBar
@@ -104,10 +105,10 @@ frontend/
 │   ├── auth.ts            # Cognito session helpers + useAuth hook
 │   ├── api/
 │   │   ├── bookings.ts    # Client helpers: submit, fetch, update status
-│   │   └── inquiries.ts
-│   ├── validations/
-│   │   ├── booking.ts     # Zod schemas (create + status update)
-│   │   └── inquiry.ts
+│   │   ├── catalog.ts     # Hotel, vehicle, and catalog image helpers
+│   │   ├── currency.ts
+│   │   ├── inquiries.ts
+│   │   └── payments.ts
 │   ├── wizard/
 │   │   ├── types.ts       # WizardState type, STEPS constant, enums
 │   │   └── store.tsx      # Wizard context / state store
@@ -124,7 +125,7 @@ frontend/
 │   └── inquiry.ts         # Inquiry, InquiryStatus, CreateInquiryInput
 │
 ├── docs/                  # Internal documentation
-├── next.config.ts         # Remote image hosts (Unsplash)
+├── next.config.ts         # Remote image hosts and /api proxy rewrites
 ├── tsconfig.json
 └── package.json
 ```
@@ -137,8 +138,8 @@ frontend/
 
 | Page | Description |
 |---|---|
-| **Homepage** | Hero section, country bento grid (Kenya, Tanzania, Uganda, Rwanda), service cards, featured experiences, trending scroller, testimonials, and FAQ accordion |
-| **Plan Trip** | 4-step guided wizard: Destination → Basics → Services → Budget & Review |
+| **Homepage** | Hero section, country bento grid (Kenya, Tanzania, Uganda), service cards, featured experiences, trending scroller, testimonials, and FAQ accordion |
+| **Plan Trip** | Guided wizard: Destination → Basics → Accommodation → Transport → Review |
 | **Results** | Trip summary → all-in pricing estimate → contact details, submitted as a booking request to Aurora PostgreSQL. No payment module is shown here. |
 | **Transport** | Standalone direct vehicle booking (Van, Alphard, Coaster, Land Cruiser, etc.) with KCB STK Push payment |
 | **Destinations** | Filterable grid of East Africa destinations (country filter + search) |
@@ -156,6 +157,7 @@ Protected by AWS Cognito admin login — unauthenticated users are redirected to
 | **Bookings** | Bookings table with search, status filters, inline status updates (optimistic) |
 | **Inquiries** | Inquiries table with search, status filters, inline status updates |
 | **Transport** | Add, edit, delete vehicle entries with USD/KSh display switching |
+| **Hotels** | Add, edit, delete hotel entries with availability, imagery, and rate support |
 
 ---
 
@@ -165,12 +167,13 @@ Protected by AWS Cognito admin login — unauthenticated users are redirected to
 |---|---|---|
 | 1 | `destination` | Country / destination selection |
 | 2 | `basics` | Start date, end date, group type, and pax count |
-| 3 | `services` | Service scope plus accommodation and/or transport details |
-| 4 | `review` | Budget range, defaulting to KSh display, plus full summary; continues to `/results` for submission |
+| 3 | `accommodation` | Accommodation opt-in/out, hotel selection, and room counts |
+| 4 | `transport` | Transport opt-in/out, route, trip days, and vehicle preference |
+| 5 | `review` | Summary and quote currency; continues to `/results` for pricing and submission |
 
 ---
 
-## Bookings & Inquiries — API
+## Backend API
 
 All persistence flows through the **FastAPI backend** (`backend/app/routers/`). Public clients write through `POST`; only admins with a valid Cognito-backed session cookie can `GET`, `PATCH`, or `DELETE`.
 
@@ -186,14 +189,22 @@ All persistence flows through the **FastAPI backend** (`backend/app/routers/`). 
 | `POST` | `/api/payments/kcb/stk-push` | Public | Initiate a direct transport booking's server-priced KCB payment |
 | `POST` | `/api/payments/kcb/callback` | KCB Buni | Receive the asynchronous STK Push result |
 | `GET` | `/api/payments/kcb/status/[booking_id]` | Public | Return only payment status and receipt for UI polling |
+| `GET` | `/api/hotels` | Public | List hotels, including optional contract rates |
+| `POST` | `/api/hotels` | Admin | Create a hotel |
+| `PATCH` | `/api/hotels/[id]` | Admin | Update a hotel |
+| `DELETE` | `/api/hotels/[id]` | Admin | Delete a hotel |
+| `GET` | `/api/vehicles` | Public | List fleet entries |
+| `POST` | `/api/vehicles` | Admin | Create a vehicle |
+| `PATCH` | `/api/vehicles/[id]` | Admin | Update a vehicle |
+| `DELETE` | `/api/vehicles/[id]` | Admin | Delete a vehicle |
 
-**Validation.** Every request body is parsed through a Pydantic model (`backend/app/schemas.py`) before it touches Aurora PostgreSQL. Public POST routes accept only user-supplied fields — `status`, `createdAt`, and `updatedAt` are set server-side. (The frontend forms still validate with the matching Zod schemas in `frontend/lib/validations/`.)
+**Validation.** Every request body is parsed through Pydantic models before it touches Aurora PostgreSQL. Public POST routes accept only user-supplied fields — `status`, `createdAt`, and `updatedAt` are set server-side.
 
 **Auth.** Admin pages call `/auth/me` with `credentials: "include"`. The backend reads the signed admin session cookie, confirms the user belongs to an allowed Cognito admin group, and returns 401 only when the cookie is missing, invalid, expired, or not an admin session.
 
 **Payments.** KCB payment UI is intentionally limited to the standalone Transport page. The trip-planning Results page submits a booking request for follow-up and does not show a payment module. Direct transport bookings calculate the payable KES amount from the selected vehicle type, daily rate, number of days, and USD→KES rate; the frontend does not send a test amount override.
 
-**Database.** The backend uses SQLAlchemy with the `postgresql+psycopg` driver. Aurora PostgreSQL access uses IAM database authentication; no permanent database password is required or stored.
+**Database.** The backend uses SQLAlchemy with the `postgresql+psycopg` driver. Aurora PostgreSQL access uses IAM database authentication; no permanent database password is required or stored. Hotel contract rates live in nullable PostgreSQL `jsonb` at `hotels.rates`, shaped by currency and room type.
 
 ---
 
@@ -288,7 +299,10 @@ npm install
 npm run dev
 ```
 
-Create `frontend/.env.local` (never commit):
+For local feature testing, make sure the frontend points at the backend running
+on your machine, not the production API. Either copy `frontend/.env.example` to
+`frontend/.env.local` (never commit it), or start the frontend with
+`npm run dev:local`, which forces these URLs for that dev session:
 
 ```env
 # Points the /api/* proxy and browser auth/payment API calls at FastAPI
@@ -299,6 +313,10 @@ NEXT_PUBLIC_MEDIA_URL=https://your-distribution.cloudfront.net
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+If you change any `NEXT_PUBLIC_*` value while the frontend dev server is already
+running, restart `npm run dev` because those browser-visible values are read by
+Next.js when the dev server starts.
+
 ### Available scripts
 
 **Frontend** (run from `frontend/`):
@@ -306,6 +324,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 | Command | Description |
 |---|---|
 | `npm run dev` | Start dev server |
+| `npm run dev:local` | Start dev server with API calls forced to `http://localhost:8000` |
 | `npm run build` | Production build |
 | `npm run start` | Run the production build |
 | `npm run lint` | Run ESLint |
@@ -316,6 +335,31 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 |---|---|
 | `uvicorn app.main:app --reload --port 8000` | Start the API |
 | `python -m pytest` | Run the contract tests |
+
+### Database Migrations
+
+Database changes use forward-only SQL files in `backend/db/migrations/`. Apply
+them with `psql` when you have a password-based connection, or through the app's
+SQLAlchemy session when using Aurora IAM auth.
+
+Example with the app environment:
+
+```bash
+cd backend
+uhambo/bin/python - <<'PY'
+from pathlib import Path
+from sqlalchemy import text
+from app.db.session import SessionLocal
+
+sql = Path("db/migrations/20260921_hotel_rates.sql").read_text(encoding="utf-8")
+with SessionLocal() as db:
+    db.execute(text(sql))
+    db.commit()
+PY
+```
+
+`20260921_hotel_rates.sql` adds `hotels.rates jsonb` for contract hotel rates
+and is idempotent via `ADD COLUMN IF NOT EXISTS`.
 
 ---
 
@@ -329,7 +373,8 @@ After Cognito redirects back to `/auth/callback`, the FastAPI backend creates a 
 
 ## Image Hosting
 
-Remote images are sourced from **Unsplash** (`images.unsplash.com` and `source.unsplash.com`) and the configured media/CDN host, permitted in `frontend/next.config.ts`.
+Remote images are served from the configured media/CDN host, with allowed hosts
+listed in `frontend/next.config.ts`.
 
 ---
 

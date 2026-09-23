@@ -103,3 +103,60 @@ The health endpoint returns only safe status information:
   "database": "connected"
 }
 ```
+
+## Database Migrations
+
+Schema changes are plain SQL files in `backend/db/migrations/`. The project does
+not use Alembic. Migrations should be forward-only and non-destructive unless a
+feature explicitly requires removing an obsolete column.
+
+Apply a migration with `psql` when you have a direct PostgreSQL connection:
+
+```bash
+psql "$DATABASE_URL" -f db/migrations/20260921_hotel_rates.sql
+```
+
+When using Aurora IAM database authentication, run the SQL through the app's
+configured SQLAlchemy session instead:
+
+```bash
+uhambo/bin/python - <<'PY'
+from pathlib import Path
+from sqlalchemy import text
+from app.db.session import SessionLocal
+
+sql = Path("db/migrations/20260921_hotel_rates.sql").read_text(encoding="utf-8")
+with SessionLocal() as db:
+    db.execute(text(sql))
+    db.commit()
+PY
+```
+
+### Hotel Rates
+
+`20260921_hotel_rates.sql` adds the nullable `hotels.rates jsonb` column used by
+the current SQLAlchemy `Hotel` model. The value stores contract rates by
+currency and room type:
+
+```json
+{
+  "KES": {
+    "sharing": {
+      "monthly": [12000, null, null, null, null, null, null, null, null, null, null, null],
+      "festive": null
+    }
+  }
+}
+```
+
+Verify the column after applying the migration:
+
+```sql
+SELECT column_name, data_type, is_nullable, column_default
+FROM information_schema.columns
+WHERE table_schema = 'public'
+  AND table_name = 'hotels'
+  AND column_name = 'rates';
+```
+
+Expected result: `rates`, `jsonb`, nullable, no default.
