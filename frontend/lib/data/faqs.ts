@@ -1,7 +1,7 @@
 export const FAQS = [
   {
     q: "Do I need a visa for East Africa?",
-    a: "Most nationalities can obtain an East African Tourist Visa online covering Kenya, Uganda and Rwanda. Tanzania requires a separate visa. We'll guide you through the right option for your passport.",
+    a: "Most nationalities can obtain an East African Tourist Visa online that covers both Kenya and Uganda. Tanzania requires a separate visa. We'll guide you through the right option for your passport.",
   },
   {
     q: "When is the best time to see the Great Migration?",
@@ -24,5 +24,5 @@ export const FAQS = [
 export const TESTIMONIALS = [
   { name: "Sarah & Tom", rating: 5, text: "Uhambo orchestrated a flawless 10-day trip across Kenya and Tanzania. Every handover was seamless." },
   { name: "Ayaan Hersi", rating: 5, text: "The Land Cruiser, the guide, the lodge — all impeccable. I've already booked my return trip." },
-  { name: "Maria Gonzalez", rating: 5, text: "We felt cared for at every step. The gorilla trek in Rwanda was a life-highlight." },
+  { name: "Maria Gonzalez", rating: 5, text: "We felt cared for at every step. The gorilla trek in Uganda was a life-highlight." },
 ];

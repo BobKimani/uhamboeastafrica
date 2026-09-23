@@ -6,8 +6,9 @@ export type Currency = "USD" | "KES";
 export const STEPS = [
   { slug: "destination", title: "Destination", label: "Exploring Horizons" },
   { slug: "basics", title: "Trip Basics", label: "When & Who" },
-  { slug: "services", title: "Services", label: "What You Need" },
-  { slug: "review", title: "Budget & Review", label: "Almost There" },
+  { slug: "accommodation", title: "Accommodation", label: "Where You'll Stay" },
+  { slug: "transport", title: "Transport", label: "Getting Around" },
+  { slug: "review", title: "Review", label: "Almost There" },
 ] as const;
 
 export type StepSlug = (typeof STEPS)[number]["slug"];
@@ -37,7 +38,15 @@ export type WizardState = {
   group?: GroupType;
   paxCount: number;
   serviceType?: ServiceType;
+  /** Traveller opted out of accommodation (step 3) or transport (step 4). */
+  skipAccommodation?: boolean;
+  skipTransport?: boolean;
+  currency: Currency;
   accommodation?: {
+    /** Star rating chosen before picking a hotel; 0 means "unrated". */
+    stars?: number;
+    hotelId?: string;
+    hotelName?: string;
     region?: string;
     rooms?: Partial<Record<RoomType, number>>;
   };
@@ -47,16 +56,28 @@ export type WizardState = {
     days?: number;
     vehicleType?: string;
   };
-  budget: {
-    currency: Currency;
-    min: number;
-    max: number;
-  };
 };
 
 export const INITIAL_STATE: WizardState = {
   paxCount: 2,
+  serviceType: "both",
+  currency: "KES",
   accommodation: {},
   transport: { days: 3 },
-  budget: { currency: "KES", min: 1000, max: 5000 },
 };
+
+/** Whether the traveller skipped each service; falls back to an older saved serviceType. */
+export function skipsAccommodation(state: WizardState): boolean {
+  return state.skipAccommodation ?? state.serviceType === "transport";
+}
+export function skipsTransport(state: WizardState): boolean {
+  return state.skipTransport ?? state.serviceType === "accommodation";
+}
+export function serviceTypeFor(
+  skipAccommodation: boolean,
+  skipTransport: boolean
+): ServiceType {
+  if (skipAccommodation) return "transport";
+  if (skipTransport) return "accommodation";
+  return "both";
+}

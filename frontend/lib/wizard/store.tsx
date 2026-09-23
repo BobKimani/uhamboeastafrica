@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { INITIAL_STATE, WizardState } from "./types";
+import { COUNTRIES } from "@/lib/data/countries";
 
 const STORAGE_KEY = "uhambo:wizard";
 
@@ -31,7 +32,18 @@ export function WizardProvider({ children }: { children: React.ReactNode }) {
       if (cancelled) return;
       try {
         const raw = sessionStorage.getItem(STORAGE_KEY);
-        if (raw) setState({ ...INITIAL_STATE, ...JSON.parse(raw) });
+        if (raw) {
+          const saved: WizardState = { ...INITIAL_STATE, ...JSON.parse(raw) };
+          // Drop a saved destination we no longer offer (e.g. Rwanda).
+          if (
+            saved.destination &&
+            !COUNTRIES.some((c) => c.slug === saved.destination)
+          ) {
+            saved.destination = undefined;
+            saved.accommodation = {};
+          }
+          setState(saved);
+        }
       } catch {}
       setHydrated(true);
     }, 0);

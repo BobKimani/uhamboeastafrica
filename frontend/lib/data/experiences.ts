@@ -43,9 +43,9 @@ export const EXPERIENCES: Experience[] = [
     title: "Gorilla Trek",
     category: "Safari",
     duration: "4 Days",
-    location: "Rwanda",
-    description: "An unforgettable morning with a family of mountain gorillas.",
-    image: IMG.rwandaHills,
+    location: "Uganda",
+    description: "An unforgettable morning with a family of mountain gorillas in Bwindi.",
+    image: IMG.ugandaGorilla,
   },
   {
     id: "e5",
@@ -55,15 +55,6 @@ export const EXPERIENCES: Experience[] = [
     location: "Kenya",
     description: "Giraffe Centre, Karen Blixen and the buzzing heart of Nairobi.",
     image: IMG.cultureCity,
-  },
-  {
-    id: "e6",
-    title: "Lake Kivu Retreat",
-    category: "Beach",
-    duration: "4 Days",
-    location: "Rwanda",
-    description: "Kayak the calm waters and sleep to the sound of lapping waves.",
-    image: IMG.lakeKivu,
   },
   {
     id: "e7",
