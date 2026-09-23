@@ -9,9 +9,10 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.auth import require_authenticated_admin
-from app.db.models import Booking
+from app.db.models import Booking, Hotel, Vehicle
 from app.db.serializers import booking_to_api
 from app.db.session import get_db
+from app.payments.pricing import UnknownVehicleError, transport_price
 from app.schemas import CreateBooking, UpdateBookingStatus
 from app.services.currency import convert_usd_to_kes
 
@@ -24,6 +25,13 @@ def _booking_id(value: str) -> UUID | None:
         return UUID(value)
     except ValueError:
         return None
+
+
+def _selected_hotel_id(db: Session, value: str | None) -> UUID | None:
+    parsed = _booking_id(value) if value else None
+    if parsed is None or db.get(Hotel, parsed) is None:
+        return None
+    return parsed
 
 
 @router.post("")
@@ -44,7 +52,28 @@ async def create_booking(request: Request, db: Session = Depends(get_db)):
         amount_due_kes = None
         payment_rate = None
         if data.bookingType in {"transport", "both"}:
-            payment_rate = await convert_usd_to_kes(data.minimumBudget)
+            # Price from the vehicle catalogue (what the site shows), falling
+            # back to the server-owned rate card for legacy vehicle types.
+            vehicle = db.scalar(
+                select(Vehicle).where(Vehicle.type == data.vehicleType)
+            )
+            try:
+                if vehicle is not None:
+                    payment_rate = await convert_usd_to_kes(
+                        float(vehicle.price_per_day) * data.transportDays
+                    )
+                else:
+                    payment_rate = await transport_price(
+                        data.vehicleType, data.transportDays
+                    )
+            except UnknownVehicleError:
+                return JSONResponse(
+                    status_code=400,
+                    content={
+                        "success": False,
+                        "error": "Selected vehicle cannot be priced",
+                    },
+                )
             amount_due_kes = payment_rate["amountKes"]
         booking = Booking(
             full_name=data.fullName,
@@ -57,8 +86,7 @@ async def create_booking(request: Request, db: Session = Depends(get_db)):
             booking_type=data.bookingType,
             number_of_travellers=data.numberOfTravellers,
             number_of_rooms=data.numberOfRooms,
-            minimum_budget=data.minimumBudget,
-            maximum_budget=data.maximumBudget,
+            selected_hotel_id=_selected_hotel_id(db, data.selectedHotelId),
             transport_from=data.transportFrom,
             transport_to=data.transportTo,
             transport_days=data.transportDays,

@@ -15,19 +15,14 @@ class CreateBooking(BaseModel):
     bookingType: Literal["accommodation", "transport", "both"]
     numberOfTravellers: int = Field(ge=1)
     numberOfRooms: int = Field(ge=0)
-    minimumBudget: float = Field(ge=0)
-    maximumBudget: float = Field(ge=0)
+    selectedHotelId: str | None = Field(default=None, min_length=1)
     transportFrom: str | None = Field(default=None, min_length=2)
     transportTo: str | None = Field(default=None, min_length=2)
     transportDays: int | None = Field(default=None, ge=1, le=365)
     vehicleType: str | None = Field(default=None, min_length=2)
 
     @model_validator(mode="after")
-    def _check_budget_and_dates(self):
-        if self.maximumBudget < self.minimumBudget:
-            raise ValueError(
-                "Maximum budget must be greater than or equal to minimum budget"
-            )
+    def _check_dates_and_transport(self):
         if date.fromisoformat(self.travelEndDate) < date.fromisoformat(
             self.travelStartDate
         ):

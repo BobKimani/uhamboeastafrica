@@ -33,6 +33,7 @@ class HotelPayload(BaseModel):
     description: str = Field(default="")
     topRated: bool = False
     isAvailable: bool = True
+    rates: dict | None = None
 
 
 class VehiclePayload(BaseModel):
@@ -111,6 +112,7 @@ async def create_hotel(
             description=payload.description,
             top_rated=payload.topRated,
             is_available=payload.isAvailable,
+            rates=payload.rates,
         )
         db.add(hotel)
         db.flush()
@@ -150,6 +152,8 @@ async def update_hotel(
         hotel.description = payload.description
         hotel.top_rated = payload.topRated
         hotel.is_available = payload.isAvailable
+        if "rates" in payload.model_fields_set:
+            hotel.rates = payload.rates
         hotel.updated_at = datetime.now(UTC)
         db.flush()
         return {"success": True, "hotel": hotel_to_api(hotel)}
