@@ -38,6 +38,9 @@ class Hotel(Base):
     description: Mapped[str] = mapped_column(Text, nullable=False)
     top_rated: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     is_available: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    # Contract rates by currency and room type:
+    # {"KES": {"sharing": {"monthly": [12 values], "festive": n|null}, ...}, "USD": {...}}
+    rates: Mapped[dict | None] = mapped_column(JSONB)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
@@ -69,7 +72,6 @@ class Vehicle(Base):
 class Booking(Base):
     __tablename__ = "bookings"
     __table_args__ = (
-        CheckConstraint("maximum_budget >= minimum_budget", name="bookings_budget_order"),
         CheckConstraint("travel_end_date >= travel_start_date", name="bookings_date_order"),
     )
 
@@ -86,8 +88,6 @@ class Booking(Base):
     booking_type: Mapped[str] = mapped_column(Text, nullable=False)
     number_of_travellers: Mapped[int] = mapped_column(Integer, nullable=False)
     number_of_rooms: Mapped[int] = mapped_column(Integer, nullable=False)
-    minimum_budget: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
-    maximum_budget: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     transport_from: Mapped[str | None] = mapped_column(Text)
     transport_to: Mapped[str | None] = mapped_column(Text)
     transport_days: Mapped[int | None] = mapped_column(Integer)

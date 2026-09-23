@@ -30,8 +30,9 @@ def booking_to_api(booking: Booking) -> dict:
         "bookingType": booking.booking_type,
         "numberOfTravellers": booking.number_of_travellers,
         "numberOfRooms": booking.number_of_rooms,
-        "minimumBudget": _json_value(booking.minimum_budget),
-        "maximumBudget": _json_value(booking.maximum_budget),
+        "selectedHotelId": str(booking.selected_hotel_id)
+        if booking.selected_hotel_id
+        else None,
         "transportFrom": booking.transport_from,
         "transportTo": booking.transport_to,
         "transportDays": booking.transport_days,
@@ -99,6 +100,7 @@ def hotel_to_api(hotel: Hotel) -> dict:
         "description": hotel.description,
         "topRated": hotel.top_rated,
         "isAvailable": hotel.is_available,
+        "rates": hotel.rates,
         "createdAt": _json_value(hotel.created_at),
         "updatedAt": _json_value(hotel.updated_at),
     }
