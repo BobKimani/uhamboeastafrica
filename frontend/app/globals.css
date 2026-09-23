@@ -102,6 +102,16 @@
 }
 
 @layer base {
+  html {
+    font-size: 17px;
+  }
+
+  @media (max-width: 640px) {
+    html {
+      font-size: 16.5px;
+    }
+  }
+
   html, body {
     background: var(--color-background);
     color: var(--color-on-background);
