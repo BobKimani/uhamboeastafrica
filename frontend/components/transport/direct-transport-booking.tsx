@@ -114,8 +114,6 @@ export function DirectTransportBooking({
       bookingType: "transport",
       numberOfTravellers: people,
       numberOfRooms: 0,
-      minimumBudget: transportPriceUsd,
-      maximumBudget: transportPriceUsd,
       transportFrom: from.trim(),
       transportTo: to.trim(),
       transportDays: days,
