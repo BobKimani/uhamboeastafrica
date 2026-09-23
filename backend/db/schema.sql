@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS hotels (
   description text NOT NULL,
   top_rated boolean NOT NULL DEFAULT false,
   is_available boolean NOT NULL DEFAULT true,
+  rates jsonb,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()
 );
@@ -46,8 +47,6 @@ CREATE TABLE IF NOT EXISTS bookings (
   booking_type text NOT NULL CHECK (booking_type IN ('accommodation', 'transport', 'both')),
   number_of_travellers integer NOT NULL CHECK (number_of_travellers >= 1),
   number_of_rooms integer NOT NULL CHECK (number_of_rooms >= 0),
-  minimum_budget numeric(12,2) NOT NULL CHECK (minimum_budget >= 0),
-  maximum_budget numeric(12,2) NOT NULL CHECK (maximum_budget >= 0),
   transport_from text,
   transport_to text,
   transport_days integer CHECK (transport_days IS NULL OR transport_days BETWEEN 1 AND 365),
@@ -64,7 +63,6 @@ CREATE TABLE IF NOT EXISTS bookings (
   rate_locked_at timestamptz,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
-  CHECK (maximum_budget >= minimum_budget),
   CHECK (travel_end_date >= travel_start_date)
 );
 
