@@ -38,13 +38,13 @@ function DestinationsContent({ initialCountry }: { initialCountry: string }) {
         <span className="text-primary font-headline font-bold text-xs tracking-widest uppercase">
           Hotels
         </span>
-        <h1 className="text-5xl md:text-6xl lg:text-7xl font-headline font-extrabold tracking-tight text-on-background mt-4 leading-[1.05]">
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-headline font-extrabold tracking-tight text-on-background mt-4 leading-[1.1]">
           Real stays across
           <br /> East Africa
         </h1>
         <p className="text-on-surface-variant text-lg md:text-xl mt-5 max-w-2xl mx-auto">
           Browse available safari lodges, beach resorts and city hotels curated
-          for Kenya, Tanzania, Uganda and Rwanda.
+          for Kenya, Tanzania and Uganda.
         </p>
       </header>
 

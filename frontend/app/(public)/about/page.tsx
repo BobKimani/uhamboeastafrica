@@ -43,7 +43,7 @@ export default function AboutPage() {
           <span className="text-primary-fixed font-headline font-bold text-xs tracking-widest uppercase">
             About Uhambo
           </span>
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-headline font-extrabold tracking-tight text-white mt-4 leading-[1.02]">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-extrabold tracking-tight text-white mt-4 leading-[1.08]">
             The journey,
             <br /> on your terms
           </h1>
@@ -108,7 +108,7 @@ export default function AboutPage() {
               <p>
                 Uhambo began as a favor. A cousin messaging from Nairobi asking
                 if we could help a friend figure out Mara timing, coastal
-                transfers, a gorilla permit in Rwanda. We said yes, then the
+                transfers, a gorilla permit in Uganda. We said yes, then the
                 friend told a friend, and the favors became a waiting list.
               </p>
               <p>
@@ -120,7 +120,7 @@ export default function AboutPage() {
               </p>
               <p>
                 So we built Uhambo — a small team with roots across Kenya,
-                Tanzania, Uganda and Rwanda, and a stubborn belief that the
+                Tanzania and Uganda, and a stubborn belief that the
                 best trips are the ones shaped by people who&apos;ve already lived
                 them.
               </p>
@@ -160,7 +160,7 @@ export default function AboutPage() {
 
       <section className="max-w-6xl mx-auto px-6 md:px-10 py-16 md:py-24">
         <Card className="p-12 md:p-16 border border-outline-variant/15 sunset-gradient text-white text-center">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-headline font-extrabold tracking-tight leading-[1.05]">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-headline font-extrabold tracking-tight leading-[1.08]">
             Ready to explore
             <br /> East Africa?
           </h2>

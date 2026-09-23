@@ -23,7 +23,7 @@ export default function ExperiencesPage() {
         <span className="text-primary font-headline font-bold text-xs tracking-widest uppercase">
           Experiences
         </span>
-        <h1 className="text-5xl md:text-6xl lg:text-7xl font-headline font-extrabold tracking-tight text-on-background mt-4 leading-[1.05]">
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-headline font-extrabold tracking-tight text-on-background mt-4 leading-[1.1]">
           Moments, curated
         </h1>
         <p className="text-on-surface-variant text-lg md:text-xl mt-5 max-w-2xl mx-auto">

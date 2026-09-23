@@ -9,10 +9,12 @@ import { SummaryPanel } from "@/components/results/summary-panel";
 import { ContactDetailsCard } from "@/components/results/contact-details-card";
 import { PricingSummary } from "@/components/results/pricing-summary";
 import { useVehicles } from "@/lib/use-vehicles";
+import { useHotels } from "@/lib/use-hotels";
 
 export default function ResultsPage() {
-  const { state, hydrated } = useWizard();
+  const { state, update, hydrated } = useWizard();
   const { vehicles } = useVehicles();
+  const { hotels } = useHotels();
 
   if (!hydrated) {
     return (
@@ -48,14 +50,17 @@ export default function ResultsPage() {
     );
   }
 
-  const estimate = estimateTrip(state, vehicles);
+  const estimate = estimateTrip(state, vehicles, hotels);
 
   return (
     <div className="min-h-screen pt-28 pb-24 px-6 md:px-10 max-w-6xl mx-auto">
       <SummaryPanel state={state} />
 
       <section className="mt-12 md:mt-16" aria-labelledby="estimate-heading">
-        <PricingSummary estimate={estimate} />
+        <PricingSummary
+          estimate={estimate}
+          onCurrencyChange={(currency) => update({ currency })}
+        />
       </section>
 
       <section className="mt-12 md:mt-16" aria-labelledby="details-heading">

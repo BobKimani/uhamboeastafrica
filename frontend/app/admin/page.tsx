@@ -22,7 +22,6 @@ import {
 import { fetchAdminBookings } from "@/lib/api/bookings";
 import type { Booking } from "@/types/booking";
 import {
-  formatCurrency,
   formatDateRange,
 } from "@/lib/utils";
 
@@ -174,8 +173,11 @@ export default function AdminHomePage() {
                           {formatLabel(b.bookingType)}
                         </span>
                         <span className="block text-xs text-on-surface-variant/80 mt-0.5">
-                          {formatCurrency(b.minimumBudget, "USD")} -{" "}
-                          {formatCurrency(b.maximumBudget, "USD")}
+                          {b.numberOfRooms > 0
+                            ? `${b.numberOfRooms} room${
+                                b.numberOfRooms === 1 ? "" : "s"
+                              }`
+                            : "No rooms"}
                         </span>
                       </Td>
                       <Td>

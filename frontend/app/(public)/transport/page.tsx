@@ -71,7 +71,7 @@ export default function TransportPage() {
         <span className="text-primary font-headline font-bold text-xs tracking-widest uppercase">
           Transport
         </span>
-        <h1 className="text-5xl md:text-6xl lg:text-7xl font-headline font-extrabold tracking-tight text-on-background mt-4 leading-[1.05]">
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-headline font-extrabold tracking-tight text-on-background mt-4 leading-[1.1]">
           Book your ride across
           <br /> East Africa
         </h1>

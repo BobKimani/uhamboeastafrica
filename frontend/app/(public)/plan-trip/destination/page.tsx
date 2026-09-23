@@ -18,7 +18,17 @@ export default function DestinationStep() {
       return;
     }
 
-    update({ destination: slug });
+    // A hotel picked for another country no longer applies.
+    update({
+      destination: slug,
+      accommodation: {
+        ...state.accommodation,
+        stars: undefined,
+        hotelId: undefined,
+        hotelName: undefined,
+        region: undefined,
+      },
+    });
   }
 
   return (
@@ -33,7 +43,7 @@ export default function DestinationStep() {
       subtitle="Select a territory to begin your curated East African odyssey. Each path offers a unique rhythm of the savanna."
       canContinue={!!state.destination}
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {COUNTRIES.map((c) => {
           const selected = state.destination === c.slug;
           return (
