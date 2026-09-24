@@ -27,6 +27,11 @@ export default function TransportStep() {
   const selectedVehicleIsAvailable = availableVehicles.some(
     (vehicle) => vehicle.type === state.transport?.vehicleType
   );
+  const transportDays = state.transport?.days;
+  const hasTransportDays =
+    typeof transportDays === "number" &&
+    Number.isFinite(transportDays) &&
+    transportDays > 0;
 
   useEffect(() => {
     if (skipped) return;
@@ -38,7 +43,8 @@ export default function TransportStep() {
   const trpReady =
     selectedVehicleIsAvailable &&
     !!state.transport?.from &&
-    !!state.transport?.to;
+    !!state.transport?.to &&
+    hasTransportDays;
   const canContinue = skipped || trpReady;
 
   const setNeeded = (needed: boolean) =>
@@ -111,15 +117,21 @@ export default function TransportStep() {
             <Input
               type="number"
               min={1}
-              value={state.transport?.days ?? 3}
-              onChange={(e) =>
+              step={1}
+              placeholder="3"
+              value={state.transport?.days ?? ""}
+              onChange={(e) => {
+                const value = e.target.value;
                 update({
                   transport: {
                     ...state.transport,
-                    days: Math.max(1, Number(e.target.value) || 1),
+                    days:
+                      value === ""
+                        ? undefined
+                        : Math.max(1, Number(value)),
                   },
-                })
-              }
+                });
+              }}
             />
           </div>
           <div>
