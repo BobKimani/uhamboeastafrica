@@ -22,7 +22,7 @@ export const FAQS = [
 ];
 
 export const TESTIMONIALS = [
-  { name: "Sarah & Tom", rating: 5, text: "Uhambo orchestrated a flawless 10-day trip across Kenya and Tanzania. Every handover was seamless." },
-  { name: "Ayaan Hersi", rating: 5, text: "The Land Cruiser, the guide, the lodge — all impeccable. I've already booked my return trip." },
+  { name: "Sarah & Tom", rating: 5, text: "Uhambo orchestrated a flawless 10 day trip across Kenya and Tanzania. Every handover was seamless." },
+  { name: "Ayaan Hersi", rating: 5, text: "The Land Cruiser, the guide, the lodge, all impeccable. I've already booked my return trip." },
   { name: "Maria Gonzalez", rating: 5, text: "We felt cared for at every step. The gorilla trek in Uganda was a life-highlight." },
 ];
