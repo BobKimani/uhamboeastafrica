@@ -1,8 +1,10 @@
 import Image from "next/image";
-import { Clock, MapPin } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, Clock, MapPin } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { Experience } from "@/lib/data/experiences";
+import { cn } from "@/lib/utils";
 
 export function ExperienceCard({ experience }: { experience: Experience }) {
   return (
@@ -38,6 +40,21 @@ export function ExperienceCard({ experience }: { experience: Experience }) {
         <p className="text-on-surface-variant text-sm mt-3 leading-relaxed line-clamp-3 flex-1">
           {experience.description}
         </p>
+        <div className="mt-6">
+          <Link
+            href="/plan-trip"
+            className={cn(
+              "inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl px-6 text-sm font-bold tracking-wide transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+              "sunset-gradient text-white shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:opacity-95"
+            )}
+          >
+            Take me there
+            <ArrowRight
+              className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+              aria-hidden="true"
+            />
+          </Link>
+        </div>
       </div>
     </Card>
   );

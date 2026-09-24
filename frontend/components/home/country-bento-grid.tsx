@@ -15,7 +15,7 @@ export function CountryBentoGrid() {
         {COUNTRIES.map((c) => (
           <Link
             key={c.slug}
-            href={`/destinations?country=${c.slug}`}
+            href="/plan-trip"
             className="group relative aspect-3/2 md:aspect-3/4 overflow-hidden rounded-2xl bg-surface-container-low"
           >
             <Image

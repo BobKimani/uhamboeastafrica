@@ -28,7 +28,6 @@ const SOCIAL = [
 const LINKS = [
   { href: "/plan-trip", label: "Plan Trip" },
   { href: "/transport", label: "Transport" },
-  { href: "/destinations", label: "Destinations" },
   { href: "/experiences", label: "Experiences" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },

@@ -3,22 +3,12 @@ import { Pencil, MapPin, Calendar, Users, Sparkles, Hotel } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { COUNTRIES } from "@/lib/data/countries";
-import { DESTINATIONS } from "@/lib/data/destinations";
 import { formatDateRange } from "@/lib/utils";
 import type { WizardState } from "@/lib/wizard/types";
 
 function prettyLocation(state: WizardState): string {
   const { destination, accommodation } = state;
   if (!destination) return "—";
-
-  const dest = DESTINATIONS.find((d) => d.slug === destination);
-  if (dest) {
-    const country = COUNTRIES.find((c) => c.slug === dest.country);
-    const countryName = country?.name ?? dest.country;
-    return accommodation?.region
-      ? `${countryName} · ${accommodation.region}`
-      : countryName;
-  }
 
   const country = COUNTRIES.find((c) => c.slug === destination);
   if (country) {

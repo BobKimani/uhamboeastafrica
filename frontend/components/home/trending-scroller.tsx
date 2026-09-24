@@ -25,7 +25,7 @@ export function TrendingScroller() {
         {featuredHotels.map((hotel) => (
           <Link
             key={hotel.id}
-            href={`/destinations?country=${hotel.country}`}
+            href="/plan-trip"
             className="flex-none w-80 group"
           >
             <div className="bg-surface-container-low rounded-2xl p-4 hover:-translate-y-1 transition-transform duration-300">

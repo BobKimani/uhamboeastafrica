@@ -15,7 +15,7 @@ const SERVICES = [
     title: "Accommodation",
     description:
       "Curated stays ranging from boutique eco-lodges in the savanna to high-end resorts on the coast.",
-    href: "/destinations",
+    href: "/plan-trip",
   },
   {
     icon: CalendarRange,
