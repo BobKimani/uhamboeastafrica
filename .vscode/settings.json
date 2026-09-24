@@ -1,4 +1,5 @@
 {
+  "css.lint.unknownAtRules": "ignore",
   "python.defaultInterpreterPath": "/Users/bobkimani/.pyenv/versions/3.12.1/bin/python",
   "python.analysis.extraPaths": ["backend"]
 }
