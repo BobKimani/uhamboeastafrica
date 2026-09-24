@@ -21,7 +21,7 @@ const SERVICES = [
     icon: CalendarRange,
     title: "Custom Planning",
     description:
-      "Personalised itineraries designed by local experts to match your pace, interests and budget.",
+      "Personalised itineraries designed by local experts to match your pace, interests and travel style.",
     href: "/plan-trip",
   },
 ];
