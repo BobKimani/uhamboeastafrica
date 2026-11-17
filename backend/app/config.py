@@ -1,32 +1,52 @@
 import os
 from pathlib import Path
-from urllib.parse import quote
 
 from dotenv import load_dotenv
+from sqlalchemy.engine import URL
 
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 
 class Settings:
-    db_host = os.environ.get("DB_HOST")
+    # PostgreSQL with standard username/password auth. On the VPS the database
+    # is the `db` service on the internal Docker network.
+    db_host = os.environ.get("DB_HOST", "db")
     db_port = int(os.environ.get("DB_PORT", "5432"))
     db_name = os.environ.get("DB_NAME")
     db_user = os.environ.get("DB_USER")
-    db_sslmode = os.environ.get("DB_SSLMODE", "require")
-    aws_region = os.environ.get("AWS_REGION", "eu-north-1")
-    s3_bucket = os.environ.get("S3_BUCKET", "uhambo-s3-bucket")
-    s3_public_base_url = os.environ.get("S3_PUBLIC_BASE_URL")
+    db_password = os.environ.get("DB_PASSWORD")
+    # "prefer" uses TLS when the server offers it; set "disable" for the
+    # internal Docker network or "require" for a remote managed database.
+    db_sslmode = os.environ.get("DB_SSLMODE", "prefer")
+
+    # Local media storage (replaces S3/CloudFront). MEDIA_ROOT is bind-mounted
+    # from /srv/uhambo/uploads on the VPS; Nginx serves it at MEDIA_BASE_URL.
+    media_root = os.environ.get("MEDIA_ROOT", "/app/uploads")
+    media_base_url = (
+        os.environ.get("MEDIA_BASE_URL", "https://api.uhamboeastafrica.com/media")
+        .strip()
+        .rstrip("/")
+    )
+    media_max_upload_bytes = int(
+        os.environ.get("MEDIA_MAX_UPLOAD_BYTES", str(10 * 1024 * 1024))
+    )
 
     @property
-    def database_url(self) -> str:
+    def database_url(self) -> URL:
         if not all([self.db_host, self.db_name, self.db_user]):
             raise ValueError(
                 "DB_HOST, DB_NAME, and DB_USER are required for database access"
             )
-        user = quote(str(self.db_user), safe="")
-        host = str(self.db_host)
-        name = quote(str(self.db_name), safe="")
-        return f"postgresql+psycopg://{user}@{host}:{self.db_port}/{name}"
+        # URL.create escapes special characters in the credentials, and its
+        # string form masks the password so it never appears in logs.
+        return URL.create(
+            drivername="postgresql+psycopg",
+            username=self.db_user,
+            password=self.db_password or None,
+            host=self.db_host,
+            port=self.db_port,
+            database=self.db_name,
+        )
 
     cors_allowed_origins = [
         origin.strip()
@@ -38,33 +58,29 @@ class Settings:
     ]
 
     frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:3000").strip().rstrip("/")
+    # Local administrator authentication (replaces AWS Cognito).
+    # SESSION_SECRET keys the per-session CSRF token HMAC.
     session_secret = os.environ.get("SESSION_SECRET")
     session_cookie_name = os.environ.get("SESSION_COOKIE_NAME", "uhambo_admin_session")
-    oauth_state_cookie_name = os.environ.get(
-        "OAUTH_STATE_COOKIE_NAME", "uhambo_oauth_state"
+    # Absolute server-side session lifetime: 8 hours, which is also the maximum.
+    # Larger values (e.g. the former Cognito-era 86400) are capped; see main.py.
+    session_max_age_limit_seconds = 8 * 60 * 60
+    session_max_age_seconds = min(
+        int(os.environ.get("SESSION_MAX_AGE_SECONDS", "28800")),
+        session_max_age_limit_seconds,
     )
-    session_max_age_seconds = int(os.environ.get("SESSION_MAX_AGE_SECONDS", "86400"))
+    # Secure cookies by default; set "false" only for plain-http local development.
     session_https_only = (
-        os.environ.get("SESSION_HTTPS_ONLY", "false").strip().lower() == "true"
+        os.environ.get("SESSION_HTTPS_ONLY", "true").strip().lower() == "true"
     )
-
-    cognito_client_id = os.environ.get("COGNITO_CLIENT_ID")
-    cognito_client_secret = os.environ.get("COGNITO_CLIENT_SECRET")
-    cognito_user_pool_id = os.environ.get("COGNITO_USER_POOL_ID")
-    cognito_region = os.environ.get("COGNITO_REGION", "eu-north-1")
-    cognito_domain = os.environ.get("COGNITO_DOMAIN")
-    cognito_metadata_url = os.environ.get("COGNITO_METADATA_URL")
-    cognito_redirect_uri = os.environ.get("COGNITO_REDIRECT_URI")
-    cognito_logout_redirect_uri = os.environ.get("COGNITO_LOGOUT_REDIRECT_URI")
-    cognito_admin_groups = [
-        group.strip()
-        for group in os.environ.get(
-            "COGNITO_ADMIN_GROUPS",
-            os.environ.get("COGNITO_ADMIN_GROUP", "admin,admins"),
-        ).split(",")
-        if group.strip()
-    ]
-    cognito_admin_group = cognito_admin_groups[0] if cognito_admin_groups else "admin"
+    # Login rate limiting: failed attempts allowed per window, per email and per IP.
+    admin_login_window_seconds = int(os.environ.get("ADMIN_LOGIN_WINDOW_SECONDS", "900"))
+    admin_login_max_failures_per_email = int(
+        os.environ.get("ADMIN_LOGIN_MAX_FAILURES_PER_EMAIL", "5")
+    )
+    admin_login_max_failures_per_ip = int(
+        os.environ.get("ADMIN_LOGIN_MAX_FAILURES_PER_IP", "20")
+    )
 
     @property
     def all_cors_allowed_origins(self) -> list[str]:

@@ -3,8 +3,6 @@ import re
 from datetime import UTC, datetime
 from uuid import UUID
 
-import boto3
-from botocore.exceptions import BotoCoreError, ClientError
 from fastapi import APIRouter, Depends, File, UploadFile
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
@@ -16,6 +14,13 @@ from app.config import settings
 from app.db.models import Hotel, Vehicle
 from app.db.serializers import hotel_to_api, vehicle_to_api
 from app.db.session import get_db
+from app.services.media_storage import (
+    InvalidMediaError,
+    MediaStorageError,
+    MediaTooLargeError,
+    read_upload_limited,
+    store_catalog_image,
+)
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api", tags=["catalog"])
@@ -70,12 +75,6 @@ def _unique_slug(db: Session, model, value: str, *, current_id: UUID | None = No
             return candidate
         candidate = f"{base}-{index}"
         index += 1
-
-
-def _s3_url(key: str) -> str:
-    if settings.s3_public_base_url:
-        return f"{settings.s3_public_base_url.rstrip('/')}/{key}"
-    return f"https://{settings.s3_bucket}.s3.{settings.aws_region}.amazonaws.com/{key}"
 
 
 @router.get("/hotels")
@@ -311,25 +310,31 @@ async def upload_catalog_image(
             content={"success": False, "error": "Only image uploads are allowed"},
         )
 
-    extension = file.filename.rsplit(".", 1)[-1].lower() if file.filename else "bin"
-    if not re.fullmatch(r"[a-z0-9]{1,8}", extension):
-        extension = "bin"
-    now = datetime.now(UTC)
-    key = f"catalog/{now.strftime('%Y/%m/%d')}/{now.timestamp():.0f}-{_slug(file.filename or 'image')}.{extension}"
-
     try:
-        body = await file.read()
-        s3 = boto3.client("s3", region_name=settings.aws_region)
-        s3.put_object(
-            Bucket=settings.s3_bucket,
-            Key=key,
-            Body=body,
-            ContentType=file.content_type,
+        body = await read_upload_limited(file, settings.media_max_upload_bytes)
+        # Content is verified by its magic bytes; the client-supplied
+        # content type and filename extension are not trusted.
+        stored = store_catalog_image(body, file.filename)
+        return {"success": True, "url": stored.url, "key": stored.key}
+    except InvalidMediaError:
+        return JSONResponse(
+            status_code=400,
+            content={"success": False, "error": "Only image uploads are allowed"},
         )
-        return {"success": True, "url": _s3_url(key), "key": key}
-    except (BotoCoreError, ClientError):
+    except MediaTooLargeError:
+        limit_mb = settings.media_max_upload_bytes // (1024 * 1024)
+        return JSONResponse(
+            status_code=413,
+            content={
+                "success": False,
+                "error": f"Image is too large (maximum {limit_mb} MB)",
+            },
+        )
+    except (MediaStorageError, OSError):
         logger.exception("Catalog image upload failed")
         return JSONResponse(
-            status_code=502,
+            status_code=500,
             content={"success": False, "error": "Failed to upload image"},
         )
+    finally:
+        await file.close()
