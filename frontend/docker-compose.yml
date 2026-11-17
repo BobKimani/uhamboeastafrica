@@ -1,0 +1,54 @@
+# Uhambo frontend (Next.js standalone) — standalone/local use only.
+#
+# ON THE VPS, DO NOT USE THIS FILE: deploy with
+# deployment/vps/uhambo-compose.sh, which uses deployment/compose.frontend.yaml
+# (same container name and port; running both would conflict).
+#
+# Nginx on the host terminates TLS for www.uhamboeastafrica.com and proxies to
+# 127.0.0.1:3000. The port is bound to localhost only, so the container is not
+# reachable directly from the internet.
+#
+# Usage (from this directory):
+#   cp .env.example .env   # then set NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+#   docker compose up -d --build
+#
+# NEXT_PUBLIC_* values are baked in at build time, so rebuild after changing them.
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api.uhamboeastafrica.com}
+        NEXT_PUBLIC_MEDIA_URL: ${NEXT_PUBLIC_MEDIA_URL:-https://api.uhamboeastafrica.com/media}
+        NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${NEXT_PUBLIC_GOOGLE_MAPS_API_KEY:?NEXT_PUBLIC_GOOGLE_MAPS_API_KEY is required}
+        BACKEND_API_URL: ${BACKEND_API_URL:-}
+    image: uhambo-frontend:latest
+    container_name: uhambo-frontend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      HOSTNAME: 0.0.0.0
+      # Read at runtime by the server-side API proxy (app/api/_proxy.ts).
+      BACKEND_API_URL: ${BACKEND_API_URL:-}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api.uhamboeastafrica.com}
+    expose:
+      - "3000"
+    ports:
+      - "127.0.0.1:3000:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3000/"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+    # If Nginx or the FastAPI backend run as containers in another compose
+    # project, attach this service to their shared network so it can be
+    # reached as http://frontend:3000 (and the backend as e.g. http://backend:8000):
+    # networks:
+    #   - uhambo
+# networks:
+#   uhambo:
+#     external: true

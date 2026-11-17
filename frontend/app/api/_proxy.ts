@@ -1,7 +1,7 @@
 import { resolveApiBaseUrl } from "@/lib/api/base-url";
 
 const FASTAPI_BASE_URL = resolveApiBaseUrl({
-  value: process.env.BACKEND_API_URL ?? process.env.NEXT_PUBLIC_API_URL,
+  value: process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL,
 });
 
 export async function proxyToFastApi(request: Request, path: string) {
@@ -13,10 +13,15 @@ export async function proxyToFastApi(request: Request, path: string) {
   const authorization = request.headers.get("authorization");
   const contentType = request.headers.get("content-type");
   const cookie = request.headers.get("cookie");
+  const csrfToken = request.headers.get("x-csrf-token");
+  const origin = request.headers.get("origin");
 
   if (authorization) headers.set("authorization", authorization);
   if (contentType) headers.set("content-type", contentType);
   if (cookie) headers.set("cookie", cookie);
+  // Needed by the backend's CSRF protection for authenticated admin requests.
+  if (csrfToken) headers.set("x-csrf-token", csrfToken);
+  if (origin) headers.set("origin", origin);
   headers.set("x-forwarded-host", incomingUrl.host);
   headers.set("x-forwarded-proto", incomingUrl.protocol.replace(":", ""));
 

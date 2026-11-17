@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input, Label } from "@/components/ui/input";
 import { IMG } from "@/lib/images";
-import { adminLoginUrl, onAuthChange } from "@/lib/auth";
+import { onAuthChange, signInWithPassword } from "@/lib/auth";
 
 function safeRedirect(target: string | null): string {
     if (target && target.startsWith("/admin")) return target;
@@ -18,6 +19,9 @@ export function AuthForm() {
     const searchParams = useSearchParams();
     const redirectTarget = safeRedirect(searchParams.get("redirect"));
     const [pending, setPending] = useState(false);
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const unsubscribe = onAuthChange((user) => {
@@ -26,9 +30,18 @@ export function AuthForm() {
         return unsubscribe;
     }, [router, redirectTarget]);
 
-    function handleSignIn() {
+    async function handleSignIn(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
         setPending(true);
-        window.location.assign(adminLoginUrl(redirectTarget));
+        setError(null);
+        try {
+            await signInWithPassword(email.trim(), password);
+            setPassword("");
+            router.replace(redirectTarget);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Sign in failed");
+            setPending(false);
+        }
     }
 
     return (
@@ -67,17 +80,49 @@ export function AuthForm() {
                         Sign in with your Uhambo administrator account.
                     </p>
 
-                    <Button
-                        type="button"
-                        variant="primary"
-                        size="lg"
-                        className="w-full"
-                        disabled={pending}
-                        onClick={handleSignIn}
-                    >
-                        {pending ? "Redirecting..." : "Continue with Cognito"}
-                        <LogIn className="h-5 w-5" aria-hidden />
-                    </Button>
+                    <form className="space-y-5" onSubmit={handleSignIn} noValidate>
+                        <div className="space-y-2">
+                            <Label htmlFor="admin-email">Email</Label>
+                            <Input
+                                id="admin-email"
+                                type="email"
+                                autoComplete="username"
+                                required
+                                value={email}
+                                onChange={(event) => setEmail(event.target.value)}
+                                disabled={pending}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="admin-password">Password</Label>
+                            <Input
+                                id="admin-password"
+                                type="password"
+                                autoComplete="current-password"
+                                required
+                                value={password}
+                                onChange={(event) => setPassword(event.target.value)}
+                                disabled={pending}
+                            />
+                        </div>
+
+                        {error && (
+                            <p role="alert" className="text-sm text-error">
+                                {error}
+                            </p>
+                        )}
+
+                        <Button
+                            type="submit"
+                            variant="primary"
+                            size="lg"
+                            className="w-full"
+                            disabled={pending || !email || !password}
+                        >
+                            {pending ? "Signing in..." : "Sign in"}
+                            <LogIn className="h-5 w-5" aria-hidden />
+                        </Button>
+                    </form>
 
                     <p className="mt-10 text-center text-xs text-on-surface-variant">
                         Authorised personnel only.
