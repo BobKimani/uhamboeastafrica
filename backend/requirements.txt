@@ -4,10 +4,7 @@ pydantic[email]
 python-dotenv
 psycopg[binary]
 SQLAlchemy
-boto3
-botocore[crt]
 python-multipart
 pytest
 httpx
-authlib
-itsdangerous
+argon2-cffi
