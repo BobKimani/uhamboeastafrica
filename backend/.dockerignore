@@ -31,8 +31,17 @@ coverage.xml
 
 # Docker files not needed inside the image
 Dockerfile
+.dockerignore
 docker-compose.yml
 docker-compose.yaml
+compose.yml
+compose.yaml
+deployment/
+
+# Tests and docs are not needed at runtime
+tests/
+pytest.ini
+README.md
 
 # Logs
 *.log
