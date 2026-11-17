@@ -1,4 +1,5 @@
 import { apiUrl, readJson } from "@/lib/api/client";
+import { csrfHeaders } from "@/lib/api/csrf";
 import type { Hotel } from "@/lib/data/hotels";
 import type { Vehicle } from "@/lib/data/vehicles";
 import { mediaUrl } from "@/lib/media";
@@ -20,6 +21,7 @@ export async function saveHotel(hotel: Hotel): Promise<Hotel> {
       method: isExisting ? "PATCH" : "POST",
       credentials: "include",
       headers: {
+        ...(await csrfHeaders()),
         "Content-Type": "application/json",
       },
       body: JSON.stringify(hotel),
@@ -36,6 +38,7 @@ export async function deleteHotel(id: string) {
   const response = await fetch(apiUrl(`/api/hotels/${id}`), {
     method: "DELETE",
     credentials: "include",
+    headers: await csrfHeaders(),
   });
   return readJson<{ success: true; message: string }>(
     response,
@@ -60,6 +63,7 @@ export async function saveVehicle(vehicle: Vehicle): Promise<Vehicle> {
       method: isExisting ? "PATCH" : "POST",
       credentials: "include",
       headers: {
+        ...(await csrfHeaders()),
         "Content-Type": "application/json",
       },
       body: JSON.stringify(vehicle),
@@ -76,6 +80,7 @@ export async function deleteVehicle(id: string) {
   const response = await fetch(apiUrl(`/api/vehicles/${id}`), {
     method: "DELETE",
     credentials: "include",
+    headers: await csrfHeaders(),
   });
   return readJson<{ success: true; message: string }>(
     response,
@@ -90,6 +95,7 @@ export async function uploadCatalogImage(file: File) {
   const response = await fetch(apiUrl("/api/uploads/catalog-image"), {
     method: "POST",
     credentials: "include",
+    headers: await csrfHeaders(),
     body: formData,
   });
 

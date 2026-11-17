@@ -4,6 +4,7 @@ import type {
     InquiryStatus,
 } from "@/types/inquiry";
 import { apiUrl, readJson } from "@/lib/api/client";
+import { csrfHeaders } from "@/lib/api/csrf";
 
 export async function submitInquiry(formData: CreateInquiryInput) {
     const response = await fetch(apiUrl("/api/inquiries"), {
@@ -39,6 +40,7 @@ export async function updateInquiryStatus(id: string, status: InquiryStatus) {
         method: "PATCH",
         credentials: "include",
         headers: {
+            ...(await csrfHeaders()),
             "Content-Type": "application/json",
         },
         body: JSON.stringify({ status }),
@@ -53,6 +55,7 @@ export async function deleteInquiry(id: string) {
     const response = await fetch(apiUrl(`/api/inquiries/${id}`), {
         method: "DELETE",
         credentials: "include",
+        headers: await csrfHeaders(),
     });
 
     const result = await readJson<{ success: true; message: string }>(

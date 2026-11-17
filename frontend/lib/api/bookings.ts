@@ -5,6 +5,7 @@ import type {
     BookingStatus,
 } from "@/types/booking";
 import { apiUrl, readJson } from "@/lib/api/client";
+import { csrfHeaders } from "@/lib/api/csrf";
 
 export async function submitBooking(formData: CreateBookingInput) {
     const response = await fetch(apiUrl("/api/bookings"), {
@@ -40,6 +41,7 @@ export async function updateBookingStatus(id: string, status: BookingStatus) {
         method: "PATCH",
         credentials: "include",
         headers: {
+            ...(await csrfHeaders()),
             "Content-Type": "application/json",
         },
         body: JSON.stringify({ status }),
@@ -54,6 +56,7 @@ export async function deleteBooking(id: string) {
     const response = await fetch(apiUrl(`/api/bookings/${id}`), {
         method: "DELETE",
         credentials: "include",
+        headers: await csrfHeaders(),
     });
 
     const result = await readJson<{ success: true; message: string }>(

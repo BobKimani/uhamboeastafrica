@@ -3,6 +3,10 @@ const MEDIA_BASE_URL = process.env.NEXT_PUBLIC_MEDIA_URL?.replace(/\/+$/, "");
 const LEGACY_S3_HOST_PATTERN =
   /^uhambo-s3-bucket\.s3(?:[.-][a-z0-9-]+)?\.amazonaws\.com$/;
 
+// Former CloudFront distribution. Media is now served from the VPS
+// (NEXT_PUBLIC_MEDIA_URL), so any stored CloudFront URLs are remapped there.
+const LEGACY_CLOUDFRONT_HOST = "d2fbz2lzk71lum.cloudfront.net";
+
 const LEGACY_CATALOG_IMAGE_PATHS: Record<string, string> = {
   "10-seater-van.png": "assets/vehicles/10-seater-van.png",
   "alphard.jpg": "assets/vehicles/alphard.jpg",
@@ -18,8 +22,13 @@ const LEGACY_CATALOG_IMAGE_PATHS: Record<string, string> = {
   "uganda-gorilla.jpg": "assets/destinations/uganda-gorilla.jpg",
 };
 
-function mediaPathFromS3Url(url: URL) {
-  if (!LEGACY_S3_HOST_PATTERN.test(url.hostname)) return null;
+function mediaPathFromLegacyUrl(url: URL) {
+  if (
+    !LEGACY_S3_HOST_PATTERN.test(url.hostname) &&
+    url.hostname !== LEGACY_CLOUDFRONT_HOST
+  ) {
+    return null;
+  }
   return url.pathname.replace(/^\/+/, "");
 }
 
@@ -46,12 +55,19 @@ export function mediaUrl(path: string) {
 
   try {
     const url = new URL(path);
-    const s3Path = mediaPathFromS3Url(url);
-    if (s3Path) {
-      return `${mediaBaseUrl()}/${remapLegacyCatalogPath(s3Path)}`;
+    const legacyPath = mediaPathFromLegacyUrl(url);
+    if (legacyPath) {
+      return `${mediaBaseUrl()}/${remapLegacyCatalogPath(legacyPath)}`;
     }
-    if (url.origin === mediaBaseUrl()) {
-      return `${mediaBaseUrl()}/${remapLegacyCatalogPath(url.pathname)}`;
+    // The media base may include a path prefix (e.g. https://api.example.com/media),
+    // so match on the full base rather than just the origin.
+    const base = new URL(mediaBaseUrl());
+    const basePath = base.pathname.replace(/\/+$/, "");
+    if (
+      url.origin === base.origin &&
+      (url.pathname === basePath || url.pathname.startsWith(`${basePath}/`))
+    ) {
+      return `${mediaBaseUrl()}/${remapLegacyCatalogPath(url.pathname.slice(basePath.length))}`;
     }
     return path;
   } catch {
