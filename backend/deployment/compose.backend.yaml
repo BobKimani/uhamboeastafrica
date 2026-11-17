@@ -1,0 +1,96 @@
+# Uhambo FastAPI backend — Compose override for the VPS.
+#
+# Adds ONLY the `backend` service to the existing /opt/uhambo/compose.yaml.
+# It does not define, recreate or modify the existing `db` (PostgreSQL 17)
+# service or its persistent volume. Because it joins the same Compose project,
+# it shares the project's default network and reaches Postgres at db:5432.
+#
+# Use it through deployment/vps/uhambo-compose.sh, which always runs from
+# /opt/uhambo with the right files and refuses unsafe commands. Equivalent:
+#   cd /opt/uhambo && docker compose -f compose.yaml \
+#     -f source/backend/deployment/compose.backend.yaml \
+#     -f source/frontend/deployment/compose.frontend.yaml <command>
+#
+# With multiple -f files, relative paths resolve from the FIRST file's
+# directory (/opt/uhambo). Defaults match the VPS layout; override if needed:
+#   UHAMBO_BACKEND_CONTEXT   backend source dir    (default ./source/backend)
+#   UHAMBO_BACKEND_ENV_FILE  runtime env + secrets (default /etc/uhambo/backend.env)
+#   UHAMBO_MEDIA_DIR         host media directory  (default /srv/uhambo/uploads)
+#   UHAMBO_IMAGE_TAG         image tag to build/run (default latest)
+#
+# The `depends_on: db` below requires the PostgreSQL service in compose.yaml to
+# be named `db`; if it is not, `docker compose config` fails loudly.
+
+services:
+  backend:
+    build:
+      context: ${UHAMBO_BACKEND_CONTEXT:-./source/backend}
+      dockerfile: Dockerfile
+    image: uhambo-backend:${UHAMBO_IMAGE_TAG:-latest}
+    container_name: uhambo-backend
+    restart: unless-stopped
+    env_file:
+      - ${UHAMBO_BACKEND_ENV_FILE:-/etc/uhambo/backend.env}
+    environment:
+      PORT: "8000"
+      # Internal Docker networking to the existing PostgreSQL service.
+      DB_HOST: db
+      DB_PORT: "5432"
+      # Uvicorn worker processes (read by uvicorn). Sessions, CSRF and login
+      # rate limiting are database-backed, so multiple workers are safe.
+      WEB_CONCURRENCY: ${UHAMBO_BACKEND_WORKERS:-2}
+      # Uvicorn trusts X-Forwarded-* only from these IPs. Safe here because the
+      # port is published on 127.0.0.1 only and otherwise reachable solely on
+      # the internal Docker network (host Nginx connects via the bridge gateway
+      # and overwrites X-Forwarded-For with the real client address).
+      FORWARDED_ALLOW_IPS: "*"
+      # Local media storage (replaces S3/CloudFront). Nginx serves the same
+      # host directory directly at https://api.uhamboeastafrica.com/media/.
+      MEDIA_ROOT: /app/uploads
+      MEDIA_BASE_URL: ${MEDIA_BASE_URL:-https://api.uhamboeastafrica.com/media}
+    volumes:
+      # Persistent bind mount: survives restarts, rebuilds and redeploys.
+      # Prepare once on the host:
+      #   sudo mkdir -p /srv/uhambo/uploads
+      #   sudo chown -R 10001:10001 /srv/uhambo/uploads   # container app UID/GID
+      #   sudo chmod 755 /srv/uhambo/uploads
+      - type: bind
+        source: ${UHAMBO_MEDIA_DIR:-/srv/uhambo/uploads}
+        target: /app/uploads
+        bind:
+          create_host_path: false
+    depends_on:
+      db:
+        condition: service_started
+    expose:
+      - "8000"
+    ports:
+      # Host Nginx proxies api.uhamboeastafrica.com -> 127.0.0.1:8000.
+      - "127.0.0.1:8000:8000"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=5)"
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+    # 6 GB VPS budget: backend <= 768 MB (2 workers; Argon2id uses 64 MB per
+    # concurrent login), frontend <= 768 MB, leaving the rest for PostgreSQL,
+    # Nginx, the OS and image builds.
+    deploy:
+      resources:
+        limits:
+          memory: ${UHAMBO_BACKEND_MEMORY:-768M}
+          cpus: "2.0"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
