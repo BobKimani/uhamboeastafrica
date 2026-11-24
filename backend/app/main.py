@@ -11,7 +11,7 @@ from app.payments.kcb import (
     log_kcb_runtime_configuration,
     validate_kcb_runtime_configuration,
 )
-from app.routers import auth, bookings, catalog, currency, inquiries, payments
+from app.routers import auth, bookings, catalog, currency, inquiries, payments, transport
 
 app = FastAPI(title="Uhambo API")
 
@@ -62,3 +62,4 @@ app.include_router(catalog.router)
 app.include_router(currency.router)
 app.include_router(inquiries.router)
 app.include_router(payments.router)
+app.include_router(transport.router)

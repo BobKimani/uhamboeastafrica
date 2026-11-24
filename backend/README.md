@@ -176,6 +176,30 @@ Cognito passwords cannot be exported, so each administrator gets a new password.
 The Cognito user pool is no longer used by the application; it was not
 modified or deleted. Remove it manually only after the VPS login is verified.
 
+## Transport Pricing (route-based)
+
+Transport is priced per trip from route distance, in KES, by the backend only
+(`app/services/transport_pricing.py`):
+
+```
+legs     = 2 for one way and return (the vehicle always drives back)
+fuel     = distance_km / vehicle km_per_litre * fuel_price_kes * legs
+driver   = fuel / 2
+total    = round_half_up((fuel + driver + margin_kes) * multiplier)
+```
+
+- Admin → Transport edits the fuel price, margin and multiplier
+  (`transport_pricing_settings`), routes/distances (`transport_places`,
+  `transport_routes`) and each vehicle's km/L (`vehicles.km_per_litre`).
+- Each booking stores a `transport_quote` snapshot, so later price changes never
+  alter existing bookings. If the price changes between quote and booking the
+  API returns 409 `price_changed` with the new quote.
+- Routes flagged `needs_review` and unlisted routes become quote requests
+  (`quote_requested`, no online payment).
+- Load the chart data once (idempotent): `python -m app.seed_transport`
+  (`db/seeds/transport_routes.seed.json`, generated from
+  `UHAMBO TRANSPORT PRICE CHART.xlsx`).
+
 ## Local Backend Check
 
 ```bash

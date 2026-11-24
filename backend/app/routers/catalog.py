@@ -45,7 +45,10 @@ class VehiclePayload(BaseModel):
     name: str = Field(min_length=2)
     type: str = Field(min_length=2)
     capacity: int = Field(ge=1)
-    pricePerDay: float = Field(ge=0)
+    # Legacy daily rate; no longer used for pricing (route pricing uses km/L).
+    pricePerDay: float | None = Field(default=None, ge=0)
+    # Fuel consumption for route pricing; None = cannot be quoted online.
+    kmPerLitre: float | None = Field(default=None, gt=0, le=100)
     bestFor: str = Field(min_length=1)
     features: list[str] = Field(default_factory=list)
     image: str = Field(min_length=1)
@@ -219,7 +222,8 @@ async def create_vehicle(
             name=payload.name,
             type=payload.type,
             capacity=payload.capacity,
-            price_per_day=payload.pricePerDay,
+            price_per_day=payload.pricePerDay or 0,
+            km_per_litre=payload.kmPerLitre,
             best_for=payload.bestFor,
             features=payload.features,
             image=payload.image,
@@ -256,7 +260,10 @@ async def update_vehicle(
         vehicle.name = payload.name
         vehicle.type = payload.type
         vehicle.capacity = payload.capacity
-        vehicle.price_per_day = payload.pricePerDay
+        if payload.pricePerDay is not None:
+            vehicle.price_per_day = payload.pricePerDay
+        if "kmPerLitre" in payload.model_fields_set:
+            vehicle.km_per_litre = payload.kmPerLitre
         vehicle.best_for = payload.bestFor
         vehicle.features = payload.features
         vehicle.image = payload.image

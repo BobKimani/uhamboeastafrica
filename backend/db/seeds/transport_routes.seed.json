@@ -1,0 +1,4491 @@
+{
+  "source": "UHAMBO TRANSPORT PRICE CHART.xlsx (distances read from the price formulas)",
+  "rules": "One distance per place pair; where the chart disagrees the larger is used and needsReview is set. Kitui-Kisii and Limuru-Mombasa flagged as suspicious.",
+  "pricingDefaults": {
+    "fuelPriceKes": 217,
+    "marginKes": 0,
+    "multiplier": 0.9
+  },
+  "vehicleKmPerLitreDefaults": {
+    "Noah": 9,
+    "10-seater Van": 9,
+    "Alphard": 9,
+    "4x4 Land Cruiser": 5,
+    "Coaster": 5,
+    "Truck": 2.5
+  },
+  "places": [
+    "Ahero",
+    "Awasi",
+    "Bomet",
+    "Bondo",
+    "Bungoma",
+    "Burnt Forest",
+    "Busia",
+    "Camp Bedouin Elementaita",
+    "Camp Ndunda",
+    "Chuka",
+    "Eldama Ravine",
+    "Eldoret",
+    "Embu",
+    "Garissa",
+    "Gilgil",
+    "Homa Bay",
+    "Isiolo",
+    "Iten/Tambach",
+    "Kabia Falls",
+    "Kakamega",
+    "Kapenguria",
+    "Kapsabet",
+    "Kendu Bay",
+    "Kericho",
+    "Keroka",
+    "Kerugoya/Kutus",
+    "Kilifi",
+    "Kimilili",
+    "Kipkelion",
+    "Kisii",
+    "Kisumu",
+    "Kitale",
+    "Kitui",
+    "Limuru",
+    "Litein",
+    "Lodwar",
+    "Londiani",
+    "Luanda",
+    "Machakos",
+    "Makuyu",
+    "Malaba",
+    "Malakisi",
+    "Malava",
+    "Malindi",
+    "Maragua",
+    "Maralal",
+    "Mariakani",
+    "Marsabit",
+    "Matuu",
+    "Maua",
+    "Mbita",
+    "Meru",
+    "Migori",
+    "Molo",
+    "Mombasa",
+    "Moyale",
+    "Mtwapa",
+    "Muhoroni",
+    "Mumias",
+    "Mwingi",
+    "Nairobi",
+    "Nakuru",
+    "Nambale",
+    "Nandi Hills",
+    "Nanyuki",
+    "Narok",
+    "Nyahururu",
+    "Nyamira",
+    "Nyansiongo",
+    "Nyeri",
+    "Ogembo",
+    "Ol Kalau",
+    "Oyugis",
+    "Rongo",
+    "Rumuruti",
+    "Runyenjes",
+    "Sagana",
+    "Siaya",
+    "Suneka",
+    "Tabaka",
+    "Taveta",
+    "Ugunja",
+    "Ukunda",
+    "Vihiga",
+    "Voi",
+    "Webuye",
+    "Wundanyi",
+    "Yala"
+  ],
+  "routes": [
+    {
+      "from": "Ahero",
+      "to": "Eldoret",
+      "distanceKm": 115.0,
+      "needsReview": false
+    },
+    {
+      "from": "Ahero",
+      "to": "Kisii",
+      "distanceKm": 85.0,
+      "needsReview": false
+    },
+    {
+      "from": "Ahero",
+      "to": "Kisumu",
+      "distanceKm": 25.0,
+      "needsReview": false
+    },
+    {
+      "from": "Ahero",
+      "to": "Kitale",
+      "distanceKm": 190.0,
+      "needsReview": false
+    },
+    {
+      "from": "Ahero",
+      "to": "Malindi",
+      "distanceKm": 820.0,
+      "needsReview": false
+    },
+    {
+      "from": "Ahero",
+      "to": "Mombasa",
+      "distanceKm": 820.0,
+      "needsReview": false
+    },
+    {
+      "from": "Ahero",
+      "to": "Nairobi",
+      "distanceKm": 335.0,
+      "needsReview": false
+    },
+    {
+      "from": "Ahero",
+      "to": "Nakuru",
+      "distanceKm": 165.0,
+      "needsReview": false
+    },
+    {
+      "from": "Ahero",
+      "to": "Ukunda",
+      "distanceKm": 850.0,
+      "needsReview": false
+    },
+    {
+      "from": "Awasi",
+      "to": "Eldoret",
+      "distanceKm": 100.0,
+      "needsReview": false
+    },
+    {
+      "from": "Awasi",
+      "to": "Kisii",
+      "distanceKm": 100.0,
+      "needsReview": false
+    },
+    {
+      "from": "Awasi",
+      "to": "Kisumu",
+      "distanceKm": 45.0,
+      "needsReview": false
+    },
+    {
+      "from": "Awasi",
+      "to": "Kitale",
+      "distanceKm": 170.0,
+      "needsReview": false
+    },
+    {
+      "from": "Awasi",
+      "to": "Malindi",
+      "distanceKm": 980.0,
+      "needsReview": false
+    },
+    {
+      "from": "Awasi",
+      "to": "Mombasa",
+      "distanceKm": 790.0,
+      "needsReview": false
+    },
+    {
+      "from": "Awasi",
+      "to": "Nairobi",
+      "distanceKm": 305.0,
+      "needsReview": false
+    },
+    {
+      "from": "Awasi",
+      "to": "Nakuru",
+      "distanceKm": 144.0,
+      "needsReview": false
+    },
+    {
+      "from": "Awasi",
+      "to": "Ukunda",
+      "distanceKm": 820.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bomet",
+      "to": "Eldoret",
+      "distanceKm": 215.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bomet",
+      "to": "Kisii",
+      "distanceKm": 85.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bomet",
+      "to": "Kisumu",
+      "distanceKm": 135.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bomet",
+      "to": "Kitale",
+      "distanceKm": 280.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bomet",
+      "to": "Malindi",
+      "distanceKm": 905.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bomet",
+      "to": "Mombasa",
+      "distanceKm": 715.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bomet",
+      "to": "Nairobi",
+      "distanceKm": 230.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bomet",
+      "to": "Nakuru",
+      "distanceKm": 185.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bomet",
+      "to": "Ukunda",
+      "distanceKm": 740.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bondo",
+      "to": "Eldoret",
+      "distanceKm": 165.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bondo",
+      "to": "Kisii",
+      "distanceKm": 175.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bondo",
+      "to": "Kisumu",
+      "distanceKm": 65.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bondo",
+      "to": "Kitale",
+      "distanceKm": 200.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bondo",
+      "to": "Malindi",
+      "distanceKm": 915.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bondo",
+      "to": "Mombasa",
+      "distanceKm": 890.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bondo",
+      "to": "Nairobi",
+      "distanceKm": 420.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bondo",
+      "to": "Nakuru",
+      "distanceKm": 245.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bondo",
+      "to": "Ukunda",
+      "distanceKm": 930.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bungoma",
+      "to": "Eldoret",
+      "distanceKm": 100.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bungoma",
+      "to": "Kisii",
+      "distanceKm": 215.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bungoma",
+      "to": "Kisumu",
+      "distanceKm": 100.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bungoma",
+      "to": "Kitale",
+      "distanceKm": 90.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bungoma",
+      "to": "Malindi",
+      "distanceKm": 1090.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bungoma",
+      "to": "Mombasa",
+      "distanceKm": 900.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bungoma",
+      "to": "Nairobi",
+      "distanceKm": 415.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bungoma",
+      "to": "Nakuru",
+      "distanceKm": 255.0,
+      "needsReview": false
+    },
+    {
+      "from": "Bungoma",
+      "to": "Ukunda",
+      "distanceKm": 930.0,
+      "needsReview": false
+    },
+    {
+      "from": "Burnt Forest",
+      "to": "Eldoret",
+      "distanceKm": 45.0,
+      "needsReview": false
+    },
+    {
+      "from": "Burnt Forest",
+      "to": "Kisii",
+      "distanceKm": 210.0,
+      "needsReview": false
+    },
+    {
+      "from": "Burnt Forest",
+      "to": "Kisumu",
+      "distanceKm": 135.0,
+      "needsReview": false
+    },
+    {
+      "from": "Burnt Forest",
+      "to": "Kitale",
+      "distanceKm": 120.0,
+      "needsReview": false
+    },
+    {
+      "from": "Burnt Forest",
+      "to": "Malindi",
+      "distanceKm": 955.0,
+      "needsReview": false
+    },
+    {
+      "from": "Burnt Forest",
+      "to": "Mombasa",
+      "distanceKm": 760.0,
+      "needsReview": false
+    },
+    {
+      "from": "Burnt Forest",
+      "to": "Nairobi",
+      "distanceKm": 275.0,
+      "needsReview": false
+    },
+    {
+      "from": "Burnt Forest",
+      "to": "Nakuru",
+      "distanceKm": 130.0,
+      "needsReview": false
+    },
+    {
+      "from": "Burnt Forest",
+      "to": "Ukunda",
+      "distanceKm": 790.0,
+      "needsReview": false
+    },
+    {
+      "from": "Busia",
+      "to": "Eldoret",
+      "distanceKm": 175.0,
+      "needsReview": false
+    },
+    {
+      "from": "Busia",
+      "to": "Kisii",
+      "distanceKm": 225.0,
+      "needsReview": false
+    },
+    {
+      "from": "Busia",
+      "to": "Kisumu",
+      "distanceKm": 115.0,
+      "needsReview": false
+    },
+    {
+      "from": "Busia",
+      "to": "Kitale",
+      "distanceKm": 150.0,
+      "needsReview": false
+    },
+    {
+      "from": "Busia",
+      "to": "Malindi",
+      "distanceKm": 1145.0,
+      "needsReview": false
+    },
+    {
+      "from": "Busia",
+      "to": "Mombasa",
+      "distanceKm": 940.0,
+      "needsReview": false
+    },
+    {
+      "from": "Busia",
+      "to": "Nairobi",
+      "distanceKm": 470.0,
+      "needsReview": false
+    },
+    {
+      "from": "Busia",
+      "to": "Nakuru",
+      "distanceKm": 300.0,
+      "needsReview": false
+    },
+    {
+      "from": "Busia",
+      "to": "Ukunda",
+      "distanceKm": 985.0,
+      "needsReview": false
+    },
+    {
+      "from": "Camp Bedouin Elementaita",
+      "to": "Nairobi",
+      "distanceKm": 130.0,
+      "needsReview": false
+    },
+    {
+      "from": "Camp Ndunda",
+      "to": "Nairobi",
+      "distanceKm": 140.0,
+      "needsReview": false
+    },
+    {
+      "from": "Chuka",
+      "to": "Eldoret",
+      "distanceKm": 435.0,
+      "needsReview": false
+    },
+    {
+      "from": "Chuka",
+      "to": "Kisii",
+      "distanceKm": 475.0,
+      "needsReview": false
+    },
+    {
+      "from": "Chuka",
+      "to": "Kisumu",
+      "distanceKm": 465.0,
+      "needsReview": false
+    },
+    {
+      "from": "Chuka",
+      "to": "Kitale",
+      "distanceKm": 510.0,
+      "needsReview": false
+    },
+    {
+      "from": "Chuka",
+      "to": "Malindi",
+      "distanceKm": 675.0,
+      "needsReview": false
+    },
+    {
+      "from": "Chuka",
+      "to": "Mombasa",
+      "distanceKm": 600.0,
+      "needsReview": false
+    },
+    {
+      "from": "Chuka",
+      "to": "Nairobi",
+      "distanceKm": 175.0,
+      "needsReview": false
+    },
+    {
+      "from": "Chuka",
+      "to": "Nakuru",
+      "distanceKm": 285.0,
+      "needsReview": false
+    },
+    {
+      "from": "Chuka",
+      "to": "Ukunda",
+      "distanceKm": 630.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldama Ravine",
+      "to": "Eldoret",
+      "distanceKm": 110.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldama Ravine",
+      "to": "Kisii",
+      "distanceKm": 180.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldama Ravine",
+      "to": "Kisumu",
+      "distanceKm": 165.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldama Ravine",
+      "to": "Kitale",
+      "distanceKm": 185.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldama Ravine",
+      "to": "Malindi",
+      "distanceKm": 900.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldama Ravine",
+      "to": "Mombasa",
+      "distanceKm": 710.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldama Ravine",
+      "to": "Nairobi",
+      "distanceKm": 225.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldama Ravine",
+      "to": "Nakuru",
+      "distanceKm": 63.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldama Ravine",
+      "to": "Ukunda",
+      "distanceKm": 735.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Embu",
+      "distanceKm": 395.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Garissa",
+      "distanceKm": 640.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Gilgil",
+      "distanceKm": 195.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Homa Bay",
+      "distanceKm": 200.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Isiolo",
+      "distanceKm": 415.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Iten/Tambach",
+      "distanceKm": 40.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Kakamega",
+      "distanceKm": 110.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Kapenguria",
+      "distanceKm": 110.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Kapsabet",
+      "distanceKm": 50.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Kendu Bay",
+      "distanceKm": 165.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Kericho",
+      "distanceKm": 140.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Keroka",
+      "distanceKm": 205.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Kerugoya/Kutus",
+      "distanceKm": 365.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Kilifi",
+      "distanceKm": 835.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Kimilili",
+      "distanceKm": 95.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Kipkelion",
+      "distanceKm": 140.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Kisii",
+      "distanceKm": 205.0,
+      "needsReview": true,
+      "chartDistancesKm": [
+        200.0,
+        205.0
+      ]
+    },
+    {
+      "from": "Eldoret",
+      "to": "Kisumu",
+      "distanceKm": 140.0,
+      "needsReview": true,
+      "chartDistancesKm": [
+        125.0,
+        140.0
+      ]
+    },
+    {
+      "from": "Eldoret",
+      "to": "Kitale",
+      "distanceKm": 75.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Kitui",
+      "distanceKm": 475.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Limuru",
+      "distanceKm": 280.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Litein",
+      "distanceKm": 170.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Lodwar",
+      "distanceKm": 365.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Londiani",
+      "distanceKm": 120.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Luanda",
+      "distanceKm": 125.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Machakos",
+      "distanceKm": 375.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Makuyu",
+      "distanceKm": 340.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Malaba",
+      "distanceKm": 130.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Malakisi",
+      "distanceKm": 125.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Malava",
+      "distanceKm": 85.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Malindi",
+      "distanceKm": 995.0,
+      "needsReview": true,
+      "chartDistancesKm": [
+        810.0,
+        995.0
+      ]
+    },
+    {
+      "from": "Eldoret",
+      "to": "Maragua",
+      "distanceKm": 350.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Maralal",
+      "distanceKm": 305.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Mariakani",
+      "distanceKm": 760.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Marsabit",
+      "distanceKm": 670.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Matuu",
+      "distanceKm": 380.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Maua",
+      "distanceKm": 460.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Mbita",
+      "distanceKm": 240.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Meru",
+      "distanceKm": 410.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Migori",
+      "distanceKm": 265.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Molo",
+      "distanceKm": 120.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Mombasa",
+      "distanceKm": 800.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Moyale",
+      "distanceKm": 915.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Mtwapa",
+      "distanceKm": 815.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Muhoroni",
+      "distanceKm": 100.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Mumias",
+      "distanceKm": 130.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Mwingi",
+      "distanceKm": 445.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Nairobi",
+      "distanceKm": 315.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Nakuru",
+      "distanceKm": 160.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Nambale",
+      "distanceKm": 155.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Nandi Hills",
+      "distanceKm": 60.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Nanyuki",
+      "distanceKm": 335.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Narok",
+      "distanceKm": 250.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Nyahururu",
+      "distanceKm": 220.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Nyamira",
+      "distanceKm": 180.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Nyansiongo",
+      "distanceKm": 195.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Nyeri",
+      "distanceKm": 320.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Ogembo",
+      "distanceKm": 215.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Ol Kalau",
+      "distanceKm": 225.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Oyugis",
+      "distanceKm": 180.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Rongo",
+      "distanceKm": 220.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Rumuruti",
+      "distanceKm": 260.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Runyenjes",
+      "distanceKm": 420.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Siaya",
+      "distanceKm": 155.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Suneka",
+      "distanceKm": 205.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Tabaka",
+      "distanceKm": 220.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Taveta",
+      "distanceKm": 620.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Ugunja",
+      "distanceKm": 155.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Ukunda",
+      "distanceKm": 830.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Vihiga",
+      "distanceKm": 100.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Voi",
+      "distanceKm": 640.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Webuye",
+      "distanceKm": 75.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Wundanyi",
+      "distanceKm": 685.0,
+      "needsReview": false
+    },
+    {
+      "from": "Eldoret",
+      "to": "Yala",
+      "distanceKm": 125.0,
+      "needsReview": false
+    },
+    {
+      "from": "Embu",
+      "to": "Kisii",
+      "distanceKm": 435.0,
+      "needsReview": false
+    },
+    {
+      "from": "Embu",
+      "to": "Kisumu",
+      "distanceKm": 425.0,
+      "needsReview": false
+    },
+    {
+      "from": "Embu",
+      "to": "Kitale",
+      "distanceKm": 470.0,
+      "needsReview": false
+    },
+    {
+      "from": "Embu",
+      "to": "Malindi",
+      "distanceKm": 650.0,
+      "needsReview": false
+    },
+    {
+      "from": "Embu",
+      "to": "Mombasa",
+      "distanceKm": 575.0,
+      "needsReview": false
+    },
+    {
+      "from": "Embu",
+      "to": "Nairobi",
+      "distanceKm": 130.0,
+      "needsReview": false
+    },
+    {
+      "from": "Embu",
+      "to": "Nakuru",
+      "distanceKm": 245.0,
+      "needsReview": false
+    },
+    {
+      "from": "Embu",
+      "to": "Ukunda",
+      "distanceKm": 600.0,
+      "needsReview": false
+    },
+    {
+      "from": "Garissa",
+      "to": "Kisii",
+      "distanceKm": 670.0,
+      "needsReview": false
+    },
+    {
+      "from": "Garissa",
+      "to": "Kisumu",
+      "distanceKm": 670.0,
+      "needsReview": false
+    },
+    {
+      "from": "Garissa",
+      "to": "Kitale",
+      "distanceKm": 715.0,
+      "needsReview": false
+    },
+    {
+      "from": "Garissa",
+      "to": "Malindi",
+      "distanceKm": 350.0,
+      "needsReview": false
+    },
+    {
+      "from": "Garissa",
+      "to": "Mombasa",
+      "distanceKm": 465.0,
+      "needsReview": false
+    },
+    {
+      "from": "Garissa",
+      "to": "Nairobi",
+      "distanceKm": 370.0,
+      "needsReview": false
+    },
+    {
+      "from": "Garissa",
+      "to": "Nakuru",
+      "distanceKm": 490.0,
+      "needsReview": false
+    },
+    {
+      "from": "Garissa",
+      "to": "Ukunda",
+      "distanceKm": 495.0,
+      "needsReview": false
+    },
+    {
+      "from": "Gilgil",
+      "to": "Kisii",
+      "distanceKm": 235.0,
+      "needsReview": false
+    },
+    {
+      "from": "Gilgil",
+      "to": "Kisumu",
+      "distanceKm": 425.0,
+      "needsReview": false
+    },
+    {
+      "from": "Gilgil",
+      "to": "Kitale",
+      "distanceKm": 270.0,
+      "needsReview": false
+    },
+    {
+      "from": "Gilgil",
+      "to": "Malindi",
+      "distanceKm": 800.0,
+      "needsReview": false
+    },
+    {
+      "from": "Gilgil",
+      "to": "Mombasa",
+      "distanceKm": 610.0,
+      "needsReview": false
+    },
+    {
+      "from": "Gilgil",
+      "to": "Nairobi",
+      "distanceKm": 125.0,
+      "needsReview": false
+    },
+    {
+      "from": "Gilgil",
+      "to": "Nakuru",
+      "distanceKm": 42.0,
+      "needsReview": false
+    },
+    {
+      "from": "Gilgil",
+      "to": "Ukunda",
+      "distanceKm": 640.0,
+      "needsReview": false
+    },
+    {
+      "from": "Homa Bay",
+      "to": "Kisii",
+      "distanceKm": 60.0,
+      "needsReview": false
+    },
+    {
+      "from": "Homa Bay",
+      "to": "Kisumu",
+      "distanceKm": 110.0,
+      "needsReview": false
+    },
+    {
+      "from": "Homa Bay",
+      "to": "Kitale",
+      "distanceKm": 270.0,
+      "needsReview": false
+    },
+    {
+      "from": "Homa Bay",
+      "to": "Malindi",
+      "distanceKm": 1050.0,
+      "needsReview": false
+    },
+    {
+      "from": "Homa Bay",
+      "to": "Mombasa",
+      "distanceKm": 860.0,
+      "needsReview": false
+    },
+    {
+      "from": "Homa Bay",
+      "to": "Nairobi",
+      "distanceKm": 370.0,
+      "needsReview": false
+    },
+    {
+      "from": "Homa Bay",
+      "to": "Nakuru",
+      "distanceKm": 245.0,
+      "needsReview": false
+    },
+    {
+      "from": "Homa Bay",
+      "to": "Ukunda",
+      "distanceKm": 885.0,
+      "needsReview": false
+    },
+    {
+      "from": "Isiolo",
+      "to": "Kisii",
+      "distanceKm": 455.0,
+      "needsReview": false
+    },
+    {
+      "from": "Isiolo",
+      "to": "Kisumu",
+      "distanceKm": 445.0,
+      "needsReview": false
+    },
+    {
+      "from": "Isiolo",
+      "to": "Kitale",
+      "distanceKm": 490.0,
+      "needsReview": false
+    },
+    {
+      "from": "Isiolo",
+      "to": "Malindi",
+      "distanceKm": 475.0,
+      "needsReview": false
+    },
+    {
+      "from": "Isiolo",
+      "to": "Mombasa",
+      "distanceKm": 695.0,
+      "needsReview": false
+    },
+    {
+      "from": "Isiolo",
+      "to": "Nairobi",
+      "distanceKm": 275.0,
+      "needsReview": false
+    },
+    {
+      "from": "Isiolo",
+      "to": "Nakuru",
+      "distanceKm": 265.0,
+      "needsReview": false
+    },
+    {
+      "from": "Isiolo",
+      "to": "Ukunda",
+      "distanceKm": 720.0,
+      "needsReview": false
+    },
+    {
+      "from": "Iten/Tambach",
+      "to": "Kisii",
+      "distanceKm": 240.0,
+      "needsReview": false
+    },
+    {
+      "from": "Iten/Tambach",
+      "to": "Kisumu",
+      "distanceKm": 160.0,
+      "needsReview": false
+    },
+    {
+      "from": "Iten/Tambach",
+      "to": "Kitale",
+      "distanceKm": 105.0,
+      "needsReview": false
+    },
+    {
+      "from": "Iten/Tambach",
+      "to": "Malindi",
+      "distanceKm": 850.0,
+      "needsReview": false
+    },
+    {
+      "from": "Iten/Tambach",
+      "to": "Mombasa",
+      "distanceKm": 840.0,
+      "needsReview": false
+    },
+    {
+      "from": "Iten/Tambach",
+      "to": "Nairobi",
+      "distanceKm": 355.0,
+      "needsReview": false
+    },
+    {
+      "from": "Iten/Tambach",
+      "to": "Nakuru",
+      "distanceKm": 195.0,
+      "needsReview": false
+    },
+    {
+      "from": "Iten/Tambach",
+      "to": "Ukunda",
+      "distanceKm": 865.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kabia Falls",
+      "to": "Nairobi",
+      "distanceKm": 130.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kakamega",
+      "to": "Kisii",
+      "distanceKm": 165.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kakamega",
+      "to": "Kisumu",
+      "distanceKm": 50.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kakamega",
+      "to": "Kitale",
+      "distanceKm": 110.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kakamega",
+      "to": "Malindi",
+      "distanceKm": 1060.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kakamega",
+      "to": "Mombasa",
+      "distanceKm": 870.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kakamega",
+      "to": "Nairobi",
+      "distanceKm": 385.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kakamega",
+      "to": "Nakuru",
+      "distanceKm": 255.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kakamega",
+      "to": "Ukunda",
+      "distanceKm": 920.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kapenguria",
+      "to": "Kisii",
+      "distanceKm": 305.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kapenguria",
+      "to": "Kisumu",
+      "distanceKm": 195.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kapenguria",
+      "to": "Kitale",
+      "distanceKm": 40.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kapenguria",
+      "to": "Malindi",
+      "distanceKm": 1100.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kapenguria",
+      "to": "Mombasa",
+      "distanceKm": 905.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kapenguria",
+      "to": "Nairobi",
+      "distanceKm": 420.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kapenguria",
+      "to": "Nakuru",
+      "distanceKm": 265.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kapenguria",
+      "to": "Ukunda",
+      "distanceKm": 935.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kapsabet",
+      "to": "Kisii",
+      "distanceKm": 165.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kapsabet",
+      "to": "Kisumu",
+      "distanceKm": 80.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kapsabet",
+      "to": "Kitale",
+      "distanceKm": 120.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kapsabet",
+      "to": "Malindi",
+      "distanceKm": 995.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kapsabet",
+      "to": "Mombasa",
+      "distanceKm": 800.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kapsabet",
+      "to": "Nairobi",
+      "distanceKm": 315.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kapsabet",
+      "to": "Nakuru",
+      "distanceKm": 155.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kapsabet",
+      "to": "Ukunda",
+      "distanceKm": 830.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kendu Bay",
+      "to": "Kisii",
+      "distanceKm": 45.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kendu Bay",
+      "to": "Kisumu",
+      "distanceKm": 80.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kendu Bay",
+      "to": "Kitale",
+      "distanceKm": 235.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kendu Bay",
+      "to": "Malindi",
+      "distanceKm": 1025.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kendu Bay",
+      "to": "Mombasa",
+      "distanceKm": 830.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kendu Bay",
+      "to": "Nairobi",
+      "distanceKm": 360.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kendu Bay",
+      "to": "Nakuru",
+      "distanceKm": 215.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kendu Bay",
+      "to": "Ukunda",
+      "distanceKm": 860.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kericho",
+      "to": "Kisii",
+      "distanceKm": 90.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kericho",
+      "to": "Kisumu",
+      "distanceKm": 85.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kericho",
+      "to": "Kitale",
+      "distanceKm": 210.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kericho",
+      "to": "Malindi",
+      "distanceKm": 945.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kericho",
+      "to": "Mombasa",
+      "distanceKm": 755.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kericho",
+      "to": "Nairobi",
+      "distanceKm": 270.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kericho",
+      "to": "Nakuru",
+      "distanceKm": 110.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kericho",
+      "to": "Ukunda",
+      "distanceKm": 780.0,
+      "needsReview": false
+    },
+    {
+      "from": "Keroka",
+      "to": "Kisii",
+      "distanceKm": 30.0,
+      "needsReview": false
+    },
+    {
+      "from": "Keroka",
+      "to": "Kisumu",
+      "distanceKm": 115.0,
+      "needsReview": false
+    },
+    {
+      "from": "Keroka",
+      "to": "Kitale",
+      "distanceKm": 275.0,
+      "needsReview": false
+    },
+    {
+      "from": "Keroka",
+      "to": "Malindi",
+      "distanceKm": 960.0,
+      "needsReview": false
+    },
+    {
+      "from": "Keroka",
+      "to": "Mombasa",
+      "distanceKm": 770.0,
+      "needsReview": false
+    },
+    {
+      "from": "Keroka",
+      "to": "Nairobi",
+      "distanceKm": 285.0,
+      "needsReview": false
+    },
+    {
+      "from": "Keroka",
+      "to": "Nakuru",
+      "distanceKm": 185.0,
+      "needsReview": false
+    },
+    {
+      "from": "Keroka",
+      "to": "Ukunda",
+      "distanceKm": 800.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kerugoya/Kutus",
+      "to": "Kisii",
+      "distanceKm": 410.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kerugoya/Kutus",
+      "to": "Kisumu",
+      "distanceKm": 395.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kerugoya/Kutus",
+      "to": "Kitale",
+      "distanceKm": 440.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kerugoya/Kutus",
+      "to": "Malindi",
+      "distanceKm": 680.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kerugoya/Kutus",
+      "to": "Mombasa",
+      "distanceKm": 615.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kerugoya/Kutus",
+      "to": "Nairobi",
+      "distanceKm": 125.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kerugoya/Kutus",
+      "to": "Nakuru",
+      "distanceKm": 215.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kerugoya/Kutus",
+      "to": "Ukunda",
+      "distanceKm": 635.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kilifi",
+      "to": "Kisii",
+      "distanceKm": 830.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kilifi",
+      "to": "Kisumu",
+      "distanceKm": 865.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kilifi",
+      "to": "Kitale",
+      "distanceKm": 910.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kilifi",
+      "to": "Malindi",
+      "distanceKm": 50.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kilifi",
+      "to": "Mombasa",
+      "distanceKm": 100.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kilifi",
+      "to": "Nairobi",
+      "distanceKm": 525.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kilifi",
+      "to": "Nakuru",
+      "distanceKm": 680.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kilifi",
+      "to": "Ukunda",
+      "distanceKm": 105.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kimilili",
+      "to": "Kisii",
+      "distanceKm": 235.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kimilili",
+      "to": "Kisumu",
+      "distanceKm": 120.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kimilili",
+      "to": "Kitale",
+      "distanceKm": 50.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kimilili",
+      "to": "Malindi",
+      "distanceKm": 1090.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kimilili",
+      "to": "Mombasa",
+      "distanceKm": 895.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kimilili",
+      "to": "Nairobi",
+      "distanceKm": 410.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kimilili",
+      "to": "Nakuru",
+      "distanceKm": 255.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kimilili",
+      "to": "Ukunda",
+      "distanceKm": 925.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kipkelion",
+      "to": "Kisii",
+      "distanceKm": 130.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kipkelion",
+      "to": "Kisumu",
+      "distanceKm": 105.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kipkelion",
+      "to": "Kitale",
+      "distanceKm": 215.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kipkelion",
+      "to": "Malindi",
+      "distanceKm": 925.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kipkelion",
+      "to": "Mombasa",
+      "distanceKm": 735.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kipkelion",
+      "to": "Nairobi",
+      "distanceKm": 245.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kipkelion",
+      "to": "Nakuru",
+      "distanceKm": 90.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kipkelion",
+      "to": "Ukunda",
+      "distanceKm": 760.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Kisumu",
+      "distanceKm": 115.0,
+      "needsReview": true,
+      "chartDistancesKm": [
+        10.0,
+        115.0
+      ]
+    },
+    {
+      "from": "Kisii",
+      "to": "Kitale",
+      "distanceKm": 275.0,
+      "needsReview": true,
+      "chartDistancesKm": [
+        270.0,
+        275.0
+      ]
+    },
+    {
+      "from": "Kisii",
+      "to": "Kitui",
+      "distanceKm": 865.0,
+      "needsReview": true
+    },
+    {
+      "from": "Kisii",
+      "to": "Limuru",
+      "distanceKm": 275.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Litein",
+      "distanceKm": 80.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Lodwar",
+      "distanceKm": 565.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Londiani",
+      "distanceKm": 140.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Luanda",
+      "distanceKm": 145.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Machakos",
+      "distanceKm": 370.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Makuyu",
+      "distanceKm": 370.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Malaba",
+      "distanceKm": 245.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Malakisi",
+      "distanceKm": 240.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Malava",
+      "distanceKm": 185.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Malindi",
+      "distanceKm": 985.0,
+      "needsReview": true,
+      "chartDistancesKm": [
+        805.0,
+        985.0
+      ]
+    },
+    {
+      "from": "Kisii",
+      "to": "Maragua",
+      "distanceKm": 375.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Maralal",
+      "distanceKm": 410.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Mariakani",
+      "distanceKm": 755.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Marsabit",
+      "distanceKm": 715.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Matuu",
+      "distanceKm": 410.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Maua",
+      "distanceKm": 500.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Mbita",
+      "distanceKm": 100.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Meru",
+      "distanceKm": 455.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Migori",
+      "distanceKm": 70.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Molo",
+      "distanceKm": 155.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Mombasa",
+      "distanceKm": 795.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Moyale",
+      "distanceKm": 955.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Mtwapa",
+      "distanceKm": 810.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Muhoroni",
+      "distanceKm": 130.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Mumias",
+      "distanceKm": 185.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Mwingi",
+      "distanceKm": 475.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Nairobi",
+      "distanceKm": 310.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Nakuru",
+      "distanceKm": 200.0,
+      "needsReview": true,
+      "chartDistancesKm": [
+        195.0,
+        200.0
+      ]
+    },
+    {
+      "from": "Kisii",
+      "to": "Nambale",
+      "distanceKm": 220.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Nandi Hills",
+      "distanceKm": 145.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Nanyuki",
+      "distanceKm": 375.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Narok",
+      "distanceKm": 165.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Nyahururu",
+      "distanceKm": 260.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Nyamira",
+      "distanceKm": 35.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Nyansiongo",
+      "distanceKm": 40.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Nyeri",
+      "distanceKm": 360.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Ogembo",
+      "distanceKm": 20.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Ol Kalau",
+      "distanceKm": 270.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Oyugis",
+      "distanceKm": 30.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Rongo",
+      "distanceKm": 30.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Rumuruti",
+      "distanceKm": 300.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Runyenjes",
+      "distanceKm": 460.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Siaya",
+      "distanceKm": 180.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Suneka",
+      "distanceKm": 15.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Tabaka",
+      "distanceKm": 25.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Taveta",
+      "distanceKm": 615.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Ugunja",
+      "distanceKm": 185.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Ukunda",
+      "distanceKm": 825.0,
+      "needsReview": true,
+      "chartDistancesKm": [
+        820.0,
+        825.0
+      ]
+    },
+    {
+      "from": "Kisii",
+      "to": "Vihiga",
+      "distanceKm": 140.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Voi",
+      "distanceKm": 635.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Webuye",
+      "distanceKm": 210.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Wundanyi",
+      "distanceKm": 675.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisii",
+      "to": "Yala",
+      "distanceKm": 155.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Kitale",
+      "distanceKm": 165.0,
+      "needsReview": true,
+      "chartDistancesKm": [
+        160.0,
+        165.0
+      ]
+    },
+    {
+      "from": "Kisumu",
+      "to": "Kitui",
+      "distanceKm": 505.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Limuru",
+      "distanceKm": 310.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Litein",
+      "distanceKm": 105.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Lodwar",
+      "distanceKm": 455.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Londiani",
+      "distanceKm": 120.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Luanda",
+      "distanceKm": 30.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Machakos",
+      "distanceKm": 405.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Makuyu",
+      "distanceKm": 370.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Malaba",
+      "distanceKm": 135.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Malakisi",
+      "distanceKm": 130.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Malava",
+      "distanceKm": 75.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Malindi",
+      "distanceKm": 1035.0,
+      "needsReview": true,
+      "chartDistancesKm": [
+        840.0,
+        1035.0
+      ]
+    },
+    {
+      "from": "Kisumu",
+      "to": "Maragua",
+      "distanceKm": 380.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Maralal",
+      "distanceKm": 400.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Mariakani",
+      "distanceKm": 790.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Marsabit",
+      "distanceKm": 700.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Matuu",
+      "distanceKm": 410.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Maua",
+      "distanceKm": 490.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Mbita",
+      "distanceKm": 110.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Meru",
+      "distanceKm": 440.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Migori",
+      "distanceKm": 175.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Molo",
+      "distanceKm": 145.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Mombasa",
+      "distanceKm": 830.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Moyale",
+      "distanceKm": 945.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Mtwapa",
+      "distanceKm": 845.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Muhoroni",
+      "distanceKm": 65.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Mumias",
+      "distanceKm": 75.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Mwingi",
+      "distanceKm": 475.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Nairobi",
+      "distanceKm": 360.0,
+      "needsReview": true,
+      "chartDistancesKm": [
+        345.0,
+        360.0
+      ]
+    },
+    {
+      "from": "Kisumu",
+      "to": "Nakuru",
+      "distanceKm": 190.0,
+      "needsReview": true,
+      "chartDistancesKm": [
+        185.0,
+        190.0
+      ]
+    },
+    {
+      "from": "Kisumu",
+      "to": "Nambale",
+      "distanceKm": 105.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Nandi Hills",
+      "distanceKm": 85.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Nanyuki",
+      "distanceKm": 365.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Narok",
+      "distanceKm": 215.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Nyahururu",
+      "distanceKm": 250.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Nyamira",
+      "distanceKm": 95.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Nyansiongo",
+      "distanceKm": 105.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Nyeri",
+      "distanceKm": 350.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Ogembo",
+      "distanceKm": 125.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Ol Kalau",
+      "distanceKm": 255.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Oyugis",
+      "distanceKm": 95.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Rongo",
+      "distanceKm": 135.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Rumuruti",
+      "distanceKm": 290.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Runyenjes",
+      "distanceKm": 450.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Siaya",
+      "distanceKm": 70.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Suneka",
+      "distanceKm": 120.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Tabaka",
+      "distanceKm": 135.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Taveta",
+      "distanceKm": 650.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Ugunja",
+      "distanceKm": 85.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Ukunda",
+      "distanceKm": 870.0,
+      "needsReview": true,
+      "chartDistancesKm": [
+        680.0,
+        870.0
+      ]
+    },
+    {
+      "from": "Kisumu",
+      "to": "Vihiga",
+      "distanceKm": 25.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Voi",
+      "distanceKm": 670.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Webuye",
+      "distanceKm": 100.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Wundanyi",
+      "distanceKm": 715.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kisumu",
+      "to": "Yala",
+      "distanceKm": 45.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Kitui",
+      "distanceKm": 550.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Limuru",
+      "distanceKm": 355.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Litein",
+      "distanceKm": 240.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Lodwar",
+      "distanceKm": 300.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Londiani",
+      "distanceKm": 195.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Luanda",
+      "distanceKm": 155.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Machakos",
+      "distanceKm": 450.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Makuyu",
+      "distanceKm": 415.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Malaba",
+      "distanceKm": 120.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Malakisi",
+      "distanceKm": 115.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Malava",
+      "distanceKm": 90.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Malindi",
+      "distanceKm": 1070.0,
+      "needsReview": true,
+      "chartDistancesKm": [
+        885.0,
+        1070.0
+      ]
+    },
+    {
+      "from": "Kitale",
+      "to": "Maragua",
+      "distanceKm": 425.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Maralal",
+      "distanceKm": 370.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Mariakani",
+      "distanceKm": 835.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Marsabit",
+      "distanceKm": 745.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Matuu",
+      "distanceKm": 455.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Maua",
+      "distanceKm": 535.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Mbita",
+      "distanceKm": 245.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Meru",
+      "distanceKm": 485.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Migori",
+      "distanceKm": 335.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Molo",
+      "distanceKm": 195.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Mombasa",
+      "distanceKm": 875.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Moyale",
+      "distanceKm": 990.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Mtwapa",
+      "distanceKm": 890.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Muhoroni",
+      "distanceKm": 170.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Mumias",
+      "distanceKm": 120.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Mwingi",
+      "distanceKm": 520.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Nairobi",
+      "distanceKm": 490.0,
+      "needsReview": true,
+      "chartDistancesKm": [
+        390.0,
+        490.0
+      ]
+    },
+    {
+      "from": "Kitale",
+      "to": "Nakuru",
+      "distanceKm": 235.0,
+      "needsReview": true,
+      "chartDistancesKm": [
+        230.0,
+        235.0
+      ]
+    },
+    {
+      "from": "Kitale",
+      "to": "Nambale",
+      "distanceKm": 130.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Nandi Hills",
+      "distanceKm": 135.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Nanyuki",
+      "distanceKm": 410.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Narok",
+      "distanceKm": 325.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Nyahururu",
+      "distanceKm": 295.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Nyamira",
+      "distanceKm": 250.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Nyansiongo",
+      "distanceKm": 265.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Nyeri",
+      "distanceKm": 395.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Ogembo",
+      "distanceKm": 285.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Ol Kalau",
+      "distanceKm": 300.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Oyugis",
+      "distanceKm": 250.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Rongo",
+      "distanceKm": 295.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Rumuruti",
+      "distanceKm": 335.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Runyenjes",
+      "distanceKm": 495.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Siaya",
+      "distanceKm": 170.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Suneka",
+      "distanceKm": 275.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Tabaka",
+      "distanceKm": 290.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Taveta",
+      "distanceKm": 695.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Ugunja",
+      "distanceKm": 155.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Ukunda",
+      "distanceKm": 905.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Vihiga",
+      "distanceKm": 145.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Voi",
+      "distanceKm": 715.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Webuye",
+      "distanceKm": 65.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Wundanyi",
+      "distanceKm": 760.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitale",
+      "to": "Yala",
+      "distanceKm": 155.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitui",
+      "to": "Malindi",
+      "distanceKm": 610.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitui",
+      "to": "Mombasa",
+      "distanceKm": 440.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitui",
+      "to": "Nairobi",
+      "distanceKm": 165.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitui",
+      "to": "Nakuru",
+      "distanceKm": 320.0,
+      "needsReview": false
+    },
+    {
+      "from": "Kitui",
+      "to": "Ukunda",
+      "distanceKm": 470.0,
+      "needsReview": false
+    },
+    {
+      "from": "Limuru",
+      "to": "Malindi",
+      "distanceKm": 715.0,
+      "needsReview": false
+    },
+    {
+      "from": "Limuru",
+      "to": "Mombasa",
+      "distanceKm": 830.0,
+      "needsReview": true
+    },
+    {
+      "from": "Limuru",
+      "to": "Nairobi",
+      "distanceKm": 45.0,
+      "needsReview": false
+    },
+    {
+      "from": "Limuru",
+      "to": "Nakuru",
+      "distanceKm": 125.0,
+      "needsReview": false
+    },
+    {
+      "from": "Limuru",
+      "to": "Ukunda",
+      "distanceKm": 555.0,
+      "needsReview": false
+    },
+    {
+      "from": "Litein",
+      "to": "Malindi",
+      "distanceKm": 950.0,
+      "needsReview": false
+    },
+    {
+      "from": "Litein",
+      "to": "Mombasa",
+      "distanceKm": 755.0,
+      "needsReview": false
+    },
+    {
+      "from": "Litein",
+      "to": "Nairobi",
+      "distanceKm": 270.0,
+      "needsReview": false
+    },
+    {
+      "from": "Litein",
+      "to": "Nakuru",
+      "distanceKm": 140.0,
+      "needsReview": false
+    },
+    {
+      "from": "Litein",
+      "to": "Ukunda",
+      "distanceKm": 785.0,
+      "needsReview": false
+    },
+    {
+      "from": "Lodwar",
+      "to": "Malindi",
+      "distanceKm": 1355.0,
+      "needsReview": false
+    },
+    {
+      "from": "Lodwar",
+      "to": "Mombasa",
+      "distanceKm": 1165.0,
+      "needsReview": false
+    },
+    {
+      "from": "Lodwar",
+      "to": "Nairobi",
+      "distanceKm": 635.0,
+      "needsReview": false
+    },
+    {
+      "from": "Lodwar",
+      "to": "Nakuru",
+      "distanceKm": 475.0,
+      "needsReview": false
+    },
+    {
+      "from": "Lodwar",
+      "to": "Ukunda",
+      "distanceKm": 1115.0,
+      "needsReview": false
+    },
+    {
+      "from": "Londiani",
+      "to": "Malindi",
+      "distanceKm": 905.0,
+      "needsReview": false
+    },
+    {
+      "from": "Londiani",
+      "to": "Mombasa",
+      "distanceKm": 710.0,
+      "needsReview": false
+    },
+    {
+      "from": "Londiani",
+      "to": "Nairobi",
+      "distanceKm": 225.0,
+      "needsReview": false
+    },
+    {
+      "from": "Londiani",
+      "to": "Nakuru",
+      "distanceKm": 65.0,
+      "needsReview": false
+    },
+    {
+      "from": "Londiani",
+      "to": "Ukunda",
+      "distanceKm": 740.0,
+      "needsReview": false
+    },
+    {
+      "from": "Luanda",
+      "to": "Malindi",
+      "distanceKm": 1065.0,
+      "needsReview": false
+    },
+    {
+      "from": "Luanda",
+      "to": "Mombasa",
+      "distanceKm": 860.0,
+      "needsReview": false
+    },
+    {
+      "from": "Luanda",
+      "to": "Nairobi",
+      "distanceKm": 385.0,
+      "needsReview": false
+    },
+    {
+      "from": "Luanda",
+      "to": "Nakuru",
+      "distanceKm": 215.0,
+      "needsReview": false
+    },
+    {
+      "from": "Luanda",
+      "to": "Ukunda",
+      "distanceKm": 900.0,
+      "needsReview": false
+    },
+    {
+      "from": "Machakos",
+      "to": "Malindi",
+      "distanceKm": 455.0,
+      "needsReview": false
+    },
+    {
+      "from": "Machakos",
+      "to": "Mombasa",
+      "distanceKm": 445.0,
+      "needsReview": false
+    },
+    {
+      "from": "Machakos",
+      "to": "Nairobi",
+      "distanceKm": 65.0,
+      "needsReview": false
+    },
+    {
+      "from": "Machakos",
+      "to": "Nakuru",
+      "distanceKm": 220.0,
+      "needsReview": false
+    },
+    {
+      "from": "Machakos",
+      "to": "Ukunda",
+      "distanceKm": 475.0,
+      "needsReview": false
+    },
+    {
+      "from": "Makuyu",
+      "to": "Malindi",
+      "distanceKm": 670.0,
+      "needsReview": false
+    },
+    {
+      "from": "Makuyu",
+      "to": "Mombasa",
+      "distanceKm": 555.0,
+      "needsReview": false
+    },
+    {
+      "from": "Makuyu",
+      "to": "Nairobi",
+      "distanceKm": 70.0,
+      "needsReview": false
+    },
+    {
+      "from": "Makuyu",
+      "to": "Nakuru",
+      "distanceKm": 190.0,
+      "needsReview": false
+    },
+    {
+      "from": "Makuyu",
+      "to": "Ukunda",
+      "distanceKm": 585.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malaba",
+      "to": "Malindi",
+      "distanceKm": 1125.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malaba",
+      "to": "Mombasa",
+      "distanceKm": 930.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malaba",
+      "to": "Nairobi",
+      "distanceKm": 445.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malaba",
+      "to": "Nakuru",
+      "distanceKm": 285.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malaba",
+      "to": "Ukunda",
+      "distanceKm": 960.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malakisi",
+      "to": "Malindi",
+      "distanceKm": 1115.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malakisi",
+      "to": "Mombasa",
+      "distanceKm": 925.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malakisi",
+      "to": "Nairobi",
+      "distanceKm": 440.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malakisi",
+      "to": "Nakuru",
+      "distanceKm": 280.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malakisi",
+      "to": "Ukunda",
+      "distanceKm": 955.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malava",
+      "to": "Malindi",
+      "distanceKm": 1075.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malava",
+      "to": "Mombasa",
+      "distanceKm": 885.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malava",
+      "to": "Nairobi",
+      "distanceKm": 400.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malava",
+      "to": "Nakuru",
+      "distanceKm": 240.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malava",
+      "to": "Ukunda",
+      "distanceKm": 915.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Maragua",
+      "distanceKm": 680.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Maralal",
+      "distanceKm": 680.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Mariakani",
+      "distanceKm": 120.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Marsabit",
+      "distanceKm": 1025.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Matuu",
+      "distanceKm": 585.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Maua",
+      "distanceKm": 675.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Mbita",
+      "distanceKm": 1090.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Meru",
+      "distanceKm": 730.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Migori",
+      "distanceKm": 1055.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Molo",
+      "distanceKm": 885.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Mombasa",
+      "distanceKm": 145.0,
+      "needsReview": true,
+      "chartDistancesKm": [
+        120.0,
+        145.0
+      ]
+    },
+    {
+      "from": "Malindi",
+      "to": "Moyale",
+      "distanceKm": 915.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Mtwapa",
+      "distanceKm": 100.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Muhoroni",
+      "distanceKm": 960.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Mumias",
+      "distanceKm": 1105.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Mwingi",
+      "distanceKm": 515.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Nairobi",
+      "distanceKm": 500.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Nakuru",
+      "distanceKm": 660.0,
+      "needsReview": true,
+      "chartDistancesKm": [
+        655.0,
+        660.0
+      ]
+    },
+    {
+      "from": "Malindi",
+      "to": "Nambale",
+      "distanceKm": 955.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Nandi Hills",
+      "distanceKm": 820.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Nanyuki",
+      "distanceKm": 770.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Narok",
+      "distanceKm": 640.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Nyahururu",
+      "distanceKm": 830.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Nyamira",
+      "distanceKm": 795.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Nyansiongo",
+      "distanceKm": 770.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Nyeri",
+      "distanceKm": 725.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Ogembo",
+      "distanceKm": 820.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Ol Kalau",
+      "distanceKm": 650.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Oyugis",
+      "distanceKm": 825.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Rongo",
+      "distanceKm": 830.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Rumuruti",
+      "distanceKm": 870.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Runyenjes",
+      "distanceKm": 655.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Siaya",
+      "distanceKm": 920.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Suneka",
+      "distanceKm": 815.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Tabaka",
+      "distanceKm": 830.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Taveta",
+      "distanceKm": 350.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Ugunja",
+      "distanceKm": 925.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Ukunda",
+      "distanceKm": 150.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Vihiga",
+      "distanceKm": 875.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Voi",
+      "distanceKm": 240.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Webuye",
+      "distanceKm": 885.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Wundanyi",
+      "distanceKm": 285.0,
+      "needsReview": false
+    },
+    {
+      "from": "Malindi",
+      "to": "Yala",
+      "distanceKm": 895.0,
+      "needsReview": false
+    },
+    {
+      "from": "Maragua",
+      "to": "Mombasa",
+      "distanceKm": 560.0,
+      "needsReview": false
+    },
+    {
+      "from": "Maragua",
+      "to": "Nairobi",
+      "distanceKm": 75.0,
+      "needsReview": false
+    },
+    {
+      "from": "Maragua",
+      "to": "Nakuru",
+      "distanceKm": 230.0,
+      "needsReview": false
+    },
+    {
+      "from": "Maragua",
+      "to": "Ukunda",
+      "distanceKm": 590.0,
+      "needsReview": false
+    },
+    {
+      "from": "Maralal",
+      "to": "Mombasa",
+      "distanceKm": 830.0,
+      "needsReview": false
+    },
+    {
+      "from": "Maralal",
+      "to": "Nairobi",
+      "distanceKm": 345.0,
+      "needsReview": false
+    },
+    {
+      "from": "Maralal",
+      "to": "Nakuru",
+      "distanceKm": 215.0,
+      "needsReview": false
+    },
+    {
+      "from": "Maralal",
+      "to": "Ukunda",
+      "distanceKm": 855.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mariakani",
+      "to": "Mombasa",
+      "distanceKm": 40.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mariakani",
+      "to": "Nairobi",
+      "distanceKm": 450.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mariakani",
+      "to": "Nakuru",
+      "distanceKm": 610.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mariakani",
+      "to": "Ukunda",
+      "distanceKm": 70.0,
+      "needsReview": false
+    },
+    {
+      "from": "Marsabit",
+      "to": "Mombasa",
+      "distanceKm": 950.0,
+      "needsReview": false
+    },
+    {
+      "from": "Marsabit",
+      "to": "Nairobi",
+      "distanceKm": 535.0,
+      "needsReview": false
+    },
+    {
+      "from": "Marsabit",
+      "to": "Nakuru",
+      "distanceKm": 520.0,
+      "needsReview": false
+    },
+    {
+      "from": "Marsabit",
+      "to": "Ukunda",
+      "distanceKm": 980.0,
+      "needsReview": false
+    },
+    {
+      "from": "Matuu",
+      "to": "Mombasa",
+      "distanceKm": 510.0,
+      "needsReview": false
+    },
+    {
+      "from": "Matuu",
+      "to": "Nairobi",
+      "distanceKm": 110.0,
+      "needsReview": false
+    },
+    {
+      "from": "Matuu",
+      "to": "Nakuru",
+      "distanceKm": 230.0,
+      "needsReview": false
+    },
+    {
+      "from": "Matuu",
+      "to": "Ukunda",
+      "distanceKm": 535.0,
+      "needsReview": false
+    },
+    {
+      "from": "Maua",
+      "to": "Mombasa",
+      "distanceKm": 705.0,
+      "needsReview": false
+    },
+    {
+      "from": "Maua",
+      "to": "Nairobi",
+      "distanceKm": 280.0,
+      "needsReview": false
+    },
+    {
+      "from": "Maua",
+      "to": "Nakuru",
+      "distanceKm": 310.0,
+      "needsReview": false
+    },
+    {
+      "from": "Maua",
+      "to": "Ukunda",
+      "distanceKm": 735.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mbita",
+      "to": "Mombasa",
+      "distanceKm": 895.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mbita",
+      "to": "Nairobi",
+      "distanceKm": 410.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mbita",
+      "to": "Nakuru",
+      "distanceKm": 285.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mbita",
+      "to": "Ukunda",
+      "distanceKm": 925.0,
+      "needsReview": false
+    },
+    {
+      "from": "Meru",
+      "to": "Mombasa",
+      "distanceKm": 655.0,
+      "needsReview": false
+    },
+    {
+      "from": "Meru",
+      "to": "Nairobi",
+      "distanceKm": 225.0,
+      "needsReview": false
+    },
+    {
+      "from": "Meru",
+      "to": "Nakuru",
+      "distanceKm": 260.0,
+      "needsReview": false
+    },
+    {
+      "from": "Meru",
+      "to": "Ukunda",
+      "distanceKm": 680.0,
+      "needsReview": false
+    },
+    {
+      "from": "Migori",
+      "to": "Mombasa",
+      "distanceKm": 860.0,
+      "needsReview": false
+    },
+    {
+      "from": "Migori",
+      "to": "Nairobi",
+      "distanceKm": 375.0,
+      "needsReview": false
+    },
+    {
+      "from": "Migori",
+      "to": "Nakuru",
+      "distanceKm": 265.0,
+      "needsReview": false
+    },
+    {
+      "from": "Migori",
+      "to": "Ukunda",
+      "distanceKm": 890.0,
+      "needsReview": false
+    },
+    {
+      "from": "Molo",
+      "to": "Mombasa",
+      "distanceKm": 695.0,
+      "needsReview": false
+    },
+    {
+      "from": "Molo",
+      "to": "Nairobi",
+      "distanceKm": 210.0,
+      "needsReview": false
+    },
+    {
+      "from": "Molo",
+      "to": "Nakuru",
+      "distanceKm": 50.0,
+      "needsReview": false
+    },
+    {
+      "from": "Molo",
+      "to": "Ukunda",
+      "distanceKm": 720.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Moyale",
+      "distanceKm": 1195.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Mtwapa",
+      "distanceKm": 20.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Muhoroni",
+      "distanceKm": 770.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Mumias",
+      "distanceKm": 900.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Mwingi",
+      "distanceKm": 535.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Nairobi",
+      "distanceKm": 490.0,
+      "needsReview": true,
+      "chartDistancesKm": [
+        480.0,
+        490.0
+      ]
+    },
+    {
+      "from": "Mombasa",
+      "to": "Nakuru",
+      "distanceKm": 650.0,
+      "needsReview": true,
+      "chartDistancesKm": [
+        645.0,
+        650.0
+      ]
+    },
+    {
+      "from": "Mombasa",
+      "to": "Nambale",
+      "distanceKm": 950.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Nandi Hills",
+      "distanceKm": 810.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Nanyuki",
+      "distanceKm": 685.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Narok",
+      "distanceKm": 630.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Nyahururu",
+      "distanceKm": 675.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Nyamira",
+      "distanceKm": 785.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Nyansiongo",
+      "distanceKm": 760.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Nyeri",
+      "distanceKm": 640.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Ogembo",
+      "distanceKm": 810.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Ol Kalau",
+      "distanceKm": 640.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Oyugis",
+      "distanceKm": 815.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Rongo",
+      "distanceKm": 820.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Rumuruti",
+      "distanceKm": 720.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Runyenjes",
+      "distanceKm": 580.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Siaya",
+      "distanceKm": 910.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Suneka",
+      "distanceKm": 810.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Tabaka",
+      "distanceKm": 820.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Taveta",
+      "distanceKm": 270.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Ugunja",
+      "distanceKm": 915.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Ukunda",
+      "distanceKm": 35.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Vihiga",
+      "distanceKm": 865.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Voi",
+      "distanceKm": 160.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Webuye",
+      "distanceKm": 875.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Wundanyi",
+      "distanceKm": 205.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mombasa",
+      "to": "Yala",
+      "distanceKm": 885.0,
+      "needsReview": false
+    },
+    {
+      "from": "Moyale",
+      "to": "Nairobi",
+      "distanceKm": 775.0,
+      "needsReview": false
+    },
+    {
+      "from": "Moyale",
+      "to": "Nakuru",
+      "distanceKm": 675.0,
+      "needsReview": false
+    },
+    {
+      "from": "Moyale",
+      "to": "Ukunda",
+      "distanceKm": 1060.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mtwapa",
+      "to": "Nairobi",
+      "distanceKm": 505.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mtwapa",
+      "to": "Nakuru",
+      "distanceKm": 665.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mtwapa",
+      "to": "Ukunda",
+      "distanceKm": 50.0,
+      "needsReview": false
+    },
+    {
+      "from": "Muhoroni",
+      "to": "Nairobi",
+      "distanceKm": 285.0,
+      "needsReview": false
+    },
+    {
+      "from": "Muhoroni",
+      "to": "Nakuru",
+      "distanceKm": 125.0,
+      "needsReview": false
+    },
+    {
+      "from": "Muhoroni",
+      "to": "Ukunda",
+      "distanceKm": 795.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mumias",
+      "to": "Nairobi",
+      "distanceKm": 415.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mumias",
+      "to": "Nakuru",
+      "distanceKm": 255.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mumias",
+      "to": "Ukunda",
+      "distanceKm": 940.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mwingi",
+      "to": "Nairobi",
+      "distanceKm": 175.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mwingi",
+      "to": "Nakuru",
+      "distanceKm": 295.0,
+      "needsReview": false
+    },
+    {
+      "from": "Mwingi",
+      "to": "Ukunda",
+      "distanceKm": 565.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nairobi",
+      "to": "Nakuru",
+      "distanceKm": 165.0,
+      "needsReview": true,
+      "chartDistancesKm": [
+        160.0,
+        165.0
+      ]
+    },
+    {
+      "from": "Nairobi",
+      "to": "Nambale",
+      "distanceKm": 450.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nairobi",
+      "to": "Nandi Hills",
+      "distanceKm": 320.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nairobi",
+      "to": "Nanyuki",
+      "distanceKm": 195.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nairobi",
+      "to": "Narok",
+      "distanceKm": 145.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nairobi",
+      "to": "Nyahururu",
+      "distanceKm": 190.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nairobi",
+      "to": "Nyamira",
+      "distanceKm": 310.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nairobi",
+      "to": "Nyansiongo",
+      "distanceKm": 275.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nairobi",
+      "to": "Nyeri",
+      "distanceKm": 155.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nairobi",
+      "to": "Ogembo",
+      "distanceKm": 325.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nairobi",
+      "to": "Ol Kalau",
+      "distanceKm": 155.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nairobi",
+      "to": "Oyugis",
+      "distanceKm": 325.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nairobi",
+      "to": "Rongo",
+      "distanceKm": 335.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nairobi",
+      "to": "Rumuruti",
+      "distanceKm": 235.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nairobi",
+      "to": "Runyenjes",
+      "distanceKm": 155.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nairobi",
+      "to": "Sagana",
+      "distanceKm": 105.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nairobi",
+      "to": "Siaya",
+      "distanceKm": 425.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nairobi",
+      "to": "Suneka",
+      "distanceKm": 320.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nairobi",
+      "to": "Tabaka",
+      "distanceKm": 335.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nairobi",
+      "to": "Taveta",
+      "distanceKm": 315.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nairobi",
+      "to": "Ugunja",
+      "distanceKm": 430.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nairobi",
+      "to": "Ukunda",
+      "distanceKm": 520.0,
+      "needsReview": true,
+      "chartDistancesKm": [
+        515.0,
+        520.0
+      ]
+    },
+    {
+      "from": "Nairobi",
+      "to": "Vihiga",
+      "distanceKm": 380.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nairobi",
+      "to": "Voi",
+      "distanceKm": 330.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nairobi",
+      "to": "Webuye",
+      "distanceKm": 390.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nairobi",
+      "to": "Wundanyi",
+      "distanceKm": 375.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nairobi",
+      "to": "Yala",
+      "distanceKm": 385.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nakuru",
+      "to": "Nambale",
+      "distanceKm": 290.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nakuru",
+      "to": "Nandi Hills",
+      "distanceKm": 165.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nakuru",
+      "to": "Nanyuki",
+      "distanceKm": 185.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nakuru",
+      "to": "Narok",
+      "distanceKm": 125.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nakuru",
+      "to": "Nyahururu",
+      "distanceKm": 65.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nakuru",
+      "to": "Nyamira",
+      "distanceKm": 165.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nakuru",
+      "to": "Nyansiongo",
+      "distanceKm": 175.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nakuru",
+      "to": "Nyeri",
+      "distanceKm": 170.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nakuru",
+      "to": "Ogembo",
+      "distanceKm": 215.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nakuru",
+      "to": "Ol Kalau",
+      "distanceKm": 60.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nakuru",
+      "to": "Oyugis",
+      "distanceKm": 190.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nakuru",
+      "to": "Rongo",
+      "distanceKm": 220.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nakuru",
+      "to": "Rumuruti",
+      "distanceKm": 110.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nakuru",
+      "to": "Runyenjes",
+      "distanceKm": 265.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nakuru",
+      "to": "Siaya",
+      "distanceKm": 250.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nakuru",
+      "to": "Suneka",
+      "distanceKm": 210.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nakuru",
+      "to": "Tabaka",
+      "distanceKm": 220.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nakuru",
+      "to": "Taveta",
+      "distanceKm": 470.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nakuru",
+      "to": "Ugunja",
+      "distanceKm": 255.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nakuru",
+      "to": "Ukunda",
+      "distanceKm": 680.0,
+      "needsReview": true,
+      "chartDistancesKm": [
+        675.0,
+        680.0
+      ]
+    },
+    {
+      "from": "Nakuru",
+      "to": "Vihiga",
+      "distanceKm": 210.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nakuru",
+      "to": "Voi",
+      "distanceKm": 490.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nakuru",
+      "to": "Webuye",
+      "distanceKm": 230.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nakuru",
+      "to": "Wundanyi",
+      "distanceKm": 530.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nakuru",
+      "to": "Yala",
+      "distanceKm": 225.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nambale",
+      "to": "Ukunda",
+      "distanceKm": 975.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nandi Hills",
+      "to": "Ukunda",
+      "distanceKm": 835.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nanyuki",
+      "to": "Ukunda",
+      "distanceKm": 710.0,
+      "needsReview": false
+    },
+    {
+      "from": "Narok",
+      "to": "Ukunda",
+      "distanceKm": 660.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nyahururu",
+      "to": "Ukunda",
+      "distanceKm": 705.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nyamira",
+      "to": "Ukunda",
+      "distanceKm": 815.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nyansiongo",
+      "to": "Ukunda",
+      "distanceKm": 790.0,
+      "needsReview": false
+    },
+    {
+      "from": "Nyeri",
+      "to": "Ukunda",
+      "distanceKm": 670.0,
+      "needsReview": false
+    },
+    {
+      "from": "Ogembo",
+      "to": "Ukunda",
+      "distanceKm": 835.0,
+      "needsReview": false
+    },
+    {
+      "from": "Ol Kalau",
+      "to": "Ukunda",
+      "distanceKm": 670.0,
+      "needsReview": false
+    },
+    {
+      "from": "Oyugis",
+      "to": "Ukunda",
+      "distanceKm": 840.0,
+      "needsReview": false
+    },
+    {
+      "from": "Rongo",
+      "to": "Ukunda",
+      "distanceKm": 850.0,
+      "needsReview": false
+    },
+    {
+      "from": "Rumuruti",
+      "to": "Ukunda",
+      "distanceKm": 750.0,
+      "needsReview": false
+    },
+    {
+      "from": "Runyenjes",
+      "to": "Ukunda",
+      "distanceKm": 610.0,
+      "needsReview": false
+    },
+    {
+      "from": "Siaya",
+      "to": "Ukunda",
+      "distanceKm": 935.0,
+      "needsReview": false
+    },
+    {
+      "from": "Suneka",
+      "to": "Ukunda",
+      "distanceKm": 835.0,
+      "needsReview": false
+    },
+    {
+      "from": "Tabaka",
+      "to": "Ukunda",
+      "distanceKm": 845.0,
+      "needsReview": false
+    },
+    {
+      "from": "Taveta",
+      "to": "Ukunda",
+      "distanceKm": 300.0,
+      "needsReview": false
+    },
+    {
+      "from": "Ugunja",
+      "to": "Ukunda",
+      "distanceKm": 940.0,
+      "needsReview": false
+    },
+    {
+      "from": "Ukunda",
+      "to": "Vihiga",
+      "distanceKm": 895.0,
+      "needsReview": false
+    },
+    {
+      "from": "Ukunda",
+      "to": "Voi",
+      "distanceKm": 190.0,
+      "needsReview": false
+    },
+    {
+      "from": "Ukunda",
+      "to": "Webuye",
+      "distanceKm": 905.0,
+      "needsReview": false
+    },
+    {
+      "from": "Ukunda",
+      "to": "Wundanyi",
+      "distanceKm": 230.0,
+      "needsReview": false
+    },
+    {
+      "from": "Ukunda",
+      "to": "Yala",
+      "distanceKm": 915.0,
+      "needsReview": false
+    }
+  ]
+}

@@ -6,6 +6,7 @@ import { useWizard } from "@/lib/wizard/store";
 import { Currency, formatRooms, totalRooms } from "@/lib/wizard/types";
 import { COUNTRIES } from "@/lib/data/countries";
 import { IMG } from "@/lib/images";
+import { TRIP_TYPE_LABELS } from "@/lib/api/transport";
 import { cn, formatDateRange } from "@/lib/utils";
 
 const CURRENCIES: { code: Currency; label: string }[] = [
@@ -93,7 +94,9 @@ export default function ReviewStep() {
           {state.transport?.vehicleType && state.serviceType !== "accommodation" && (
             <Row
               label="Vehicle"
-              value={`${state.transport.vehicleType} • ${state.transport.days}d`}
+              value={`${state.transport.vehicleType} • ${
+                state.transport.tripType ? TRIP_TYPE_LABELS[state.transport.tripType] : ""
+              }${state.transport.from && state.transport.to ? ` • ${state.transport.from} → ${state.transport.to}` : ""}`}
             />
           )}
 

@@ -1,3 +1,5 @@
+import type { TripType } from "@/lib/api/transport";
+
 export type GroupType = "Solo" | "Couple" | "Family" | "Group";
 export type ServiceType = "accommodation" | "transport" | "both";
 export type RoomType = "Single" | "Twin" | "Double" | "Triple";
@@ -51,10 +53,19 @@ export type WizardState = {
     rooms?: Partial<Record<RoomType, number>>;
   };
   transport?: {
+    /** Listed route (priced by the backend). */
+    fromId?: string;
+    toId?: string;
+    /** Place names (listed route) or free text (quote request). */
     from?: string;
     to?: string;
-    days?: number;
+    /** Unlisted route: sent as a quote request, no online price. */
+    quoteMode?: boolean;
+    tripType?: TripType;
+    vehicleId?: string;
     vehicleType?: string;
+    /** Legacy (day-based pricing was removed); ignored. */
+    days?: number;
   };
 };
 
@@ -63,7 +74,7 @@ export const INITIAL_STATE: WizardState = {
   serviceType: "both",
   currency: "KES",
   accommodation: {},
-  transport: { days: 3 },
+  transport: { tripType: "one_way" },
 };
 
 /** Whether the traveller skipped each service; falls back to an older saved serviceType. */

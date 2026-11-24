@@ -17,6 +17,8 @@ import {
   deleteBooking,
 } from "@/lib/api/bookings";
 import type { Booking, BookingStatus } from "@/types/booking";
+import { TRIP_TYPE_LABELS } from "@/lib/api/transport";
+import { formatFromKes } from "@/lib/currency";
 import {
   cn,
   formatDateRange,
@@ -33,6 +35,39 @@ const ALL_STATUSES: BookingStatus[] = [
 ];
 
 const FILTERS: ("all" | BookingStatus)[] = ["all", ...ALL_STATUSES];
+
+const formatKes = (amount: number) => formatFromKes(amount, "KES");
+
+function TransportDetails({ booking }: { booking: Booking }) {
+  if (booking.bookingType === "accommodation" || !booking.transportFrom) {
+    return <span className="text-on-surface-variant">—</span>;
+  }
+  const quote = booking.transportQuote;
+  return (
+    <div className="flex min-w-48 flex-col gap-0.5">
+      <span className="font-medium">
+        {booking.transportFrom} → {booking.transportTo}
+      </span>
+      <span className="text-xs text-on-surface-variant">
+        {booking.tripType ? TRIP_TYPE_LABELS[booking.tripType] : "Legacy booking"}
+        {booking.vehicleType ? ` · ${booking.vehicleType}` : ""}
+      </span>
+      {booking.quoteRequested ? (
+        <span className="mt-1 inline-flex w-fit items-center rounded-full bg-amber-500/15 px-2.5 py-0.5 text-xs font-semibold text-amber-700">
+          Quote requested
+        </span>
+      ) : quote ? (
+        <span className="text-xs text-on-surface-variant">
+          <span className="font-semibold text-on-surface">{formatKes(quote.totalKes)}</span>
+          {" "}· fuel {formatKes(quote.fuelKes)} + driver {formatKes(quote.driverAllowanceKes)}
+          {" "}· {quote.distanceKm} km
+        </span>
+      ) : booking.transportAmountKes ? (
+        <span className="text-xs font-semibold">{formatKes(booking.transportAmountKes)}</span>
+      ) : null}
+    </div>
+  );
+}
 
 function formatLabel(value: string) {
   return value
@@ -204,6 +239,7 @@ export function BookingsTable() {
               <Th>Dates</Th>
               <Th>Travelling with</Th>
               <Th>Booking type</Th>
+              <Th>Transport</Th>
               <Th>Travellers</Th>
               <Th>Rooms</Th>
               <Th>Submitted</Th>
@@ -232,6 +268,9 @@ export function BookingsTable() {
                 </Td>
                 <Td>{formatLabel(booking.travellingWith)}</Td>
                 <Td>{formatLabel(booking.bookingType)}</Td>
+                <Td>
+                  <TransportDetails booking={booking} />
+                </Td>
                 <Td className="text-right">{booking.numberOfTravellers}</Td>
                 <Td className="text-right">{booking.numberOfRooms}</Td>
                 <Td className="text-on-surface-variant">

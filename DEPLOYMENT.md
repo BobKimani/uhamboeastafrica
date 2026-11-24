@@ -232,6 +232,17 @@ $UC exec backend python -m app.admin_cli create --email <admin2-email> --name "<
 $UC exec backend python -m app.admin_cli list
 ```
 
+**9.1b Transport routes** (after migration `20261119_transport_route_pricing.sql`
+from §6.6). Loads the 88 places / 715 routes from the price chart and default
+vehicle km/L; idempotent and never overwrites admin edits:
+```bash
+$UC exec backend python -m app.seed_transport
+```
+Then, in **Admin → Transport**: confirm the fuel price, set km/L for any vehicle
+showing "Not set", and review the 25 routes flagged "Needs review" (including
+Nairobi ↔ Mombasa). Flagged routes can only be requested as quotes until
+reviewed.
+
 **9.2 Local smoke test (before DNS):**
 ```bash
 curl -fsS http://127.0.0.1:8000/health                 # {"status":"healthy","database":"connected"}
