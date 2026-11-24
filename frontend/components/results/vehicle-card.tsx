@@ -3,25 +3,26 @@ import { Users } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { DEFAULT_CURRENCY, formatTravelPrice } from "@/lib/currency";
 import { mediaUrl } from "@/lib/media";
-import { formatCurrency } from "@/lib/utils";
 import type { Vehicle } from "@/lib/data/vehicles";
 
 export function VehicleCard({
   vehicle,
-  price,
-  priceLabel = "/ day",
-  currency = DEFAULT_CURRENCY,
+  priceText,
+  priceHeading = "Trip total",
+  priceLabel,
   ctaLabel = "Request",
+  ctaDisabled = false,
   highlighted = false,
   onRequest,
 }: {
   vehicle: Vehicle;
-  price: number;
+  /** Pre-formatted price (route prices are calculated by the backend). */
+  priceText: string;
+  priceHeading?: string;
   priceLabel?: string;
-  currency?: string;
   ctaLabel?: string;
+  ctaDisabled?: boolean;
   highlighted?: boolean;
   onRequest?: () => void;
 }) {
@@ -76,18 +77,18 @@ export function VehicleCard({
         <div className="flex items-end justify-between mt-6 pt-6 border-t border-outline-variant/15">
           <div>
             <p className="text-on-surface-variant text-[10px] font-bold uppercase tracking-widest">
-              From
+              {priceHeading}
             </p>
             <p className="text-on-surface font-headline font-extrabold text-2xl">
-              {currency === "KES" || currency === "USD"
-                ? formatTravelPrice(price, currency)
-                : formatCurrency(price, currency)}
-              <span className="text-on-surface-variant text-xs font-medium ml-1">
-                {priceLabel}
-              </span>
+              {priceText}
+              {priceLabel && (
+                <span className="text-on-surface-variant text-xs font-medium ml-1">
+                  {priceLabel}
+                </span>
+              )}
             </p>
           </div>
-          <Button size="sm" onClick={onRequest}>{ctaLabel}</Button>
+          <Button size="sm" onClick={onRequest} disabled={ctaDisabled}>{ctaLabel}</Button>
         </div>
       </div>
     </Card>

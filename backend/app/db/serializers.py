@@ -2,7 +2,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from uuid import UUID
 
-from app.db.models import Booking, Hotel, Inquiry, Payment, Vehicle
+from app.db.models import Booking, Hotel, Inquiry, Vehicle
 
 
 def _json_value(value):
@@ -37,6 +37,9 @@ def booking_to_api(booking: Booking) -> dict:
         "transportTo": booking.transport_to,
         "transportDays": booking.transport_days,
         "vehicleType": booking.vehicle_type,
+        "tripType": booking.trip_type,
+        "transportQuote": booking.transport_quote,
+        "quoteRequested": bool(booking.quote_requested),
         "transportAmountKes": booking.transport_amount_kes,
         "status": booking.status,
         "paymentStatus": booking.payment_status,
@@ -60,29 +63,6 @@ def inquiry_to_api(inquiry: Inquiry) -> dict:
         "status": inquiry.status,
         "createdAt": _json_value(inquiry.created_at),
         "updatedAt": _json_value(inquiry.updated_at),
-    }
-
-
-def payment_to_api(payment: Payment) -> dict:
-    return {
-        "id": str(payment.id),
-        "bookingId": str(payment.booking_id) if payment.booking_id else None,
-        "paymentReference": payment.payment_reference,
-        "invoiceNumber": payment.invoice_number,
-        "merchantRequestId": payment.merchant_request_id,
-        "checkoutRequestId": payment.checkout_request_id,
-        "mpesaReceiptNumber": payment.mpesa_receipt_number,
-        "phoneNumber": payment.phone_number,
-        "accountNumber": payment.account_number,
-        "provider": payment.provider,
-        "providerReference": payment.provider_reference,
-        "status": payment.status,
-        "amount": _json_value(payment.amount),
-        "currency": payment.currency,
-        "paidAt": _json_value(payment.paid_at),
-        "queriedAt": _json_value(payment.queried_at),
-        "createdAt": _json_value(payment.created_at),
-        "updatedAt": _json_value(payment.updated_at),
     }
 
 
@@ -113,6 +93,7 @@ def vehicle_to_api(vehicle: Vehicle) -> dict:
         "type": vehicle.type,
         "capacity": vehicle.capacity,
         "pricePerDay": _json_value(vehicle.price_per_day),
+        "kmPerLitre": _json_value(vehicle.km_per_litre),
         "bestFor": vehicle.best_for,
         "features": vehicle.features,
         "image": vehicle.image,

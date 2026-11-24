@@ -1,18 +1,13 @@
 from collections.abc import Generator
 
-from sqlalchemy import create_engine, event
+from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from app.config import settings
-from app.db.auth import generate_iam_auth_token
 
 
 class Base(DeclarativeBase):
     pass
-
-
-def provide_iam_token(dialect, conn_rec, cargs, cparams):
-    cparams["password"] = generate_iam_auth_token()
 
 
 def create_database_engine():
@@ -26,7 +21,6 @@ def create_database_engine():
         pool_timeout=10,
         echo=False,
     )
-    event.listen(database_engine, "do_connect", provide_iam_token)
     return database_engine
 
 

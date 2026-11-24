@@ -1,21 +1,28 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { AlertCircle, CheckCircle2, Send } from "lucide-react";
 import { KcbPayment } from "@/components/payments/kcb-payment";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
-import { submitBooking } from "@/lib/api/bookings";
-import { fetchUsdKesRate } from "@/lib/api/currency";
-import { USD_TO_KES } from "@/lib/currency";
+import {
+  BookingPriceChangedError,
+  BookingRouteUnavailableError,
+  submitBooking,
+} from "@/lib/api/bookings";
+import { TRIP_TYPE_LABELS, type TransportQuote, type TripType } from "@/lib/api/transport";
+import { formatFromKes } from "@/lib/currency";
 import type { Vehicle } from "@/lib/data/vehicles";
 import type { CreateBookingInput, TravellingWith } from "@/types/booking";
 
+/** A listed route priced by the backend, or an unlisted route sent for a quote. */
+export type TransportBookingRoute =
+  | { mode: "priced"; quote: TransportQuote }
+  | { mode: "quote"; fromText: string; toText: string; tripType: TripType };
+
 type DirectTransportBookingProps = {
   vehicle: Vehicle;
-  from: string;
-  to: string;
-  days: number;
+  route: TransportBookingRoute;
   people: number;
   onClose?: () => void;
 };
@@ -26,32 +33,17 @@ type BookingPayment = {
   phone: string;
 };
 
-function endDateFrom(startDate: string, days: number) {
-  const [year, month, day] = startDate.split("-").map(Number);
-  const date = new Date(Date.UTC(year, month - 1, day));
-  date.setUTCDate(date.getUTCDate() + Math.max(days - 1, 0));
-  return date.toISOString().slice(0, 10);
-}
-
 function travellingWith(people: number): TravellingWith {
   if (people === 1) return "solo";
   if (people === 2) return "couple";
   return "group";
 }
 
-function formatKes(amount: number) {
-  return new Intl.NumberFormat("en-KE", {
-    style: "currency",
-    currency: "KES",
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
+const formatKes = (amount: number) => formatFromKes(amount, "KES");
 
 export function DirectTransportBooking({
   vehicle,
-  from,
-  to,
-  days,
+  route,
   people,
   onClose,
 }: DirectTransportBookingProps) {
@@ -65,27 +57,20 @@ export function DirectTransportBooking({
   const [error, setError] = useState<string | null>(null);
   const [payment, setPayment] = useState<BookingPayment | null>(null);
   const [paymentComplete, setPaymentComplete] = useState(false);
-  const [exchangeRate, setExchangeRate] = useState(USD_TO_KES);
+  // Latest server quote; replaced if the price changed before booking.
+  const [quote, setQuote] = useState<TransportQuote | null>(
+    route.mode === "priced" ? route.quote : null
+  );
+  const [priceNotice, setPriceNotice] = useState<string | null>(null);
+  const [requestSent, setRequestSent] = useState(false);
 
-  const transportPriceUsd = vehicle.pricePerDay * days;
-  const transportAmountKes = Math.round(transportPriceUsd * exchangeRate);
+  // No server quote (unlisted route, or the route stopped being bookable
+  // online) means the booking is sent as a quote request without payment.
+  const isQuoteRequest = quote === null;
+  const tripType = route.mode === "priced" ? route.quote.tripType : route.tripType;
+  const from = route.mode === "priced" ? route.quote.fromPlace : route.fromText;
+  const to = route.mode === "priced" ? route.quote.toPlace : route.toText;
   const today = new Date().toLocaleDateString("en-CA");
-
-  useEffect(() => {
-    let cancelled = false;
-
-    fetchUsdKesRate()
-      .then((result) => {
-        if (!cancelled) setExchangeRate(result.rate);
-      })
-      .catch(() => {
-        if (!cancelled) setExchangeRate(USD_TO_KES);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     setForm((current) => ({
@@ -108,22 +93,34 @@ export function DirectTransportBooking({
       email: form.email.trim(),
       phone: form.phone.trim(),
       destination: to.trim(),
+      // Single-day trip: a drop-off, or a return with the driver waiting.
       travelStartDate: form.pickupDate,
-      travelEndDate: endDateFrom(form.pickupDate, days),
+      travelEndDate: form.pickupDate,
       travellingWith: travellingWith(people),
       bookingType: "transport",
       numberOfTravellers: people,
       numberOfRooms: 0,
-      transportFrom: from.trim(),
-      transportTo: to.trim(),
-      transportDays: days,
+      tripType,
       vehicleType: vehicle.type,
+      ...(quote
+        ? {
+            transportFromId: quote.fromPlaceId,
+            transportToId: quote.toPlaceId,
+            vehicleId: quote.vehicleId,
+            quotedTotalKes: quote.totalKes,
+          }
+        : { quoteRequested: true, transportFrom: from.trim(), transportTo: to.trim() }),
     };
 
     setSubmitting(true);
     setError(null);
+    setPriceNotice(null);
     try {
       const result = await submitBooking(payload);
+      if (isQuoteRequest) {
+        setRequestSent(true);
+        return;
+      }
       if (!result.payment.required || !result.payment.amountKes) {
         throw new Error("Transport payment details were not returned.");
       }
@@ -133,6 +130,23 @@ export function DirectTransportBooking({
         phone: payload.phone,
       });
     } catch (reason) {
+      if (reason instanceof BookingPriceChangedError) {
+        // Never charge an amount the customer has not seen: show the new
+        // price and let them confirm by submitting again.
+        setQuote(reason.quote);
+        setPriceNotice(
+          `The price for this trip has changed to ${formatKes(reason.quote.totalKes)}. Please review and confirm.`
+        );
+        return;
+      }
+      if (reason instanceof BookingRouteUnavailableError) {
+        // Keep the customer's details and offer a quote request instead.
+        setQuote(null);
+        setPriceNotice(
+          "This route can no longer be booked online. Submit again to send it as a quote request — our team will contact you. No payment is taken now."
+        );
+        return;
+      }
       setError(
         reason instanceof Error ? reason.message : "Failed to submit booking."
       );
@@ -155,18 +169,53 @@ export function DirectTransportBooking({
           <p className="font-bold mt-1">{vehicle.name}</p>
         </div>
         <div>
+          <p className="text-xs text-on-surface-variant">Trip</p>
+          <p className="font-bold mt-1">{TRIP_TYPE_LABELS[tripType]}</p>
+        </div>
+        <div>
           <p className="text-xs text-on-surface-variant">Passengers</p>
           <p className="font-bold mt-1">{people}</p>
         </div>
-        <div>
-          <p className="text-xs text-on-surface-variant">Transport total</p>
-          <p className="font-bold mt-1">
-            {formatKes(transportAmountKes)}
-          </p>
-        </div>
+        {quote ? (
+          <>
+            <div>
+              <p className="text-xs text-on-surface-variant">Fuel ({quote.distanceKm} km)</p>
+              <p className="font-bold mt-1">{formatKes(quote.fuelKes)}</p>
+            </div>
+            <div>
+              <p className="text-xs text-on-surface-variant">Driver&apos;s allowance</p>
+              <p className="font-bold mt-1">{formatKes(quote.driverAllowanceKes)}</p>
+            </div>
+            <div className="col-span-2 border-t border-outline-variant/20 pt-3">
+              <p className="text-xs text-on-surface-variant">Transport total</p>
+              <p className="font-bold mt-1 text-base">{formatKes(quote.totalKes)}</p>
+            </div>
+          </>
+        ) : (
+          <div className="col-span-2 border-t border-outline-variant/20 pt-3">
+            <p className="text-xs text-on-surface-variant">Price</p>
+            <p className="font-bold mt-1">
+              On request — our team will price this route and contact you. No payment now.
+            </p>
+          </div>
+        )}
       </div>
 
-      {!payment ? (
+      {priceNotice && (
+        <div role="status" className="mt-4 flex items-start gap-2 rounded-xl bg-primary/10 px-4 py-3 text-sm text-primary">
+          <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+          <span>{priceNotice}</span>
+        </div>
+      )}
+
+      {requestSent ? (
+        <div className="mt-6 flex items-start gap-2 rounded-xl bg-surface-container-low px-4 py-4 text-sm">
+          <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0 text-kcb" aria-hidden="true" />
+          <span>
+            Quote request sent. Our team will contact you with a price for {from} → {to}.
+          </span>
+        </div>
+      ) : !payment ? (
         <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-6">
           <div className="sm:col-span-2">
             <Label htmlFor="directFullName">Full name</Label>
@@ -229,7 +278,13 @@ export function DirectTransportBooking({
 
           <Button type="submit" size="lg" disabled={submitting} className="sm:col-span-2 w-full">
             <Send className="h-4 w-4" />
-            {submitting ? "Booking..." : "Book transport"}
+            {submitting
+              ? "Sending..."
+              : isQuoteRequest
+                ? "Request quote"
+                : priceNotice
+                  ? "Confirm new price"
+                  : "Book transport"}
           </Button>
         </form>
       ) : (

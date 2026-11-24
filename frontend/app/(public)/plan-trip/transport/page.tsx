@@ -5,10 +5,19 @@ import Image from "next/image";
 import { Users } from "lucide-react";
 import { WizardShell } from "@/components/wizard/wizard-shell";
 import { NeedToggle } from "@/components/wizard/need-toggle";
-import { Input, Label } from "@/components/ui/input";
+import { Label } from "@/components/ui/input";
 import { TransportMap } from "@/components/transport/transport-map";
+import {
+  RoutePicker,
+  TripTypeToggle,
+  isRouteComplete,
+  type RouteSelection,
+} from "@/components/transport/route-picker";
 import { useWizard } from "@/lib/wizard/store";
 import { useVehicles } from "@/lib/use-vehicles";
+import { useTransportPlaces } from "@/lib/use-transport-places";
+import { useTransportQuotes } from "@/lib/use-transport-quotes";
+import { formatFromKes } from "@/lib/currency";
 import { mediaUrl } from "@/lib/media";
 import { serviceTypeFor, skipsAccommodation, skipsTransport } from "@/lib/wizard/types";
 import { cn } from "@/lib/utils";
@@ -16,8 +25,19 @@ import { cn } from "@/lib/utils";
 export default function TransportStep() {
   const { state, update } = useWizard();
   const { vehicles } = useVehicles();
+  const { places, byId, loading: placesLoading } = useTransportPlaces();
   const accSkipped = skipsAccommodation(state);
   const skipped = skipsTransport(state) && !accSkipped;
+  const transport = state.transport ?? {};
+  const tripType = transport.tripType ?? "one_way";
+
+  const route: RouteSelection = {
+    fromId: transport.fromId ?? "",
+    toId: transport.toId ?? "",
+    quoteMode: Boolean(transport.quoteMode),
+    fromText: transport.quoteMode ? transport.from ?? "" : "",
+    toText: transport.quoteMode ? transport.to ?? "" : "",
+  };
 
   const availableVehicles = useMemo(
     () => vehicles.filter((vehicle) => vehicle.isAvailable),
@@ -25,26 +45,27 @@ export default function TransportStep() {
   );
 
   const selectedVehicleIsAvailable = availableVehicles.some(
-    (vehicle) => vehicle.type === state.transport?.vehicleType
+    (vehicle) => vehicle.id === transport.vehicleId
   );
-  const transportDays = state.transport?.days;
-  const hasTransportDays =
-    typeof transportDays === "number" &&
-    Number.isFinite(transportDays) &&
-    transportDays > 0;
+
+  const listedRoute = !route.quoteMode && Boolean(route.fromId && route.toId);
+  const { quotes } = useTransportQuotes(
+    listedRoute ? route.fromId : undefined,
+    listedRoute ? route.toId : undefined,
+    tripType,
+    availableVehicles.map((v) => v.id)
+  );
 
   useEffect(() => {
     if (skipped) return;
-    if (!state.transport?.vehicleType) return;
+    if (!state.transport?.vehicleId) return;
     if (vehicles.length === 0 || selectedVehicleIsAvailable) return;
-    update({ transport: { ...state.transport, vehicleType: undefined } });
+    update({
+      transport: { ...state.transport, vehicleId: undefined, vehicleType: undefined },
+    });
   }, [skipped, vehicles.length, selectedVehicleIsAvailable, state.transport, update]);
 
-  const trpReady =
-    selectedVehicleIsAvailable &&
-    !!state.transport?.from &&
-    !!state.transport?.to &&
-    hasTransportDays;
+  const trpReady = selectedVehicleIsAvailable && isRouteComplete(route);
   const canContinue = skipped || trpReady;
 
   const setNeeded = (needed: boolean) =>
@@ -52,6 +73,23 @@ export default function TransportStep() {
       skipTransport: !needed,
       serviceType: serviceTypeFor(accSkipped, !needed),
     });
+
+  function updateRoute(patch: Partial<RouteSelection>) {
+    const next = { ...route, ...patch };
+    update({
+      transport: {
+        ...state.transport,
+        quoteMode: next.quoteMode,
+        fromId: next.quoteMode ? undefined : next.fromId || undefined,
+        toId: next.quoteMode ? undefined : next.toId || undefined,
+        from: next.quoteMode ? next.fromText : byId.get(next.fromId)?.name,
+        to: next.quoteMode ? next.toText : byId.get(next.toId)?.name,
+      },
+    });
+  }
+
+  const mapFrom = route.quoteMode ? route.fromText : byId.get(route.fromId)?.name ?? "";
+  const mapTo = route.quoteMode ? route.toText : byId.get(route.toId)?.name ?? "";
 
   return (
     <WizardShell
@@ -80,72 +118,47 @@ export default function TransportStep() {
           Transport
         </h3>
         <div className="space-y-5">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label className="block mb-2">From</Label>
-              <Input
-                placeholder="e.g. Nairobi"
-                value={state.transport?.from ?? ""}
-                onChange={(e) =>
-                  update({
-                    transport: { ...state.transport, from: e.target.value },
-                  })
-                }
-              />
-            </div>
-            <div>
-              <Label className="block mb-2">To</Label>
-              <Input
-                placeholder="e.g. Maasai Mara"
-                value={state.transport?.to ?? ""}
-                onChange={(e) =>
-                  update({
-                    transport: { ...state.transport, to: e.target.value },
-                  })
-                }
-              />
-            </div>
-          </div>
-
-          <TransportMap
-            from={state.transport?.from ?? ""}
-            to={state.transport?.to ?? ""}
+          <RoutePicker
+            value={route}
+            onChange={updateRoute}
+            places={places}
+            placesLoading={placesLoading}
+            idPrefix="planner"
           />
 
-          <div>
-            <Label className="block mb-2">Number of Days</Label>
-            <Input
-              type="number"
-              min={1}
-              step={1}
-              placeholder="3"
-              value={state.transport?.days ?? ""}
-              onChange={(e) => {
-                const value = e.target.value;
-                update({
-                  transport: {
-                    ...state.transport,
-                    days:
-                      value === ""
-                        ? undefined
-                        : Math.max(1, Number(value)),
-                  },
-                });
-              }}
-            />
-          </div>
+          <TransportMap from={mapFrom} to={mapTo} />
+
+          <TripTypeToggle
+            value={tripType}
+            onChange={(next) =>
+              update({ transport: { ...state.transport, tripType: next } })
+            }
+          />
+
           <div>
             <Label className="block mb-3">Vehicle</Label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {availableVehicles.map((v) => {
-                const selected = state.transport?.vehicleType === v.type;
+                const selected = transport.vehicleId === v.id;
+                const result = quotes[v.id];
+                const priceText = route.quoteMode
+                  ? "Price on request"
+                  : !listedRoute
+                    ? null
+                    : result?.ok
+                      ? formatFromKes(result.quote.totalKes, state.currency)
+                      : result
+                        ? "Price on request"
+                        : "Pricing...";
                 return (
                   <button
                     key={v.id}
+                    type="button"
                     onClick={() =>
                       update({
                         transport: {
                           ...state.transport,
+                          vehicleId: v.id,
                           vehicleType: v.type,
                         },
                       })
@@ -177,6 +190,11 @@ export default function TransportStep() {
                       <div className="text-xs text-secondary mt-1">
                         Best for: {v.bestFor}
                       </div>
+                      {priceText && (
+                        <div className="text-sm font-bold text-on-surface mt-2">
+                          {priceText}
+                        </div>
+                      )}
                     </div>
                   </button>
                 );

@@ -18,8 +18,18 @@ class CreateBooking(BaseModel):
     selectedHotelId: str | None = Field(default=None, min_length=1)
     transportFrom: str | None = Field(default=None, min_length=2)
     transportTo: str | None = Field(default=None, min_length=2)
+    # Legacy (day-based pricing was removed); accepted but not used for pricing.
     transportDays: int | None = Field(default=None, ge=1, le=365)
     vehicleType: str | None = Field(default=None, min_length=2)
+    # Route pricing: listed route + specific vehicle, priced by the server.
+    tripType: Literal["one_way", "return"] | None = None
+    transportFromId: str | None = Field(default=None, max_length=64)
+    transportToId: str | None = Field(default=None, max_length=64)
+    vehicleId: str | None = Field(default=None, max_length=64)
+    # Total the customer was shown; a mismatch means prices changed meanwhile.
+    quotedTotalKes: int | None = Field(default=None, ge=0)
+    # Unlisted route: saved for the team to price; no online payment.
+    quoteRequested: bool = False
 
     @model_validator(mode="after")
     def _check_dates_and_transport(self):
@@ -30,16 +40,14 @@ class CreateBooking(BaseModel):
                 "Travel end date must be after or equal to travel start date"
             )
         if self.bookingType in {"transport", "both"}:
-            if not all(
-                [
-                    self.transportFrom,
-                    self.transportTo,
-                    self.transportDays,
-                    self.vehicleType,
-                ]
-            ):
+            if self.tripType is None:
+                raise ValueError("Choose one way or return for transport bookings")
+            if self.quoteRequested:
+                if not (self.transportFrom and self.transportTo):
+                    raise ValueError("Pickup and destination are required for a quote request")
+            elif not (self.transportFromId and self.transportToId and self.vehicleId):
                 raise ValueError(
-                    "Transport route, days, and vehicle are required for transport bookings"
+                    "Choose a listed route and vehicle, or request a quote for this route"
                 )
         return self
 

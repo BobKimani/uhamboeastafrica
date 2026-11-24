@@ -15,17 +15,16 @@ import {
 } from "@/components/admin/data-table";
 import type { Vehicle } from "@/lib/data/vehicles";
 import { uploadCatalogImage } from "@/lib/api/catalog";
-import { cn, formatCurrency } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { useVehicles } from "@/lib/use-vehicles";
-
-type DisplayCurrency = "USD" | "KES";
 
 type VehicleDraft = {
   id: string;
   name: string;
   type: string;
   capacity: number | "";
-  pricePerDay: number | "";
+  /** Fuel consumption used for route pricing. */
+  kmPerLitre: number | "";
   region: string;
   bestFor: string;
   image: string;
@@ -38,7 +37,7 @@ const EMPTY: VehicleDraft = {
   name: "",
   type: "",
   capacity: "",
-  pricePerDay: "",
+  kmPerLitre: "",
   region: "",
   bestFor: "",
   image: "",
@@ -46,19 +45,8 @@ const EMPTY: VehicleDraft = {
   isAvailable: true,
 };
 
-const KES_PER_USD = 130;
-
-function getDisplayPrice(priceUsd: number, currency: DisplayCurrency) {
-  return currency === "KES" ? priceUsd * KES_PER_USD : priceUsd;
-}
-
-function getUsdPrice(price: number, currency: DisplayCurrency) {
-  return currency === "KES" ? price / KES_PER_USD : price;
-}
-
 export function TransportManager() {
   const [query, setQuery] = useState("");
-  const [currency, setCurrency] = useState<DisplayCurrency>("KES");
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<"create" | "edit">("edit");
   const [draft, setDraft] = useState<VehicleDraft>(EMPTY);
@@ -83,7 +71,7 @@ export function TransportManager() {
       name: v.name,
       type: v.type,
       capacity: v.capacity,
-      pricePerDay: getDisplayPrice(v.pricePerDay, currency),
+      kmPerLitre: v.kmPerLitre ?? "",
       region: v.region,
       bestFor: v.bestFor,
       image: v.image,
@@ -107,22 +95,9 @@ export function TransportManager() {
     await deleteVehicle(vehicle.id);
   };
 
-  const handleCurrencyChange = (nextCurrency: DisplayCurrency) => {
-    if (nextCurrency === currency) return;
-
-    setDraft((current) => ({
-      ...current,
-      pricePerDay:
-        current.pricePerDay === ""
-          ? ""
-          : getDisplayPrice(getUsdPrice(current.pricePerDay, currency), nextCurrency),
-    }));
-    setCurrency(nextCurrency);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!draft.name || !draft.type || draft.capacity === "" || draft.pricePerDay === "") {
+    if (!draft.name || !draft.type || draft.capacity === "" || draft.kmPerLitre === "") {
       return;
     }
 
@@ -141,7 +116,9 @@ export function TransportManager() {
       name: draft.name,
       type: draft.type,
       capacity: draft.capacity,
-      pricePerDay: getUsdPrice(draft.pricePerDay, currency),
+      // Legacy daily rate is no longer used for pricing; keep the stored value.
+      pricePerDay: existingVehicle?.pricePerDay ?? 0,
+      kmPerLitre: draft.kmPerLitre,
       region: draft.region,
       bestFor: draft.bestFor,
       features: existingVehicle?.features ?? [],
@@ -180,27 +157,6 @@ export function TransportManager() {
           </div>
 
           <div className="flex min-w-0 flex-wrap items-center gap-2 md:justify-end">
-            <div
-              className="inline-flex h-10 rounded-xl bg-surface-container-low p-1"
-              aria-label="Display currency"
-            >
-              {(["KES", "USD"] as const).map((option) => (
-                <button
-                  key={option}
-                  type="button"
-                  onClick={() => handleCurrencyChange(option)}
-                  aria-pressed={currency === option}
-                  className={cn(
-                    "min-w-14 rounded-lg px-3 text-xs font-bold transition-colors",
-                    currency === option
-                      ? "bg-surface text-on-surface shadow-sm"
-                      : "text-on-surface-variant hover:text-on-surface"
-                  )}
-                >
-                  {option === "KES" ? "KSh" : option}
-                </button>
-              ))}
-            </div>
             <Button type="button" size="sm" onClick={openCreate}>
               <Plus className="h-4 w-4" />
               Add vehicle
@@ -227,9 +183,7 @@ export function TransportManager() {
                 <Th>Region</Th>
                 <Th>Best for</Th>
                 <Th>Availability</Th>
-                <Th className="text-right">
-                  Price / day ({currency === "KES" ? "KSh" : currency})
-                </Th>
+                <Th className="text-right">Fuel (km/L)</Th>
                 <Th className="text-right">Actions</Th>
               </tr>
             </thead>
@@ -268,9 +222,12 @@ export function TransportManager() {
                     </span>
                   </Td>
                   <Td className="text-right font-semibold">
-                    {formatCurrency(
-                      getDisplayPrice(v.pricePerDay, currency),
-                      currency
+                    {v.kmPerLitre ? (
+                      v.kmPerLitre
+                    ) : (
+                      <span className="text-xs font-semibold text-red-500">
+                        Not set — cannot be priced
+                      </span>
                     )}
                   </Td>
                   <Td className="text-right">
@@ -366,23 +323,25 @@ export function TransportManager() {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="vehicle-price">
-                Price per day ({currency === "KES" ? "KSh" : currency})
+              <Label htmlFor="vehicle-km-per-litre">
+                Fuel consumption (km per litre)
               </Label>
               <Input
-                id="vehicle-price"
+                id="vehicle-km-per-litre"
                 type="number"
-                min={0}
+                min={0.01}
+                max={100}
+                step={0.01}
                 required
-                value={draft.pricePerDay}
+                value={draft.kmPerLitre}
                 onChange={(e) =>
                   setDraft({
                     ...draft,
-                    pricePerDay:
+                    kmPerLitre:
                       e.target.value === "" ? "" : Number(e.target.value),
                   })
                 }
-                placeholder="250"
+                placeholder="9"
               />
             </div>
           </div>

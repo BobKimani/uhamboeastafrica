@@ -1,6 +1,4 @@
 import json
-from decimal import Decimal
-from types import SimpleNamespace
 from uuid import uuid4
 
 import pytest
@@ -85,19 +83,10 @@ async def test_create_accommodation_booking_without_legacy_amount_range_persists
 
 
 @pytest.mark.anyio
-async def test_create_transport_booking_without_legacy_amount_range_persists(monkeypatch):
-    async def fake_convert(amount_usd):
-        return {
-            "amountUsd": amount_usd,
-            "exchangeRate": 129.0,
-            "amountKes": 46_440,
-            "source": "test",
-        }
-
-    monkeypatch.setattr(bookings, "convert_usd_to_kes", fake_convert)
-    db = RecordingSession(
-        vehicle=SimpleNamespace(type="Van", price_per_day=Decimal("180.00"))
-    )
+async def test_day_based_transport_booking_is_no_longer_accepted():
+    # Transport is priced by route now; a days + vehicle-type payload without a
+    # listed route or a quote request cannot be priced.
+    db = RecordingSession()
 
     response = await bookings.create_booking(
         JsonRequest(
@@ -108,34 +97,20 @@ async def test_create_transport_booking_without_legacy_amount_range_persists(mon
                 transportTo="Naivasha",
                 transportDays=2,
                 vehicleType="Van",
+                tripType="return",
             )
         ),
         db,
     )
 
-    body = decode(response)
-    assert response.status_code == 201
-    assert body["payment"] == {"required": True, "amountKes": 46_440}
-    persisted = db.added[0]
-    assert persisted.booking_type == "transport"
-    assert persisted.transport_days == 2
-    assert persisted.transport_amount_kes == 46_440
+    assert response.status_code == 400
+    assert decode(response)["success"] is False
+    assert db.added == []
 
 
 @pytest.mark.anyio
-async def test_create_general_booking_without_legacy_amount_range_persists(monkeypatch):
-    async def fake_convert(amount_usd):
-        return {
-            "amountUsd": amount_usd,
-            "exchangeRate": 129.0,
-            "amountKes": 69_660,
-            "source": "test",
-        }
-
-    monkeypatch.setattr(bookings, "convert_usd_to_kes", fake_convert)
-    db = RecordingSession(
-        vehicle=SimpleNamespace(type="Land Cruiser", price_per_day=Decimal("180.00"))
-    )
+async def test_general_booking_with_unlisted_route_is_saved_as_quote_request():
+    db = RecordingSession()
 
     response = await bookings.create_booking(
         JsonRequest(
@@ -143,18 +118,36 @@ async def test_create_general_booking_without_legacy_amount_range_persists(monke
                 bookingType="both",
                 transportFrom="Arusha",
                 transportTo="Serengeti",
-                transportDays=3,
                 vehicleType="Land Cruiser",
+                tripType="one_way",
+                quoteRequested=True,
             )
         ),
         db,
     )
 
     assert response.status_code == 201
+    assert decode(response)["payment"] == {"required": False, "amountKes": None}
     persisted = db.added[0]
     assert persisted.booking_type == "both"
     assert persisted.number_of_rooms == 1
     assert persisted.vehicle_type == "Land Cruiser"
+    assert persisted.quote_requested is True
+    assert persisted.trip_type == "one_way"
+    assert persisted.payment_status == "not_required"
+
+
+@pytest.mark.anyio
+async def test_invalid_dates_return_400_not_a_server_error():
+    db = RecordingSession()
+
+    response = await bookings.create_booking(
+        JsonRequest(booking_payload(travelStartDate="2026-10-13", travelEndDate="2026-10-10")),
+        db,
+    )
+
+    assert response.status_code == 400
+    assert decode(response)["error"] == "Invalid booking data"
 
 
 @pytest.mark.anyio

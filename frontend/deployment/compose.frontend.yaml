@@ -1,0 +1,70 @@
+# Uhambo frontend (Next.js) — Compose override for the VPS.
+#
+# Adds ONLY the `frontend` service to the existing /opt/uhambo/compose.yaml,
+# alongside `db` and `backend` (backend/deployment/compose.backend.yaml). Being
+# in the same Compose project puts it on the same network, so the Next.js
+# /api/* rewrite reaches FastAPI internally at http://backend:8000.
+#
+# Use it through deployment/vps/uhambo-compose.sh (see that file / DEPLOYMENT.md).
+#
+# With multiple -f files, relative paths resolve from /opt/uhambo:
+#   UHAMBO_FRONTEND_CONTEXT   frontend source dir   (default ./source/frontend)
+#   UHAMBO_IMAGE_TAG          image tag to build/run (default latest)
+#
+# The ${...} build values are interpolated by Compose from the shell
+# environment. uhambo-compose.sh exports them from /etc/uhambo/frontend.env.
+# NEXT_PUBLIC_GOOGLE_MAPS_API_KEY must be set there (browser key; restrict it
+# by HTTP referrer). NEXT_PUBLIC_* and BACKEND_API_URL are baked in at build
+# time — rebuild the image after changing them.
+#
+# Standalone alternative (frontend in its own project, using the public API
+# URL for the rewrite): frontend/docker-compose.yml.
+
+services:
+  frontend:
+    build:
+      context: ${UHAMBO_FRONTEND_CONTEXT:-./source/frontend}
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api.uhamboeastafrica.com}
+        NEXT_PUBLIC_MEDIA_URL: ${NEXT_PUBLIC_MEDIA_URL:-https://api.uhamboeastafrica.com/media}
+        NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${NEXT_PUBLIC_GOOGLE_MAPS_API_KEY:?NEXT_PUBLIC_GOOGLE_MAPS_API_KEY is required}
+        # Server-side /api/* rewrite target over the internal Docker network.
+        BACKEND_API_URL: ${BACKEND_API_URL:-http://backend:8000}
+    image: uhambo-frontend:${UHAMBO_IMAGE_TAG:-latest}
+    container_name: uhambo-frontend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      HOSTNAME: 0.0.0.0
+      BACKEND_API_URL: ${BACKEND_API_URL:-http://backend:8000}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api.uhamboeastafrica.com}
+    depends_on:
+      backend:
+        condition: service_healthy
+    expose:
+      - "3000"
+    ports:
+      # Host Nginx proxies www.uhamboeastafrica.com -> 127.0.0.1:3000.
+      - "127.0.0.1:3000:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3000/"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: ${UHAMBO_FRONTEND_MEMORY:-768M}
+          cpus: "2.0"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"

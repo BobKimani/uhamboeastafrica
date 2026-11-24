@@ -8,7 +8,12 @@ import { Input, Label } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useWizard } from "@/lib/wizard/store";
 import { totalRooms } from "@/lib/wizard/types";
-import { submitBooking } from "@/lib/api/bookings";
+import {
+  BookingPriceChangedError,
+  BookingRouteUnavailableError,
+  submitBooking,
+} from "@/lib/api/bookings";
+import type { TransportQuote } from "@/lib/api/transport";
 import type { CreateBookingInput, TravellingWith } from "@/types/booking";
 
 const INITIAL_CONTACT = {
@@ -33,12 +38,30 @@ function toTravellingWith(group: string | undefined): TravellingWith {
   }
 }
 
-export function ContactDetailsCard() {
+/**
+ * none: no listed-route transport to price; loading: price not back yet;
+ * ready: quote available; unavailable: the server can't price it online.
+ */
+export type TransportQuoteStatus = "none" | "loading" | "ready" | "unavailable";
+
+export function ContactDetailsCard({
+  transportQuote = null,
+  transportQuoteStatus = "none",
+}: {
+  /** Backend quote shown to the customer for a listed transport route. */
+  transportQuote?: TransportQuote | null;
+  transportQuoteStatus?: TransportQuoteStatus;
+}) {
   const router = useRouter();
   const { state, reset } = useWizard();
   const [form, setForm] = useState(INITIAL_CONTACT);
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  // Replaces the page quote if the price changed before booking.
+  const [updatedQuote, setUpdatedQuote] = useState<TransportQuote | null>(null);
+  // Set when the route stopped being bookable online during submission.
+  const [forceQuoteRequest, setForceQuoteRequest] = useState(false);
+  const quote = forceQuoteRequest ? null : updatedQuote ?? transportQuote;
 
   const busy = status === "submitting";
   const done = status === "success";
@@ -56,6 +79,14 @@ export function ContactDetailsCard() {
       setErrorMessage(
         "Trip details are missing. Please complete the planner first."
       );
+      return;
+    }
+
+    if (transportQuoteStatus === "loading" && !forceQuoteRequest) {
+      // Never send a priceable trip as a quote request just because the
+      // price hasn't loaded yet.
+      setStatus("error");
+      setErrorMessage("Your transport price is still loading — please try again in a moment.");
       return;
     }
 
@@ -84,10 +115,24 @@ export function ContactDetailsCard() {
         : {}),
       ...(state.serviceType !== "accommodation"
         ? {
-            transportFrom: state.transport?.from,
-            transportTo: state.transport?.to,
-            transportDays: state.transport?.days,
+            tripType: state.transport?.tripType ?? "one_way",
             vehicleType: state.transport?.vehicleType,
+            ...(quote && !state.transport?.quoteMode
+              ? {
+                  // Listed route: the server prices it; quotedTotalKes lets it
+                  // detect a price change since the customer saw the quote.
+                  transportFromId: quote.fromPlaceId,
+                  transportToId: quote.toPlaceId,
+                  vehicleId: quote.vehicleId,
+                  quotedTotalKes: quote.totalKes,
+                }
+              : {
+                  // Unlisted route, or a vehicle/route that can't be priced
+                  // online: the team prices it and contacts the customer.
+                  quoteRequested: true,
+                  transportFrom: state.transport?.from,
+                  transportTo: state.transport?.to,
+                }),
           }
         : {}),
     };
@@ -103,6 +148,20 @@ export function ContactDetailsCard() {
       setTimeout(() => router.push("/"), 2000);
     } catch (error) {
       setStatus("error");
+      if (error instanceof BookingPriceChangedError) {
+        setUpdatedQuote(error.quote);
+        setErrorMessage(
+          `The transport price has changed to KES ${error.quote.totalKes.toLocaleString("en-KE")}. Submit again to confirm the new price.`
+        );
+        return;
+      }
+      if (error instanceof BookingRouteUnavailableError) {
+        setForceQuoteRequest(true);
+        setErrorMessage(
+          "This transport route can no longer be booked online. Submit again to send your trip as a quote request — our team will contact you with the price."
+        );
+        return;
+      }
       setErrorMessage(
         error instanceof Error ? error.message : "Failed to submit booking."
       );

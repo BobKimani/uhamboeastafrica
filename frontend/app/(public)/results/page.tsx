@@ -6,15 +6,40 @@ import { estimateTrip } from "@/lib/pricing/estimate-trip";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SummaryPanel } from "@/components/results/summary-panel";
-import { ContactDetailsCard } from "@/components/results/contact-details-card";
+import {
+  ContactDetailsCard,
+  type TransportQuoteStatus,
+} from "@/components/results/contact-details-card";
 import { PricingSummary } from "@/components/results/pricing-summary";
 import { useVehicles } from "@/lib/use-vehicles";
 import { useHotels } from "@/lib/use-hotels";
+import { useTransportQuotes } from "@/lib/use-transport-quotes";
 
 export default function ResultsPage() {
   const { state, update, hydrated } = useWizard();
   const { vehicles } = useVehicles();
   const { hotels } = useHotels();
+  const transport = state.transport;
+  const wantsTransport = state.serviceType !== "accommodation";
+  const listedRoute =
+    wantsTransport && !transport?.quoteMode && transport?.fromId && transport?.toId;
+  // Server-calculated price for the chosen vehicle on the chosen listed route.
+  const { quotes, loading: quoteLoading } = useTransportQuotes(
+    listedRoute ? transport?.fromId : undefined,
+    listedRoute ? transport?.toId : undefined,
+    transport?.tripType ?? "one_way",
+    listedRoute && transport?.vehicleId ? [transport.vehicleId] : []
+  );
+  const quoteResult = transport?.vehicleId ? quotes[transport.vehicleId] : undefined;
+  const transportQuote = quoteResult?.ok ? quoteResult.quote : null;
+  const transportQuoteStatus: TransportQuoteStatus =
+    !listedRoute || !transport?.vehicleId
+      ? "none"
+      : quoteLoading || !quoteResult
+        ? "loading"
+        : quoteResult.ok
+          ? "ready"
+          : "unavailable";
 
   if (!hydrated) {
     return (
@@ -50,7 +75,7 @@ export default function ResultsPage() {
     );
   }
 
-  const estimate = estimateTrip(state, vehicles, hotels);
+  const estimate = estimateTrip(state, vehicles, hotels, transportQuote);
 
   return (
     <div className="min-h-screen pt-28 pb-24 px-6 md:px-10 max-w-6xl mx-auto">
@@ -64,7 +89,10 @@ export default function ResultsPage() {
       </section>
 
       <section className="mt-12 md:mt-16" aria-labelledby="details-heading">
-        <ContactDetailsCard />
+        <ContactDetailsCard
+          transportQuote={transportQuote}
+          transportQuoteStatus={transportQuoteStatus}
+        />
       </section>
     </div>
   );

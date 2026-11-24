@@ -1,3 +1,5 @@
+import type { TransportQuote, TripType } from "@/lib/api/transport";
+
 export type TravellingWith = "solo" | "couple" | "family" | "group";
 
 export type BookingType = "accommodation" | "transport" | "both";
@@ -37,8 +39,10 @@ export type Booking = {
 
     transportFrom?: string;
     transportTo?: string;
-    transportDays?: number;
     vehicleType?: string;
+    tripType?: TripType | null;
+    transportQuote?: TransportQuote | null;
+    quoteRequested?: boolean;
     transportAmountKes?: number;
     paymentStatus?: "not_required" | "unpaid" | "pending" | "paid" | "failed";
     kcbReceiptNumber?: string;
@@ -69,8 +73,13 @@ export type CreateBookingInput = {
 
     transportFrom?: string;
     transportTo?: string;
-    transportDays?: number;
     vehicleType?: string;
+    tripType?: TripType;
+    transportFromId?: string;
+    transportToId?: string;
+    vehicleId?: string;
+    quotedTotalKes?: number;
+    quoteRequested?: boolean;
 };
 
 export type CreateBookingResult = {

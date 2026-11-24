@@ -20,3 +20,19 @@ export function formatTravelPrice(
     maximumFractionDigits: 0,
   }).format(amount);
 }
+
+/** Format an amount that is natively in KES (e.g. route-priced transport). */
+export function formatFromKes(
+  amountKes: number,
+  currency: DisplayCurrency = DEFAULT_CURRENCY,
+  usdToKes: number = USD_TO_KES
+) {
+  const amount = currency === "KES" ? amountKes : amountKes / usdToKes;
+  const locale = currency === "KES" ? "en-KE" : "en-US";
+
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency,
+    maximumFractionDigits: 0,
+  }).format(amount);
+}

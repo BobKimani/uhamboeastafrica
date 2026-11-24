@@ -8,6 +8,7 @@ import {
   type RoomRateKey,
 } from "@/lib/data/hotels";
 import type { Vehicle } from "@/lib/data/vehicles";
+import { TRIP_TYPE_LABELS, type TransportQuote } from "@/lib/api/transport";
 import type { Currency, RoomType, WizardState } from "@/lib/wizard/types";
 
 /**
@@ -141,12 +142,12 @@ export function estimateAccommodation(
 export function estimateTrip(
   state: WizardState,
   vehicles: Vehicle[] = [],
-  hotels: Hotel[] = []
+  hotels: Hotel[] = [],
+  /** Backend route quote for the chosen vehicle (KES); null if not priced. */
+  transportQuote: TransportQuote | null = null
 ): TripEstimate {
   const lines: TripLineItem[] = [];
   const notes: string[] = [];
-  const nights = nightsBetween(state.startDate, state.endDate);
-  const days = state.transport?.days ?? Math.max(nights, 1);
 
   if (state.serviceType !== "transport") {
     const hotel = hotels.find((h) => h.id === state.accommodation?.hotelId);
@@ -156,12 +157,16 @@ export function estimateTrip(
   }
 
   if (state.serviceType !== "accommodation") {
-    const vehicle = vehicles.find((v) => v.type === state.transport?.vehicleType);
-    if (vehicle) {
+    const vehicle = vehicles.find((v) => v.id === state.transport?.vehicleId);
+    if (vehicle && transportQuote && !state.transport?.quoteMode) {
       lines.push({
-        label: `${vehicle.name} (${days} day${days === 1 ? "" : "s"})`,
-        amount: vehicle.pricePerDay * days,
+        label: `${vehicle.name} (${TRIP_TYPE_LABELS[transportQuote.tripType]})`,
+        // Route prices are in KES; estimate amounts are in the USD base unit.
+        amount: transportQuote.totalKes / USD_TO_KES,
+        detail: `${transportQuote.fromPlace} → ${transportQuote.toPlace} · ${transportQuote.distanceKm} km`,
       });
+    } else if (vehicle) {
+      notes.push("Transport is priced on request — our team will confirm the price.");
     }
   }
 

@@ -9,12 +9,18 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.auth import require_authenticated_admin
-from app.db.models import Booking, Hotel, Vehicle
+from app.db.models import Booking, Hotel
 from app.db.serializers import booking_to_api
 from app.db.session import get_db
-from app.payments.pricing import UnknownVehicleError, transport_price
+from app.routers.transport import quote_error_response
 from app.schemas import CreateBooking, UpdateBookingStatus
-from app.services.currency import convert_usd_to_kes
+from app.services.transport_quotes import (
+    TransportQuoteError,
+    parse_uuid,
+    quote_route,
+    quote_snapshot,
+    quote_to_api,
+)
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/bookings", tags=["bookings"])
@@ -45,36 +51,45 @@ async def create_booking(request: Request, db: Session = Depends(get_db)):
             content={
                 "success": False,
                 "error": "Invalid booking data",
-                "details": e.errors(),
+                # include_context=False: model-validator errors carry the raw
+                # exception in ctx, which is not JSON serialisable (was a 500).
+                "details": e.errors(include_url=False, include_context=False),
             },
         )
     try:
         amount_due_kes = None
-        payment_rate = None
-        if data.bookingType in {"transport", "both"}:
-            # Price from the vehicle catalogue (what the site shows), falling
-            # back to the server-owned rate card for legacy vehicle types.
-            vehicle = db.scalar(
-                select(Vehicle).where(Vehicle.type == data.vehicleType)
-            )
-            try:
-                if vehicle is not None:
-                    payment_rate = await convert_usd_to_kes(
-                        float(vehicle.price_per_day) * data.transportDays
-                    )
-                else:
-                    payment_rate = await transport_price(
-                        data.vehicleType, data.transportDays
-                    )
-            except UnknownVehicleError:
+        snapshot = None
+        transport_from, transport_to = data.transportFrom, data.transportTo
+        selected_vehicle_id = None
+        vehicle_type = data.vehicleType
+        is_transport = data.bookingType in {"transport", "both"}
+        if is_transport and not data.quoteRequested:
+            # Route pricing: the server always computes the price.
+            ids = [parse_uuid(v) for v in (data.transportFromId, data.transportToId, data.vehicleId)]
+            if not all(ids):
                 return JSONResponse(
                     status_code=400,
+                    content={"success": False, "error": "Invalid route or vehicle"},
+                )
+            try:
+                result = quote_route(db, ids[0], ids[1], ids[2], data.tripType)
+            except TransportQuoteError as exc:
+                return quote_error_response(exc)
+            if data.quotedTotalKes is not None and data.quotedTotalKes != result.quote.total_kes:
+                return JSONResponse(
+                    status_code=409,
                     content={
                         "success": False,
-                        "error": "Selected vehicle cannot be priced",
+                        "code": "price_changed",
+                        "error": "The price for this trip has changed. Please review the new price.",
+                        "quote": quote_to_api(result),
                     },
                 )
-            amount_due_kes = payment_rate["amountKes"]
+            amount_due_kes = result.quote.total_kes
+            snapshot = quote_snapshot(result)
+            transport_from, transport_to = result.from_place.name, result.to_place.name
+            selected_vehicle_id = result.vehicle.id
+            vehicle_type = result.vehicle.type
         booking = Booking(
             full_name=data.fullName,
             email=data.email,
@@ -87,18 +102,23 @@ async def create_booking(request: Request, db: Session = Depends(get_db)):
             number_of_travellers=data.numberOfTravellers,
             number_of_rooms=data.numberOfRooms,
             selected_hotel_id=_selected_hotel_id(db, data.selectedHotelId),
-            transport_from=data.transportFrom,
-            transport_to=data.transportTo,
-            transport_days=data.transportDays,
-            vehicle_type=data.vehicleType,
+            transport_from=transport_from,
+            transport_to=transport_to,
+            transport_days=None if is_transport else data.transportDays,
+            vehicle_type=vehicle_type,
+            selected_vehicle_id=selected_vehicle_id,
+            trip_type=data.tripType if is_transport else None,
+            transport_quote=snapshot,
+            quote_requested=bool(is_transport and data.quoteRequested),
             status="new",
             payment_status="unpaid" if amount_due_kes else "not_required",
             transport_amount_kes=amount_due_kes,
-            amount_usd=payment_rate["amountUsd"] if payment_rate else None,
-            exchange_rate=payment_rate["exchangeRate"] if payment_rate else None,
+            # Route prices are calculated in KES; no currency conversion.
+            amount_usd=None,
+            exchange_rate=None,
             amount_kes=amount_due_kes,
-            currency_source=payment_rate["source"] if payment_rate else None,
-            rate_locked_at=datetime.now(UTC) if payment_rate else None,
+            currency_source="route-pricing" if amount_due_kes else None,
+            rate_locked_at=datetime.now(UTC) if amount_due_kes else None,
         )
         db.add(booking)
         db.flush()

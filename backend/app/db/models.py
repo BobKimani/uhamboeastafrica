@@ -58,6 +58,8 @@ class Vehicle(Base):
     type: Mapped[str] = mapped_column(Text, nullable=False)
     capacity: Mapped[int] = mapped_column(Integer, nullable=False)
     price_per_day: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+    # Fuel consumption used by route pricing; None = vehicle cannot be quoted.
+    km_per_litre: Mapped[Decimal | None] = mapped_column(Numeric(5, 2))
     best_for: Mapped[str] = mapped_column(Text, nullable=False)
     features: Mapped[list[str]] = mapped_column(ARRAY(Text), nullable=False, default=list)
     image: Mapped[str] = mapped_column(Text, nullable=False)
@@ -92,6 +94,9 @@ class Booking(Base):
     transport_to: Mapped[str | None] = mapped_column(Text)
     transport_days: Mapped[int | None] = mapped_column(Integer)
     vehicle_type: Mapped[str | None] = mapped_column(Text)
+    trip_type: Mapped[str | None] = mapped_column(Text)
+    transport_quote: Mapped[dict | None] = mapped_column(JSONB)
+    quote_requested: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     selected_hotel_id: Mapped[UUID | None] = mapped_column(
         PostgresUUID(as_uuid=True), ForeignKey("hotels.id", ondelete="SET NULL")
     )
